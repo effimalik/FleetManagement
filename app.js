@@ -674,12 +674,19 @@ function closeSidebar() {
    BADGES
    ═══════════════════════════════════════════════ */
 function updateBadges() {
-  document.getElementById('emp-nav-badge').textContent  = employees.length;
-  document.getElementById('bike-nav-badge').textContent = bikes.length;
+  const empNavBadge  = document.getElementById('emp-nav-badge');
+  const bikeNavBadge = document.getElementById('bike-nav-badge');
+  const empExpBadge  = document.getElementById('emp-exp-badge');
+  const bikeExpBadge = document.getElementById('bike-exp-badge');
+
+  if (empNavBadge)  empNavBadge.textContent  = employees.length;
+  if (bikeNavBadge) bikeNavBadge.textContent = bikes.length;
+
   const ee = employees.filter(e => isExpiring(e.eidExp)||isExpiring(e.visaExp)||isExpired(e.eidExp)||isExpired(e.visaExp)).length;
   const be = bikes.filter(b => isExpiring(b.mulkiyaExp)||isExpiring(b.insExp)||isExpired(b.mulkiyaExp)||isExpired(b.insExp)).length;
-  document.getElementById('emp-exp-badge').textContent  = ee;
-  document.getElementById('bike-exp-badge').textContent = be;
+
+  if (empExpBadge)  empExpBadge.textContent  = ee;
+  if (bikeExpBadge) bikeExpBadge.textContent = be;
 
   // Header alert badge
   const total = ee + be;
