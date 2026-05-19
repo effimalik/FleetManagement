@@ -21,7 +21,11 @@ const EMP_SHEET_URL  = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPL
 // The script should return a JSON array of bike rows (array-of-arrays or array-of-objects).
 const BIKE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPLL0uP8GlonjZ29ASKoBuXNDeIhtPg8D9Rw6jYE4RX5Zg6ky_yR24qg/exec?type=bike';
 
-const AV_BG = ['#1f6feb20','#1a7f3720','#9a6700206','#6e40c920','#bf454220','#0e7490206'];
+// Base POST URL for write operations (updateEmployee / updateBike).
+// Same Apps Script deployment — without the ?type= read param.
+const SHEET_POST_URL = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPLL0uP8GlonjZ29ASKoBuXNDeIhtPg8D9Rw6jYE4RX5Zg6ky_yR24qg/exec';
+
+const AV_BG = ['#1f6feb20','#1a7f3720','#9a670020','#6e40c920','#bf454220','#0e749020'];
 const AV_FG = ['#58a6ff','#3fb950','#e3b341','#d2a8ff','#ffa198','#22d3ee'];
 const AV_BG2= ['rgba(31,111,235,.2)','rgba(26,127,55,.2)','rgba(154,103,0,.2)','rgba(110,64,201,.2)','rgba(191,69,66,.2)','rgba(14,116,144,.2)'];
 
@@ -245,15 +249,48 @@ function showCacheBanner(show) {
   if (!banner) {
     banner = document.createElement('div');
     banner.id = 'emp-cache-banner';
-    banner.style.cssText = 'font-size:11px;color:var(--text3);padding:4px 12px;text-align:right;';
+    banner.className = 'cache-banner';
     const tbl = document.getElementById('emp-tbody')?.closest('table');
     tbl?.parentElement?.insertBefore(banner, tbl);
   }
   if (show) {
-    banner.innerHTML = `<i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i> Refreshing data in background…`;
+    banner.innerHTML = `
+      <div class="cache-banner-main">
+        <span class="cache-banner-status syncing">
+          <i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i>
+          Refreshing data…
+        </span>
+      </div>`;
   } else {
-    const now = new Date().toLocaleTimeString();
-    banner.innerHTML = `Last synced: ${now} &nbsp;·&nbsp; <a href="#" onclick="empCacheClear();loadEmployees();return false;" style="color:var(--text3);">Force refresh</a>`;
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const dateStr = now.toLocaleDateString([], { day:'2-digit', month:'short' });
+    banner.innerHTML = `
+      <div class="cache-banner-main">
+        <span class="cache-banner-status synced">
+          <i class="ti ti-circle-check"></i> Synced
+        </span>
+        <span class="cache-banner-datetime">
+          <i class="ti ti-clock"></i> ${dateStr}, ${timeStr}
+        </span>
+        <button class="cache-banner-icon-btn" onclick="empCacheClear();loadEmployees();" title="Force refresh">
+          <i class="ti ti-refresh"></i>
+        </button>
+        <button class="cache-banner-icon-btn" onclick="toggleCacheSubBanner('emp-cache-sub')" title="More options">
+          <i class="ti ti-chevron-down"></i>
+        </button>
+      </div>
+      <div class="cache-banner-sub" id="emp-cache-sub">
+        <a href="#" class="cache-sub-link" onclick="empCacheClear();loadEmployees();return false;">
+          <i class="ti ti-refresh"></i> Force refresh from Google Sheet
+        </a>
+        <a href="#" class="cache-sub-link" onclick="empCacheClear();return false;">
+          <i class="ti ti-database-off"></i> Clear local cache only
+        </a>
+        <span class="cache-sub-note">
+          <i class="ti ti-info-circle"></i> Data auto-refreshes every 5 minutes
+        </span>
+      </div>`;
   }
 }
 
@@ -293,7 +330,7 @@ async function loadEmployees() {
     showCacheBanner(true); // show "refreshing" notice
   } else {
     tbody.innerHTML = `
-      <tr><td colspan="9" style="text-align:center;padding:30px;">
+      <tr><td colspan="5" style="text-align:center;padding:30px;">
         <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;font-size:22px;color:var(--text3);"></i>
         <div style="margin-top:8px;color:var(--text3);font-size:13px;">Loading employees…</div>
       </td></tr>`;
@@ -314,7 +351,7 @@ async function loadEmployees() {
   } catch (err) {
     console.error('loadEmployees error:', err);
     if (!cached || !cached.length) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--red);">
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--red);">
         Error loading data — check console for details.
       </td></tr>`;
     } else {
@@ -365,15 +402,48 @@ function showBikeCacheBanner(show) {
   if (!banner) {
     banner = document.createElement('div');
     banner.id = 'bike-cache-banner';
-    banner.style.cssText = 'font-size:11px;color:var(--text3);padding:4px 12px;text-align:right;';
+    banner.className = 'cache-banner';
     const tbl = document.getElementById('bike-tbody')?.closest('table');
     tbl?.parentElement?.insertBefore(banner, tbl);
   }
   if (show) {
-    banner.innerHTML = `<i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i> Refreshing data in background…`;
+    banner.innerHTML = `
+      <div class="cache-banner-main">
+        <span class="cache-banner-status syncing">
+          <i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i>
+          Refreshing data…
+        </span>
+      </div>`;
   } else {
-    const now = new Date().toLocaleTimeString();
-    banner.innerHTML = `Last synced: ${now} &nbsp;·&nbsp; <a href="#" onclick="bikeCacheClear();loadBikes();return false;" style="color:var(--text3);">Force refresh</a>`;
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const dateStr = now.toLocaleDateString([], { day:'2-digit', month:'short' });
+    banner.innerHTML = `
+      <div class="cache-banner-main">
+        <span class="cache-banner-status synced">
+          <i class="ti ti-circle-check"></i> Synced
+        </span>
+        <span class="cache-banner-datetime">
+          <i class="ti ti-clock"></i> ${dateStr}, ${timeStr}
+        </span>
+        <button class="cache-banner-icon-btn" onclick="bikeCacheClear();loadBikes();" title="Force refresh">
+          <i class="ti ti-refresh"></i>
+        </button>
+        <button class="cache-banner-icon-btn" onclick="toggleCacheSubBanner('bike-cache-sub')" title="More options">
+          <i class="ti ti-chevron-down"></i>
+        </button>
+      </div>
+      <div class="cache-banner-sub" id="bike-cache-sub">
+        <a href="#" class="cache-sub-link" onclick="bikeCacheClear();loadBikes();return false;">
+          <i class="ti ti-refresh"></i> Force refresh from Google Sheet
+        </a>
+        <a href="#" class="cache-sub-link" onclick="bikeCacheClear();return false;">
+          <i class="ti ti-database-off"></i> Clear local cache only
+        </a>
+        <span class="cache-sub-note">
+          <i class="ti ti-info-circle"></i> Data auto-refreshes every 5 minutes
+        </span>
+      </div>`;
   }
 }
 
@@ -555,16 +625,22 @@ function toast(msg, type='success') {
    NAVIGATION
    ═══════════════════════════════════════════════ */
 const VIEW_TITLES = {
-  dashboard:          'Dashboard',
-  'emp-list':         'All Employees',
-  'emp-add':          'Add Employee',
-  'emp-expiring':     'Expiring Documents',
-  'bike-list':        'Bike Fleet',
-  'bike-add':         'Register Bike',
-  'bike-expiring':    'Expiring Documents',
-  'checkout-portal':  'Check In / Out',
-  'checkout-active':  'Active Checkouts & History',
-  'checkout-manage':  'Manage Fleet',
+  dashboard:              'Dashboard',
+  'emp-list':             'All Employees',
+  'emp-add':              'Add Employee',
+  'emp-expiring':         'Expiring Documents',
+  'bike-list':            'Bike Fleet',
+  'bike-add':             'Register Bike',
+  'bike-expiring':        'Expiring Documents',
+  'checkout-portal':      'Check In / Out',
+  'checkout-active':      'Active Checkouts & History',
+  'checkout-manage':      'Manage Fleet',
+  'adv-employees':        'Advance — Employees',
+  'adv-pending':          'Advance — Pending Requests',
+  'adv-finance':          'Advance — Finance Queue',
+  'adv-rejected':         'Advance — Rejected',
+  'adv-bulk-disburse':    'Advance — Bulk Upload',
+  'adv-accounts':         'Advance — Accounts',
 };
 
 function showView(viewId, navEl) {
@@ -652,21 +728,24 @@ function openParentForView(viewId) {
   if (viewId.startsWith('emp'))           openParentOnly('emp');
   else if (viewId.startsWith('bike'))     openParentOnly('bike');
   else if (viewId.startsWith('checkout')) openParentOnly('checkout');
+  else if (viewId.startsWith('adv'))      openParentOnly('adv');
 }
 
 /* ═══════════════════════════════════════════════
    SIDEBAR TOGGLE
    ═══════════════════════════════════════════════ */
 function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
+  const sb = document.getElementById('sub-bar');
   const ov = document.getElementById('overlay');
-  sb.classList.toggle('open');
-  ov.classList.toggle('show');
+  if (sb) sb.classList.toggle('collapsed');
+  if (ov) ov.classList.toggle('show');
 }
 function closeSidebar() {
   if (window.innerWidth <= 768) {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
+    const sb = document.getElementById('sub-bar');
+    const ov = document.getElementById('overlay');
+    if (sb) sb.classList.add('collapsed');
+    if (ov) ov.classList.remove('show');
   }
 }
 
@@ -826,41 +905,83 @@ function getFilteredEmps(list) {
   });
 }
 
-function buildEmpRow(emp) {
-  const ex     = emp.expiry || {};
-  const eidEx  = ex.eid       || {};
-  const licEx  = ex.license   || {};
-  const labEx  = ex.labour    || {};
-  const insEx  = ex.insurance || {};
-
-  const rawDate = (expObj) => {
-    if (!expObj || !expObj.date) return '<span style="color:var(--text3);">—</span>';
-    return `<span style="font-family:var(--mono);font-size:12px;">${expObj.date}</span>`;
-  };
-
+function buildEmpRow(emp, idx) {
+  const ex      = emp.expiry || {};
   const overall = calcOverall(ex);
-  let rowStyle = '';
-  if (overall === 'expired')            rowStyle = 'style="border-left:4px solid #b3261e;background:rgba(248,81,73,.04);"';
-  else if (overall === 'expiring_soon') rowStyle = 'style="border-left:4px solid #a15c00;background:rgba(227,179,65,.04);"';
 
+  // Row highlight
+  let rowStyle = '';
+  if (overall === 'expired')            rowStyle = 'style="border-left:3px solid var(--red);background:rgba(248,81,73,.04);"';
+  else if (overall === 'expiring_soon') rowStyle = 'style="border-left:3px solid var(--amber);background:rgba(227,179,65,.04);"';
+  else                                  rowStyle = 'style="border-left:3px solid transparent;"';
+
+  // Status dot colour
+  const dotColor = overall === 'expired' ? 'var(--red)' : overall === 'expiring_soon' ? 'var(--amber)' : 'var(--teal)';
+  const dotTitle = overall === 'expired' ? 'Expired' : overall === 'expiring_soon' ? 'Expiring Soon' : 'Valid';
+
+  // Avatar initials
+  const initials = (emp.name || '?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const avBg = AV_BG2[idx % AV_BG2.length];
+  const avFg = AV_FG [idx % AV_FG.length];
+
+  // EID display (truncated nicely)
+  const eidDisplay = emp.eid
+    ? `<span style="font-family:var(--mono);font-size:10.5px;color:var(--text3);letter-spacing:.03em;">${emp.eid}</span>`
+    : `<span style="color:var(--text3);font-size:11px;">No EID</span>`;
+
+  // HR Status badge
   const hrBadge = emp.hrStatus
-    ? `<span class="badge" style="background:rgba(88,166,255,.15);color:#58a6ff;border:1px solid rgba(88,166,255,.3);white-space:nowrap;">${emp.hrStatus}</span>`
-    : '<span style="color:var(--text3);">—</span>';
+    ? `<span class="badge" style="background:rgba(88,166,255,.15);color:var(--accent);border:1px solid rgba(88,166,255,.3);font-size:11px;white-space:nowrap;">${emp.hrStatus}</span>`
+    : `<span style="color:var(--text3);font-size:12px;">—</span>`;
+
+  // CO Exception
+  const coExc = emp.checkoutException
+    ? `<span class="badge expiring" style="font-size:11px;">${emp.checkoutException}</span>`
+    : `<span style="color:var(--text3);font-size:12px;">—</span>`;
+
+  // Mobile
+  const mob = emp.mobile
+    ? `<a href="tel:${emp.mobile}" style="font-family:var(--mono);font-size:12px;color:var(--text);text-decoration:none;">${emp.mobile}</a>`
+    : `<span style="color:var(--text3);">—</span>`;
 
   return `
-    <tr ${rowStyle}>
-      <td style="font-family:var(--mono);font-size:11px;color:var(--text3);white-space:nowrap;">${emp.id || '—'}</td>
-      <td style="white-space:nowrap;"><b>${emp.name || '—'}</b></td>
-      <td>${rawDate(eidEx)}</td>
-      <td>${rawDate(licEx)}</td>
-      <td>${rawDate(labEx)}</td>
-      <td>${rawDate(insEx)}</td>
-      <td style="white-space:nowrap;">${emp.checkoutException || '<span style="color:var(--text3);">—</span>'}</td>
+    <tr ${rowStyle} data-emp-id="${emp.id}">
+
+      <!-- ── Stacked identity cell ── -->
+      <td style="padding:10px 14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <!-- Avatar -->
+          <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:${avBg};color:${avFg};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;position:relative;">
+            ${initials}
+            <!-- status dot -->
+            <span title="${dotTitle}" style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:${dotColor};border:2px solid var(--bg2);"></span>
+          </div>
+          <div style="min-width:0;">
+            <!-- Row 1: Emp ID -->
+            <div style="font-family:var(--mono);font-size:10.5px;color:var(--text3);line-height:1.2;">#${emp.id || '—'}</div>
+            <!-- Row 2: Name -->
+            <div style="font-weight:600;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;">${emp.name || '—'}</div>
+            <!-- Row 3: EID -->
+            <div style="margin-top:1px;">${eidDisplay}</div>
+          </div>
+        </div>
+      </td>
+
+      <!-- ── Mobile ── -->
+      <td style="white-space:nowrap;">${mob}</td>
+
+      <!-- ── HR Status ── -->
       <td>${hrBadge}</td>
-      <td>
-        <button class="tb-btn view-btn" style="padding:6px 12px;font-size:12px;" onclick="viewEmployee(${JSON.stringify(emp.id)})">
-          <i class="ti ti-eye"></i><span class="btn-text"> View</span>
-        </button>
+
+      <!-- ── CO Exception ── -->
+      <td>${coExc}</td>
+
+      <!-- ── Action Buttons ── -->
+      <td style="white-space:nowrap;padding:8px 12px;">
+        <div style="display:flex;gap:5px;align-items:center;flex-wrap:nowrap;">
+          <button class="row-btn row-btn-view"    title="View details"    onclick="viewEmployee(${JSON.stringify(emp.id)})"><i class="ti ti-eye"></i><span>View</span></button>
+          <button class="row-btn row-btn-view"    title="Advance request" onclick="openAdvRequest(${JSON.stringify(emp.id)})"><i class="ti ti-cash"></i><span>Advance</span></button>
+        </div>
       </td>
     </tr>`;
 }
@@ -913,7 +1034,7 @@ function renderEmpTable(list) {
   const filtered = getFilteredEmps(list);
 
   if (!filtered.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px 16px;">
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;">
       <div style="color:var(--text3);display:flex;flex-direction:column;align-items:center;gap:10px;">
         <i class="ti ti-users-minus" style="font-size:36px;opacity:.4;"></i>
         <span style="font-size:13px;">No employees match this filter</span>
@@ -932,7 +1053,7 @@ function renderEmpTable(list) {
   const pageRows = filtered.slice(start, start + EMP_PAGE_SIZE);
 
   // Build all rows as one string — much faster than appending one by one
-  tbody.innerHTML = pageRows.map(buildEmpRow).join('');
+  tbody.innerHTML = pageRows.map((emp, i) => buildEmpRow(emp, start + i)).join('');
 
   renderEmpPagination(filtered.length, empCurrentPage);
 }
@@ -960,119 +1081,584 @@ function filterHR(type) {
 }
 
 /* ═══════════════════════════════════════════════
-   EMPLOYEE VIEW POPUP
+   DETAIL PANEL — per-row lazy load & inline edit
    ═══════════════════════════════════════════════ */
-function viewEmployee(empId) {
-  const emp = employees.find(e => String(e.id) === String(empId));
-  if (!emp) { console.warn('viewEmployee: not found', empId); return; }
 
-  const ex = emp.expiry || {};
+// Cache for per-row detail fetched on-demand: { empId: detailObj, ... }
+const _empDetailCache  = {};
+const _bikeDetailCache = {};
+
+// Which view panel is currently open
+let _panelType = null; // 'emp' | 'bike'
+let _panelId   = null;
+
+/* ── Ensure the panel DOM exists ── */
+function _ensurePanel() {
+  if (document.getElementById('detail-panel')) return;
+  const el = document.createElement('div');
+  el.id = 'detail-panel';
+  el.className = 'detail-panel';
+  el.innerHTML = `
+    <div class="dp-backdrop" onclick="closeDetailPanel()"></div>
+    <div class="dp-sheet">
+      <div class="dp-header">
+        <div class="dp-header-info">
+          <div class="dp-avatar" id="dp-avatar"></div>
+          <div>
+            <div class="dp-name" id="dp-name">—</div>
+            <div class="dp-sub"  id="dp-sub">—</div>
+          </div>
+        </div>
+        <div class="dp-header-actions">
+          <span class="dp-status-badge" id="dp-status-badge"></span>
+          <button class="dp-close-btn" onclick="closeDetailPanel()" title="Close"><i class="ti ti-x"></i></button>
+        </div>
+      </div>
+
+      <div class="dp-body" id="dp-body">
+        <div class="dp-loading"><div class="dp-spinner"></div><span>Loading details…</span></div>
+      </div>
+
+      <div class="dp-footer">
+        <button class="dp-btn dp-btn-secondary" onclick="closeDetailPanel()"><i class="ti ti-x"></i> Close</button>
+        <button class="dp-btn dp-btn-edit"   id="dp-edit-btn"   onclick="_dpEnterEdit()"><i class="ti ti-pencil"></i> Edit</button>
+        <button class="dp-btn dp-btn-save"   id="dp-save-btn"   onclick="_dpSave()" style="display:none;"><i class="ti ti-device-floppy"></i> Save</button>
+        <button class="dp-btn dp-btn-cancel" id="dp-cancel-btn" onclick="_dpCancelEdit()" style="display:none;"><i class="ti ti-arrow-back-up"></i> Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+function closeDetailPanel() {
+  const p = document.getElementById('detail-panel');
+  if (p) { p.classList.remove('open'); }
+  _panelType = null; _panelId = null;
+}
+
+/* ── Employee View ── */
+async function viewEmployee(empId) {
+  const emp = employees.find(e => String(e.id) === String(empId));
+  if (!emp) return;
+  _panelType = 'emp'; _panelId = empId;
+  _ensurePanel();
+
+  // Header (instant — from table data)
+  const idx      = employees.indexOf(emp);
+  const avBg     = AV_BG2[idx % AV_BG2.length];
+  const avFg     = AV_FG [idx % AV_FG.length];
+  const initials = (emp.name || '?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const ex       = emp.expiry || {};
+  const overall  = calcOverall(ex);
+  const stColors = { valid:'var(--teal)', expiring_soon:'var(--amber)', expired:'var(--red)' };
+  const stLabels = { valid:'Valid', expiring_soon:'Expiring Soon', expired:'Expired' };
+  const stBadge  = overall === 'expired' ? 'dp-badge-red' : overall === 'expiring_soon' ? 'dp-badge-amber' : 'dp-badge-green';
+
+  document.getElementById('dp-avatar').style.cssText = `background:${avBg};color:${avFg};`;
+  document.getElementById('dp-avatar').textContent   = initials;
+  document.getElementById('dp-name').textContent     = emp.name || '—';
+  document.getElementById('dp-sub').textContent      = emp.eid  ? 'EID: ' + emp.eid : 'No EID on record';
+  document.getElementById('dp-status-badge').className = 'dp-status-badge ' + stBadge;
+  document.getElementById('dp-status-badge').textContent = stLabels[overall] || overall;
+
+  // Reset footer buttons to view mode
+  _dpResetButtons();
+
+  // Show panel with loading state
+  document.getElementById('dp-body').innerHTML = `<div class="dp-loading"><div class="dp-spinner"></div><span>Loading details…</span></div>`;
+  document.getElementById('detail-panel').classList.add('open');
+
+  // ── Render immediately from what we have ──
+  _renderEmpDetail(emp, ex);
+
+  // ── Lazy-load fresh per-row details if not cached ──
+  if (!_empDetailCache[empId]) {
+    try {
+      const res  = await fetch(EMP_SHEET_URL.replace('?type=employee', '?type=employeeDetail&empId=' + encodeURIComponent(empId)) + '&nocache=' + Date.now());
+      const data = await res.json();
+      if (data && (data.id || data.empId)) {
+        _empDetailCache[empId] = data;
+        // Merge detail into the employee object
+        const merged = Object.assign({}, emp, {
+          dob:       data.dob       || emp.dob       || '',
+          hrStatus:  data.hrStatus  || emp.hrStatus  || '',
+          checkoutException: data.checkoutException || emp.checkoutException || '',
+          expiry: {
+            eid:      computeExpiry(data.eidExpiry      || (emp.expiry && emp.expiry.eid      && emp.expiry.eid.date)      || ''),
+            license:  computeExpiry(data.licExpiry      || (emp.expiry && emp.expiry.license  && emp.expiry.license.date)  || ''),
+            labour:   computeExpiry(data.labourExpiry   || (emp.expiry && emp.expiry.labour   && emp.expiry.labour.date)   || ''),
+            insurance:computeExpiry(data.insExpiry      || (emp.expiry && emp.expiry.insurance&& emp.expiry.insurance.date)|| ''),
+          }
+        });
+        // Only re-render if this panel is still open for same emp
+        if (_panelType === 'emp' && String(_panelId) === String(empId)) {
+          _renderEmpDetail(merged, merged.expiry);
+        }
+      }
+    } catch(e) {
+      // Fine — we already rendered what we have
+      console.warn('viewEmployee detail fetch failed:', e.message);
+    }
+  } else {
+    // Use cached detail
+    const d = _empDetailCache[empId];
+    _renderEmpDetail(Object.assign({}, emp, d, { expiry: emp.expiry }), ex);
+  }
+}
+
+function _renderEmpDetail(emp, ex) {
+  if (_panelType !== 'emp') return;
 
   function fmtDate(d) {
     if (!d) return '<span style="color:var(--text3);">—</span>';
-    const dt = new Date(d);
-    if (isNaN(dt)) return d;
-    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    try { return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }); }
+    catch { return d; }
   }
-
-  function vrow(label, val) {
-    return `<div class="vp-row">
-      <span class="vp-label">${label}</span>
-      <span class="vp-val">${val || '<span style="color:var(--text3);">—</span>'}</span>
+  function exCard(label, exObj) {
+    const s = exObj && exObj.status ? exObj.status : 'not_available';
+    const d = exObj && exObj.date   ? exObj.date   : null;
+    const cls = s === 'valid' ? 'dp-ex-valid' : s === 'expired' ? 'dp-ex-expired' : s === 'expiring_soon' ? 'dp-ex-expiring' : 'dp-ex-na';
+    const icon = s === 'valid' ? 'ti-circle-check' : s === 'expired' ? 'ti-alert-triangle' : s === 'expiring_soon' ? 'ti-clock' : 'ti-circle-off';
+    const lbl  = s === 'valid' ? 'Valid' : s === 'expired' ? 'Expired' : s === 'expiring_soon' ? 'Expiring' : 'No Data';
+    return `<div class="dp-ex-card ${cls}">
+      <i class="ti ${icon} dp-ex-icon"></i>
+      <div class="dp-ex-label">${label}</div>
+      <div class="dp-ex-status">${lbl}</div>
+      <div class="dp-ex-date">${d ? fmtDate(d) : '—'}</div>
     </div>`;
   }
 
-  function docCard(label, expObj) {
-    const s   = expObj && expObj.status ? expObj.status : 'not_available';
-    const dt  = expObj && expObj.date   ? expObj.date   : null;
-    const css = apiColorToCss(expObj && expObj.color ? expObj.color : 'gray');
-    const colorVar = css === 'valid' ? 'var(--teal)' : css === 'expired' ? 'var(--red)' : css === 'expiring_soon' ? 'var(--amber)' : 'var(--text3)';
-    const bgVar    = css === 'valid' ? 'var(--teal-dim)' : css === 'expired' ? 'var(--red-dim)' : css === 'expiring_soon' ? 'var(--amber-dim)' : 'rgba(100,100,100,.1)';
-    return `
-      <div style="background:${bgVar};border-radius:6px;padding:10px 12px;border:1px solid ${colorVar}44;">
-        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">${label}</div>
-        <div style="font-size:12px;font-weight:700;color:${colorVar};text-transform:capitalize;">${statusLabel(s)}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:3px;">${fmtDate(dt)}</div>
-      </div>`;
-  }
-
-  const overall = (() => {
-    const ss = [ex.eid?.status, ex.license?.status, ex.labour?.status, ex.insurance?.status];
-    if (ss.includes('expired'))       return { css:'expired',       label:'Expired' };
-    if (ss.includes('expiring_soon')) return { css:'expiring_soon', label:'Expiring Soon' };
-    return { css:'valid', label:'Valid' };
-  })();
-
-  // Remove any existing popup
-  document.getElementById('emp-view-modal')?.remove();
-
   const html = `
-    <div class="modal-backdrop open" id="emp-view-modal" onclick="if(event.target===this)this.remove()">
-      <div class="modal" style="max-width:620px;width:95%;max-height:90vh;overflow-y:auto;">
+    <div class="dp-section">
+      <div class="dp-section-title"><i class="ti ti-user"></i> Personal Information</div>
+      <div class="dp-fields" id="dp-emp-fields">
+        <div class="dp-field"><span class="dp-fl">Emp ID</span><span class="dp-fv dp-mono">${emp.id || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Full Name</span>
+          <span class="dp-fv" data-field="name" data-type="text">${emp.name || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">EID Number</span>
+          <span class="dp-fv dp-mono" data-field="eid" data-type="text">${emp.eid || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Date of Birth</span>
+          <span class="dp-fv">${fmtDate(emp.dob)}</span></div>
+        <div class="dp-field"><span class="dp-fl">UAE Mobile</span>
+          <span class="dp-fv dp-mono" data-field="mobile" data-type="tel">${emp.mobile || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Emergency</span>
+          <span class="dp-fv dp-mono" data-field="mobilePak" data-type="tel">${emp.mobilePak || emp.emergency || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Reference</span>
+          <span class="dp-fv" data-field="ref" data-type="text">${emp.ref || emp.reference || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">HR Status</span>
+          <span class="dp-fv">${emp.hrStatus ? `<span class="dp-badge-accent">${emp.hrStatus}</span>` : '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">CO Exception</span>
+          <span class="dp-fv">${emp.checkoutException || '—'}</span></div>
+      </div>
+    </div>
 
-        <div class="modal-header" style="position:sticky;top:0;background:var(--bg2);z-index:10;">
-          <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <i class="ti ti-user-circle" style="color:var(--accent);"></i>
-            Employee Record
-            <span class="badge ${overall.css}" style="font-size:11px;">${overall.label}</span>
-          </h2>
-          <button class="action-btn" onclick="document.getElementById('emp-view-modal').remove()">
-            <i class="ti ti-x"></i>
-          </button>
-        </div>
-
-        <div class="modal-body" style="padding-top:12px;display:flex;flex-direction:column;gap:14px;">
-
-          <!-- Personal Info -->
-          <div style="background:var(--bg3);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:10px;">
-              <i class="ti ti-user" style="margin-right:4px;"></i>Personal Information
-            </div>
-            ${vrow('Emp ID',     `<span style="font-family:var(--mono);font-size:12px;color:var(--accent);">${emp.id || '—'}</span>`)}
-            ${vrow('Full Name',  `<b style="font-size:14px;">${emp.name || '—'}</b>`)}
-            ${vrow('EID Number', `<span style="font-family:var(--mono);font-size:12px;">${emp.eid || '—'}</span>`)}
-            ${vrow('Date of Birth', fmtDate(emp.dob))}
-            ${vrow('UAE Mobile',    emp.mobile || '')}
-            ${vrow('Emergency Contact', emp.emergency || '')}
-            ${vrow('Reference / Company', emp.reference || emp.ref || '')}
-            ${vrow('Timestamp', fmtDate(emp.timestamp))}
-          </div>
-
-          <!-- Doc Expiry Cards -->
-          <div style="background:var(--bg3);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:12px;">
-              <i class="ti ti-calendar-event" style="margin-right:4px;"></i>Document Expiry Status
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              ${docCard('Emirates ID',     ex.eid)}
-              ${docCard('Driving License', ex.license)}
-              ${docCard('Labour Card',     ex.labour)}
-              ${docCard('Insurance',       ex.insurance)}
-            </div>
-          </div>
-
-          <!-- HR & Compliance -->
-          <div style="background:var(--bg3);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:10px;">
-              <i class="ti ti-shield-check" style="margin-right:4px;"></i>HR &amp; Compliance
-            </div>
-            ${vrow('HR Status', emp.hrStatus
-              ? `<span style="font-weight:600;color:var(--accent);">${emp.hrStatus}</span>`
-              : '')}
-            ${vrow('Checkout Exception', emp.checkoutException || '')}
-          </div>
-
-        </div>
-
-        <div class="modal-footer" style="position:sticky;bottom:0;background:var(--bg2);z-index:10;">
-          <button class="tb-btn" onclick="document.getElementById('emp-view-modal').remove()">
-            <i class="ti ti-x"></i> Close
-          </button>
-        </div>
+    <div class="dp-section">
+      <div class="dp-section-title"><i class="ti ti-calendar-stats"></i> Document Expiry</div>
+      <div class="dp-ex-grid">
+        ${exCard('Emirates ID',     ex.eid)}
+        ${exCard('Driving Licence', ex.license)}
+        ${exCard('Labour Card',     ex.labour)}
+        ${exCard('Insurance',       ex.insurance)}
+      </div>
+      <div class="dp-fields" style="margin-top:12px;">
+        <div class="dp-field"><span class="dp-fl">EID Expiry</span>
+          <span class="dp-fv dp-mono" data-field="eidExp" data-type="date">${(ex.eid && ex.eid.date) || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Licence Expiry</span>
+          <span class="dp-fv dp-mono" data-field="licExpiry" data-type="date">${(ex.license && ex.license.date) || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Labour Expiry</span>
+          <span class="dp-fv dp-mono" data-field="labourExpiry" data-type="date">${(ex.labour && ex.labour.date) || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Insurance Expiry</span>
+          <span class="dp-fv dp-mono" data-field="insExpiry" data-type="date">${(ex.insurance && ex.insurance.date) || '—'}</span></div>
       </div>
     </div>`;
 
-  document.body.insertAdjacentHTML('beforeend', html);
+  document.getElementById('dp-body').innerHTML = html;
+}
+
+/* ── Bike View ── */
+async function viewBike(bikeId) {
+  const b = bikes.find(x => String(x.id) === String(bikeId));
+  if (!b) return;
+  _panelType = 'bike'; _panelId = bikeId;
+  _ensurePanel();
+
+  // Header (instant)
+  const idx  = bikes.indexOf(b);
+  const avBg = AV_BG2[idx % AV_BG2.length];
+  const avFg = AV_FG [idx % AV_FG.length];
+  const st   = bikeStatus(b);
+  const stBadge = st === 'expired' ? 'dp-badge-red' : st === 'expiring' ? 'dp-badge-amber' : 'dp-badge-green';
+  const stLbl   = st === 'expired' ? 'Expired' : st === 'expiring' ? 'Expiring' : 'Active';
+
+  const avEl = document.getElementById('dp-avatar');
+  avEl.style.cssText = `background:${avBg};color:${avFg};border-radius:8px;`;
+  avEl.innerHTML = '<i class="ti ti-motorbike" style="font-size:16px;"></i>';
+  document.getElementById('dp-name').textContent  = (b.make + ' ' + b.model).trim() || '—';
+  document.getElementById('dp-sub').textContent   = b.plate || 'No plate';
+  document.getElementById('dp-status-badge').className   = 'dp-status-badge ' + stBadge;
+  document.getElementById('dp-status-badge').textContent = stLbl;
+
+  _dpResetButtons();
+  document.getElementById('dp-body').innerHTML = `<div class="dp-loading"><div class="dp-spinner"></div><span>Loading details…</span></div>`;
+  document.getElementById('detail-panel').classList.add('open');
+
+  // Render immediately from table data
+  _renderBikeDetail(b);
+
+  // Lazy-load fresh detail
+  if (!_bikeDetailCache[bikeId]) {
+    try {
+      const res  = await fetch(BIKE_SHEET_URL.replace('?type=bike', '?type=bikeDetail&bikeId=' + encodeURIComponent(bikeId)) + '&nocache=' + Date.now());
+      const data = await res.json();
+      if (data && (data.id || data.bikeId)) {
+        _bikeDetailCache[bikeId] = data;
+        const merged = Object.assign({}, b, {
+          chassis: data.chassis || b.chassis || '',
+          owner:   data.owner   || b.owner   || '',
+          mobile:  data.mobile  || b.mobile  || '',
+          ref:     data.ref     || b.ref     || '',
+          fine:    data.fine !== undefined ? Number(data.fine) : b.fine || 0,
+        });
+        if (_panelType === 'bike' && String(_panelId) === String(bikeId)) {
+          _renderBikeDetail(merged);
+        }
+      }
+    } catch(e) {
+      console.warn('viewBike detail fetch failed:', e.message);
+    }
+  } else {
+    _renderBikeDetail(Object.assign({}, b, _bikeDetailCache[bikeId]));
+  }
+}
+
+function _renderBikeDetail(b) {
+  if (_panelType !== 'bike') return;
+
+  function fmtDate(d) {
+    if (!d) return '<span style="color:var(--text3);">—</span>';
+    try { return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }); }
+    catch { return d; }
+  }
+  function exCard(label, dateStr) {
+    const exp = isExpired(dateStr); const expg = isExpiring(dateStr);
+    const cls  = exp ? 'dp-ex-expired' : expg ? 'dp-ex-expiring' : dateStr ? 'dp-ex-valid' : 'dp-ex-na';
+    const icon = exp ? 'ti-alert-triangle' : expg ? 'ti-clock' : dateStr ? 'ti-circle-check' : 'ti-circle-off';
+    const lbl  = exp ? 'Expired' : expg ? 'Expiring' : dateStr ? 'Valid' : 'No Data';
+    return `<div class="dp-ex-card ${cls}">
+      <i class="ti ${icon} dp-ex-icon"></i>
+      <div class="dp-ex-label">${label}</div>
+      <div class="dp-ex-status">${lbl}</div>
+      <div class="dp-ex-date">${dateStr ? fmtDate(dateStr) : '—'}</div>
+    </div>`;
+  }
+
+  // Document checklist chips
+  const totalDocs = BIKE_DOCS.length;
+  const doneDocs  = BIKE_DOCS.filter(k => b.docs && b.docs[k]).length;
+  const docsColor = doneDocs === totalDocs ? 'var(--teal)' : doneDocs < totalDocs / 2 ? 'var(--red)' : 'var(--amber)';
+  const docChips = BIKE_DOCS.map(k => {
+    const state    = dotState(b.docs || {}, k);
+    const chipColor= state === 'ok' ? 'var(--teal)' : state === 'miss' ? 'var(--red)' : 'var(--amber)';
+    const chipBg   = state === 'ok' ? 'var(--teal-dim)' : state === 'miss' ? 'var(--red-dim)' : 'var(--amber-dim)';
+    const icon     = state === 'ok' ? 'ti-circle-check' : state === 'miss' ? 'ti-circle-x' : 'ti-clock';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;background:${chipBg};color:${chipColor};border:1px solid ${chipColor}44;cursor:pointer;"
+      onclick="openDocModal('bike',${JSON.stringify(b.id)},'${k}')">
+      <i class="ti ${icon}"></i>${k}
+    </span>`;
+  }).join('');
+
+  const html = `
+    <div class="dp-section">
+      <div class="dp-section-title"><i class="ti ti-motorbike"></i> Vehicle Details</div>
+      <div class="dp-fields" id="dp-bike-fields">
+        <div class="dp-field"><span class="dp-fl">Bike ID</span><span class="dp-fv dp-mono">${b.id || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Plate</span>
+          <span class="dp-fv dp-mono" data-field="plate" data-type="text">${b.plate || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Make</span>
+          <span class="dp-fv" data-field="make" data-type="text">${b.make || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Model</span>
+          <span class="dp-fv" data-field="model" data-type="text">${b.model || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Chassis / VIN</span>
+          <span class="dp-fv dp-mono">${b.chassis || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Emirate</span>
+          <span class="dp-fv" data-field="emirate" data-type="select-emirate">${b.emirate || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Owner</span>
+          <span class="dp-fv" data-field="owner" data-type="text">${b.owner || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Mobile</span>
+          <span class="dp-fv dp-mono" data-field="mobile" data-type="tel">${b.mobile || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Reference</span>
+          <span class="dp-fv" data-field="ref" data-type="text">${b.ref || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">RTA Fine (AED)</span>
+          <span class="dp-fv dp-mono ${b.fine > 0 ? 'dp-val-red' : ''}" data-field="fine" data-type="number">${b.fine > 0 ? b.fine.toLocaleString() : '—'}</span></div>
+      </div>
+    </div>
+
+    <div class="dp-section">
+      <div class="dp-section-title"><i class="ti ti-calendar-stats"></i> Document Expiry</div>
+      <div class="dp-ex-grid">
+        ${exCard('Mulkiya',   b.mulkiyaExp)}
+        ${exCard('Passing',   b.licExp)}
+        ${exCard('Insurance', b.insExp)}
+      </div>
+      <div class="dp-fields" style="margin-top:12px;">
+        <div class="dp-field"><span class="dp-fl">Mulkiya Expiry</span>
+          <span class="dp-fv dp-mono" data-field="mulkiyaExp" data-type="date">${b.mulkiyaExp || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Passing Expiry</span>
+          <span class="dp-fv dp-mono" data-field="licExp" data-type="date">${b.licExp || '—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Insurance Expiry</span>
+          <span class="dp-fv dp-mono" data-field="insExp" data-type="date">${b.insExp || '—'}</span></div>
+      </div>
+    </div>
+
+    <div class="dp-section">
+      <div class="dp-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span><i class="ti ti-files"></i> Document Checklist</span>
+        <span style="color:${docsColor};font-size:12px;font-weight:700;">${doneDocs}/${totalDocs} complete</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">${docChips}</div>
+    </div>
+    ${b.fine > 0 ? `
+    <div class="dp-section" style="border:1px solid rgba(248,81,73,.3);border-radius:var(--radius);background:var(--red-dim);padding:14px 16px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--red);font-weight:700;margin-bottom:6px;"><i class="ti ti-receipt" style="margin-right:4px;"></i>Outstanding RTA Fine</div>
+      <div style="font-size:22px;font-weight:700;color:var(--red);">AED ${b.fine.toLocaleString()}</div>
+    </div>` : ''}`;
+
+  document.getElementById('dp-body').innerHTML = html;
+}
+
+/* ── Edit mode in panel ── */
+const EMIRATE_OPTS = ['Dubai','Abu Dhabi','Sharjah','Ras Al Khaimah','Ajman','Fujairah','Umm Al Quwain'];
+
+function _dpResetButtons() {
+  document.getElementById('dp-edit-btn').style.display   = '';
+  document.getElementById('dp-save-btn').style.display   = 'none';
+  document.getElementById('dp-cancel-btn').style.display = 'none';
+}
+
+function _dpEnterEdit() {
+  // Turn every [data-field] span into an input
+  document.querySelectorAll('#dp-body [data-field]').forEach(span => {
+    const field = span.dataset.field;
+    const type  = span.dataset.type || 'text';
+    const rawVal = span.textContent.trim() === '—' ? '' : span.textContent.trim();
+
+    let inp;
+    if (type === 'date') {
+      inp = document.createElement('input');
+      inp.type = 'date';
+      // Parse display date back to YYYY-MM-DD
+      let dateVal = '';
+      try {
+        const d = new Date(rawVal);
+        if (!isNaN(d)) dateVal = d.toISOString().split('T')[0];
+      } catch(e) {}
+      inp.value = dateVal || rawVal;
+    } else if (type === 'select-emirate') {
+      inp = document.createElement('select');
+      EMIRATE_OPTS.forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o; opt.textContent = o;
+        if (o === rawVal) opt.selected = true;
+        inp.appendChild(opt);
+      });
+    } else if (type === 'number') {
+      inp = document.createElement('input');
+      inp.type = 'number'; inp.min = '0';
+      inp.value = rawVal.replace(/[^0-9.]/g, '') || '0';
+    } else {
+      inp = document.createElement('input');
+      inp.type = type;
+      inp.value = rawVal;
+    }
+    inp.dataset.field = field;
+    inp.className = 'dp-edit-input';
+    inp.placeholder = span.textContent.trim() === '—' ? '—' : '';
+    span.replaceWith(inp);
+  });
+
+  document.getElementById('dp-edit-btn').style.display   = 'none';
+  document.getElementById('dp-save-btn').style.display   = '';
+  document.getElementById('dp-cancel-btn').style.display = '';
+}
+
+function _dpCancelEdit() {
+  // Re-render from in-memory data without saving
+  if (_panelType === 'emp') {
+    const emp = employees.find(e => String(e.id) === String(_panelId));
+    if (emp) _renderEmpDetail(emp, emp.expiry || {});
+  } else if (_panelType === 'bike') {
+    const b = bikes.find(x => String(x.id) === String(_panelId));
+    if (b) _renderBikeDetail(b);
+  }
+  _dpResetButtons();
+}
+
+async function _dpSave() {
+  const saveBtn = document.getElementById('dp-save-btn');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i class="ti ti-loader-2"></i> Saving…';
+
+  // Collect all edited inputs
+  const vals = {};
+  document.querySelectorAll('#dp-body [data-field]').forEach(inp => {
+    vals[inp.dataset.field] = inp.value;
+  });
+
+  if (_panelType === 'emp') {
+    const emp = employees.find(e => String(e.id) === String(_panelId));
+    if (!emp) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="ti ti-device-floppy"></i> Save'; return; }
+
+    // Update in-memory
+    if (vals.name      !== undefined) emp.name     = vals.name;
+    if (vals.eid       !== undefined) emp.eid      = vals.eid;
+    if (vals.mobile    !== undefined) emp.mobile   = vals.mobile;
+    if (vals.mobilePak !== undefined) emp.mobilePak = vals.mobilePak;
+    if (vals.ref       !== undefined) emp.ref      = vals.ref;
+    if (vals.eidExp    !== undefined) { emp.eidExp  = vals.eidExp;    emp.expiry.eid      = computeExpiry(vals.eidExp); }
+    if (vals.licExpiry !== undefined) { emp.expiry.license   = computeExpiry(vals.licExpiry); }
+    if (vals.labourExpiry !== undefined) { emp.expiry.labour = computeExpiry(vals.labourExpiry); }
+    if (vals.insExpiry !== undefined) { emp.expiry.insurance = computeExpiry(vals.insExpiry); }
+
+    renderEmpTable(employees); updateBadges(); empCacheClear();
+
+    // Re-render panel view
+    _dpResetButtons();
+    _renderEmpDetail(emp, emp.expiry || {});
+
+    // Push to sheet
+    const payload = {
+      action:'updateEmployee', empId:String(emp.id),
+      name: emp.name, eid: emp.eid, mobile: emp.mobile,
+      mobilePak: emp.mobilePak || '', reference: emp.ref || '',
+      eidExpiry: vals.eidExp || '', licExpiry: vals.licExpiry || '',
+      labourExpiry: vals.labourExpiry || '', insExpiry: vals.insExpiry || '',
+    };
+    try {
+      await fetch(SHEET_POST_URL, { method:'POST', mode:'no-cors', body: new URLSearchParams(payload) });
+      toast('Employee saved to sheet.');
+    } catch(err) { toast('Sheet save failed: ' + err.message, 'error'); }
+
+  } else if (_panelType === 'bike') {
+    const b = bikes.find(x => String(x.id) === String(_panelId));
+    if (!b) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="ti ti-device-floppy"></i> Save'; return; }
+
+    if (vals.plate      !== undefined) b.plate      = vals.plate;
+    if (vals.make       !== undefined) b.make       = vals.make;
+    if (vals.model      !== undefined) b.model      = vals.model;
+    if (vals.emirate    !== undefined) b.emirate    = vals.emirate;
+    if (vals.owner      !== undefined) b.owner      = vals.owner;
+    if (vals.mobile     !== undefined) b.mobile     = vals.mobile;
+    if (vals.ref        !== undefined) b.ref        = vals.ref;
+    if (vals.fine       !== undefined) b.fine       = parseFloat(vals.fine) || 0;
+    if (vals.mulkiyaExp !== undefined) b.mulkiyaExp = vals.mulkiyaExp;
+    if (vals.licExp     !== undefined) b.licExp     = vals.licExp;
+    if (vals.insExp     !== undefined) b.insExp     = vals.insExp;
+
+    renderBikeTable(bikes); updateBadges(); bikeCacheClear();
+    _dpResetButtons();
+    _renderBikeDetail(b);
+
+    const payload = {
+      action:'updateBike', bikeId:String(b.id),
+      plate: b.plate, make: b.make, model: b.model,
+      owner: b.owner, mobile: b.mobile || '', reference: b.ref || '',
+      emirate: b.emirate || '', fine: String(b.fine || 0),
+      mulkiyaExp: b.mulkiyaExp || '', licExp: b.licExp || '', insExp: b.insExp || '',
+    };
+    try {
+      await fetch(SHEET_POST_URL, { method:'POST', mode:'no-cors', body: new URLSearchParams(payload) });
+      toast('Bike saved to sheet.');
+    } catch(err) { toast('Sheet save failed: ' + err.message, 'error'); }
+  }
+
+  saveBtn.disabled = false;
+  saveBtn.innerHTML = '<i class="ti ti-device-floppy"></i> Save';
+}
+
+/* ═══════════════════════════════════════════════
+   ADVANCE REQUEST MODAL
+   ═══════════════════════════════════════════════ */
+// Simple in-memory request log (replace with API calls as needed)
+const advRequests = [];
+
+function openAdvRequest(empId) {
+  const emp = employees.find(e => String(e.id) === String(empId));
+  if (!emp) return;
+
+  // Fill avatar strip
+  const idx      = employees.indexOf(emp);
+  const avBg     = AV_BG2[idx % AV_BG2.length];
+  const avFg     = AV_FG [idx % AV_FG.length];
+  const initials = (emp.name||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+  document.getElementById('adv-strip-av').style.background = avBg;
+  document.getElementById('adv-strip-av').style.color      = avFg;
+  document.getElementById('adv-strip-av').textContent      = initials;
+  document.getElementById('adv-strip-name').textContent    = emp.name || '—';
+  document.getElementById('adv-strip-id').textContent      = `#${emp.id}  ·  ${emp.eid || 'No EID'}`;
+
+  // Overall status badge
+  const overall = calcOverall(emp.expiry || {});
+  const statusColors = { valid:'var(--teal)', expiring_soon:'var(--amber)', expired:'var(--red)' };
+  const statusLabels = { valid:'Valid', expiring_soon:'Expiring Soon', expired:'Expired' };
+  document.getElementById('adv-strip-status').innerHTML =
+    `<span style="font-size:11px;font-weight:700;color:${statusColors[overall]||'var(--text3)'};padding:3px 8px;border-radius:20px;border:1px solid ${statusColors[overall]||'var(--border)'};background:${statusColors[overall]||'var(--border)'}22;">
+      ${statusLabels[overall]||overall}
+    </span>`;
+
+  // Default month to current
+  const now = new Date();
+  document.getElementById('adv-month').value =
+    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('adv-amount').value = '';
+  document.getElementById('adv-reason').value = '';
+  document.getElementById('adv-type').selectedIndex = 0;
+
+  // History for this employee
+  const history = advRequests.filter(r => String(r.empId) === String(emp.id));
+  const histEl  = document.getElementById('adv-history');
+  if (!history.length) {
+    histEl.innerHTML = `<div style="color:var(--text3);font-style:italic;">No previous requests.</div>`;
+  } else {
+    histEl.innerHTML = history.slice().reverse().map(r => {
+      const stColor = r.status === 'Pending' ? 'var(--amber)' : r.status === 'Approved' ? 'var(--teal)' : 'var(--red)';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:10px;color:${stColor};font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid ${stColor}44;background:${stColor}18;white-space:nowrap;">${r.status}</span>
+        <span style="flex:1;">${r.type} — AED ${Number(r.amount).toLocaleString()}</span>
+        <span style="color:var(--text3);font-size:11px;">${r.date}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Store active emp id on modal
+  document.getElementById('adv-modal').dataset.empId = emp.id;
+  openModal('adv-modal');
+}
+
+function submitAdvRequest() {
+  const modal  = document.getElementById('adv-modal');
+  const empId  = modal.dataset.empId;
+  const amount = document.getElementById('adv-amount').value.trim();
+  const type   = document.getElementById('adv-type').value;
+  const month  = document.getElementById('adv-month').value;
+  const reason = document.getElementById('adv-reason').value.trim();
+
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    toast('Please enter a valid amount.', 'error'); return;
+  }
+
+  const rec = {
+    empId,
+    type:   document.getElementById('adv-type').options[document.getElementById('adv-type').selectedIndex].text,
+    amount: Number(amount).toFixed(2),
+    month,
+    reason,
+    status: 'Pending',
+    date:   new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }),
+  };
+  advRequests.push(rec);
+
+  toast(`Request submitted for ${rec.type} — AED ${Number(rec.amount).toLocaleString()}`);
+  closeModal('adv-modal');
 }
 
 /* ─── Employee expiring ─── */
@@ -1215,12 +1801,9 @@ function buildBikeRow(b, i) {
     <td><div class="doc-dots">${dots(b.docs, BIKE_DOCS, 'bike', b.id)}</div></td>
     <td style="font-size:12.5px;${b.fine > 0 ? 'color:var(--red);font-weight:600;' : 'color:var(--text3);'}">${b.fine > 0 ? 'AED ' + b.fine.toLocaleString() : '—'}</td>
     <td><span class="badge ${st}">${capFirst(st)}</span></td>
-    <td>
-      <div style="display:flex;gap:6px;">
-        <button class="tb-btn view-btn" style="padding:6px 12px;font-size:12px;" onclick="viewBike(${JSON.stringify(b.id)})">
-          <i class="ti ti-eye"></i><span class="btn-text"> View</span>
-        </button>
-        <button class="action-btn" onclick="openBikeEdit(${b.id})"><i class="ti ti-pencil"></i></button>
+    <td style="white-space:nowrap;padding:8px 12px;">
+      <div style="display:flex;gap:5px;align-items:center;">
+        <button class="row-btn row-btn-view"  title="View details"  onclick="viewBike(${JSON.stringify(b.id)})"><i class="ti ti-eye"></i><span>View</span></button>
       </div>
     </td>
   </tr>`;
@@ -1366,151 +1949,6 @@ function renderBikeExpiring() {
     : `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3);"><i class="ti ti-circle-check" style="font-size:24px;display:block;margin:0 auto 8px;color:var(--teal);"></i>No expiring bike documents.</td></tr>`;
 }
 
-/* ─── Bike view popup ─── */
-function viewBike(bikeId) {
-  const b = bikes.find(x => String(x.id) === String(bikeId));
-  if (!b) { console.warn('viewBike: not found', bikeId); return; }
-
-  function fmtDate(d) {
-    if (!d) return '<span style="color:var(--text3);">—</span>';
-    const dt = new Date(d);
-    if (isNaN(dt)) return d;
-    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-  }
-
-  function vrow(label, val) {
-    return `<div class="vp-row">
-      <span class="vp-label">${label}</span>
-      <span class="vp-val">${val || '<span style="color:var(--text3);">—</span>'}</span>
-    </div>`;
-  }
-
-  function docCard(label, dateStr) {
-    const css      = isExpired(dateStr) ? 'expired' : isExpiring(dateStr) ? 'expiring_soon' : dateStr ? 'valid' : 'not_available';
-    const colorVar = css === 'valid' ? 'var(--teal)' : css === 'expired' ? 'var(--red)' : css === 'expiring_soon' ? 'var(--amber)' : 'var(--text3)';
-    const bgVar    = css === 'valid' ? 'var(--teal-dim)' : css === 'expired' ? 'var(--red-dim)' : css === 'expiring_soon' ? 'var(--amber-dim)' : 'rgba(100,100,100,.1)';
-    const lbl      = css === 'valid' ? 'Valid' : css === 'expired' ? 'Expired' : css === 'expiring_soon' ? 'Expiring Soon' : 'No Data';
-    return `
-      <div style="background:${bgVar};border-radius:6px;padding:10px 12px;border:1px solid ${colorVar}44;">
-        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">${label}</div>
-        <div style="font-size:12px;font-weight:700;color:${colorVar};">${lbl}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:3px;">${fmtDate(dateStr)}</div>
-      </div>`;
-  }
-
-  const st = bikeStatus(b);
-  const stLabel = st === 'expired' ? 'Expired' : st === 'expiring' ? 'Expiring Soon' : 'Active';
-
-  // Doc completion summary
-  const totalDocs = BIKE_DOCS.length;
-  const doneDocs  = BIKE_DOCS.filter(k => b.docs && b.docs[k]).length;
-  const docsColor = doneDocs === totalDocs ? 'var(--teal)' : doneDocs < totalDocs / 2 ? 'var(--red)' : 'var(--amber)';
-
-  // Doc chips
-  const docChips = BIKE_DOCS.map(k => {
-    const ok = b.docs && b.docs[k];
-    const state = dotState(b.docs || {}, k);
-    const chipColor = state === 'ok' ? 'var(--teal)' : state === 'miss' ? 'var(--red)' : 'var(--amber)';
-    const chipBg    = state === 'ok' ? 'var(--teal-dim)' : state === 'miss' ? 'var(--red-dim)' : 'var(--amber-dim)';
-    const icon      = state === 'ok' ? 'ti-circle-check' : state === 'miss' ? 'ti-circle-x' : 'ti-clock';
-    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;background:${chipBg};color:${chipColor};border:1px solid ${chipColor}44;">
-      <i class="ti ${icon}"></i>${k}
-    </span>`;
-  }).join('');
-
-  // Remove any existing popup
-  document.getElementById('bike-view-modal')?.remove();
-
-  const html = `
-    <div class="modal-backdrop open" id="bike-view-modal" onclick="if(event.target===this)this.remove()">
-      <div class="modal" style="max-width:640px;width:95%;max-height:90vh;overflow-y:auto;">
-
-        <div class="modal-header" style="position:sticky;top:0;background:var(--bg2);z-index:10;">
-          <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <i class="ti ti-motorbike" style="color:var(--accent);"></i>
-            Bike Record
-            <span class="badge ${st}" style="font-size:11px;">${stLabel}</span>
-          </h2>
-          <button class="action-btn" onclick="document.getElementById('bike-view-modal').remove()">
-            <i class="ti ti-x"></i>
-          </button>
-        </div>
-
-        <div class="modal-body" style="padding-top:12px;display:flex;flex-direction:column;gap:14px;">
-
-          <!-- Vehicle Info -->
-          <div style="background:var(--bg3);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:10px;">
-              <i class="ti ti-motorbike" style="margin-right:4px;"></i>Vehicle Information
-            </div>
-            ${vrow('Bike ID',       `<span style="font-family:var(--mono);font-size:12px;color:var(--accent);">${b.id || '—'}</span>`)}
-            ${vrow('Plate Number',  `<span class="plate" style="font-size:13px;">${b.plate || '—'}</span>`)}
-            ${vrow('Make / Model',  `<b style="font-size:14px;">${b.make} ${b.model}</b>`)}
-            ${vrow('Year',          b.year || '')}
-            ${vrow('Colour',        b.colour || '')}
-            ${vrow('Engine (cc)',   b.cc ? b.cc + ' cc' : '')}
-            ${vrow('Chassis / VIN', `<span style="font-family:var(--mono);font-size:11px;">${b.chassis || '—'}</span>`)}
-            ${vrow('Emirate',       b.emirate || '')}
-          </div>
-
-          <!-- Owner / Rider Info -->
-          <div style="background:var(--bg3);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:10px;">
-              <i class="ti ti-user" style="margin-right:4px;"></i>Owner / Rider
-            </div>
-            ${vrow('Owner Name',   b.owner || '')}
-            ${vrow('Owner EID',    `<span style="font-family:var(--mono);font-size:12px;">${b.ownerEid || '—'}</span>`)}
-            ${vrow('Licence No.',  b.licence || '')}
-            ${vrow('Licence Cat.', b.licCat || '')}
-            ${vrow('Mobile',       b.mobile || '')}
-            ${vrow('Reference',    b.ref || '')}
-          </div>
-
-          <!-- Expiry Status Cards -->
-          <div style="background:var(--bg3);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:12px;">
-              <i class="ti ti-calendar-event" style="margin-right:4px;"></i>Document Expiry Status
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-              ${docCard('Mulkiya',   b.mulkiyaExp)}
-              ${docCard('Insurance', b.insExp)}
-              ${docCard('Licence',   b.licExp)}
-            </div>
-          </div>
-
-          <!-- Document Checklist -->
-          <div style="background:var(--bg3);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border);">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
-              <span><i class="ti ti-files" style="margin-right:4px;"></i>Document Checklist</span>
-              <span style="color:${docsColor};font-size:12px;font-weight:700;">${doneDocs}/${totalDocs} complete</span>
-            </div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">${docChips}</div>
-          </div>
-
-          <!-- Fines -->
-          ${b.fine > 0 ? `
-          <div style="background:var(--red-dim);border-radius:var(--radius);padding:14px 16px;border:1px solid rgba(248,81,73,.25);">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--red);font-weight:700;margin-bottom:6px;">
-              <i class="ti ti-receipt" style="margin-right:4px;"></i>Outstanding RTA Fines
-            </div>
-            <div style="font-size:22px;font-weight:700;color:var(--red);">AED ${b.fine.toLocaleString()}</div>
-          </div>` : ''}
-
-        </div>
-
-        <div class="modal-footer" style="position:sticky;bottom:0;background:var(--bg2);z-index:10;display:flex;gap:8px;">
-          <button class="tb-btn" onclick="document.getElementById('bike-view-modal').remove()">
-            <i class="ti ti-x"></i> Close
-          </button>
-          <button class="tb-btn primary" onclick="document.getElementById('bike-view-modal').remove();openBikeEdit(${b.id})">
-            <i class="ti ti-pencil"></i> Edit
-          </button>
-        </div>
-      </div>
-    </div>`;
-
-  document.body.insertAdjacentHTML('beforeend', html);
-}
 function resetBikeForm() {
   ['bf-plate','bf-chassis','bf-make','bf-model',
    'bf-mulkiya-exp','bf-ins-exp','bf-lic-exp'].forEach(id => {
@@ -1789,9 +2227,8 @@ function fileUploaded(e, type) {
 /* ═══════════════════════════════════════════════
    MODAL
    ═══════════════════════════════════════════════ */
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 // Close modal on backdrop click
 document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
@@ -2279,14 +2716,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setTheme(mode, save = true) {
   document.documentElement.setAttribute('data-theme', mode);
-  const icon = document.getElementById('theme-icon');
-  if (icon) icon.className = mode === 'light' ? 'ti ti-moon' : 'ti ti-sun';
+  const icon  = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  const btn   = document.getElementById('theme-toggle-btn');
+  if (icon)  icon.className  = mode === 'light' ? 'ti ti-sun' : 'ti ti-moon';
+  if (label) label.textContent = mode === 'light' ? 'Light' : 'Dark';
+  if (btn)   btn.classList.toggle('light-mode', mode === 'light');
   if (save) localStorage.setItem('theme', mode);
 }
 
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'dark';
   setTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+function toggleCacheSubBanner(id) {
+  const sub = document.getElementById(id);
+  if (!sub) return;
+  const isOpen = sub.classList.contains('open');
+  // close all sub-banners first
+  document.querySelectorAll('.cache-banner-sub').forEach(s => s.classList.remove('open'));
+  if (!isOpen) sub.classList.add('open');
 }
 
 
