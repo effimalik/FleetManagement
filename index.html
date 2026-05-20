@@ -1,509 +1,604 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AdminPro UAE — HR &amp; Fleet Management</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-<!-- <link rel="stylesheet" href="style.css" /> -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
 
 <style>
-/* ── Icon font fix ── */
-[class^="ti-"]::before,
-[class*=" ti-"]::before {
-  font-family: 'tabler-icons' !important;
-  font-style: normal !important;
-  font-weight: normal !important;
-  font-variant: normal !important;
-  text-transform: none !important;
-  line-height: 1 !important;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-.ti { font-family: 'tabler-icons' !important; font-style: normal !important; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
-/* ═══════════════════════════════════════════════════
-   DESIGN TOKENS
-   ═══════════════════════════════════════════════════ */
-*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root, [data-theme="dark"] {
-  --bg:#0d1117; --bg2:#161b22; --bg3:#1c2333;
-  --surface:#21262d; --surface2:#2d333b;
-  --border:#30363d; --border2:#444c56;
-  --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
-  --accent:#58a6ff; --accent-dim:rgba(88,166,255,.12); --accent-glow:rgba(88,166,255,.25);
-  --teal:#39d353; --teal-dim:rgba(57,211,83,.12);
-  --amber:#e3b341; --amber-dim:rgba(227,179,65,.12);
-  --red:#f85149; --red-dim:rgba(248,81,73,.12);
-  --purple:#a371f7; --purple-dim:rgba(163,113,247,.12);
-  --orange:#f0883e; --orange-dim:rgba(240,136,62,.12);
-  --icon-bar-w:56px; --sub-bar-w:220px; --topbar-h:64px;
-  --radius:8px; --radius-lg:12px; --radius-xl:16px;
-  --font:'Sora',sans-serif; --mono:'JetBrains Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
-  --shadow-md:0 4px 16px rgba(0,0,0,.5); --shadow-lg:0 8px 32px rgba(0,0,0,.6);
+/* ═══ TOKENS ═══ */
+:root,[data-theme="dark"]{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;
+  --surface:#21262d;--surface2:#2d333b;
+  --border:#30363d;--border2:#444c56;
+  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+  --accent:#58a6ff;--accent-dim:rgba(88,166,255,.12);--accent-glow:rgba(88,166,255,.28);
+  --teal:#39d353;--teal-dim:rgba(57,211,83,.12);
+  --amber:#e3b341;--amber-dim:rgba(227,179,65,.12);
+  --red:#f85149;--red-dim:rgba(248,81,73,.12);
+  --purple:#a371f7;--purple-dim:rgba(163,113,247,.12);
+  --orange:#f0883e;--orange-dim:rgba(240,136,62,.12);
+  --icon-bar-w:56px;--sub-bar-w:220px;
+  --topbar-h:56px;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,.4);
+  --shadow-md:0 4px 16px rgba(0,0,0,.5);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.6);
 }
-[data-theme="light"] {
-  --bg:#f0f2f5; --bg2:#fff; --bg3:#e8ecf0;
-  --surface:#fff; --surface2:#e2e7ed;
-  --border:#c8d0d9; --border2:#9aa5b1;
-  --text:#0d1117; --text2:#3d454f; --text3:#5a6370;
-  --accent:#0550ae; --accent-dim:rgba(5,80,174,.12); --accent-glow:rgba(5,80,174,.22);
-  --teal:#116329; --teal-dim:rgba(17,99,41,.13);
-  --amber:#7d4e00; --amber-dim:rgba(125,78,0,.13);
-  --red:#a8111b; --red-dim:rgba(168,17,27,.11);
-  --purple:#6639c8; --purple-dim:rgba(102,57,200,.13);
-  --orange:#953800; --orange-dim:rgba(149,56,0,.13);
-  --shadow:0 1px 3px rgba(0,0,0,.10); --shadow-md:0 4px 16px rgba(0,0,0,.12); --shadow-lg:0 8px 32px rgba(0,0,0,.15);
+[data-theme="light"]{
+  --bg:#f0f2f5;--bg2:#ffffff;--bg3:#e8ecf0;
+  --surface:#ffffff;--surface2:#e2e7ed;
+  --border:#c8d0d9;--border2:#9aa5b1;
+  --text:#0d1117;--text2:#3d454f;--text3:#5a6370;
+  --accent:#0550ae;--accent-dim:rgba(5,80,174,.12);--accent-glow:rgba(5,80,174,.22);
+  --teal:#116329;--teal-dim:rgba(17,99,41,.13);
+  --amber:#7d4e00;--amber-dim:rgba(125,78,0,.13);
+  --red:#a8111b;--red-dim:rgba(168,17,27,.11);
+  --purple:#6639c8;--purple-dim:rgba(102,57,200,.13);
+  --orange:#953800;--orange-dim:rgba(149,56,0,.13);
+  --shadow:0 1px 3px rgba(0,0,0,.10);
+  --shadow-md:0 4px 16px rgba(0,0,0,.12);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.15);
 }
 
-html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased;}
 
-/* ═══════════════════════════════════════════════════
-   LAYOUT SHELL
-   ═══════════════════════════════════════════════════ */
-.app { display: flex; height: 100vh; overflow: hidden; }
+/* ═══ SHELL ═══ */
+.shell{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
-/* ── Icon bar ── */
-#icon-bar {
-  width: var(--icon-bar-w);
-  background: var(--bg2); border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; align-items: center;
-  padding: 10px 0; gap: 2px;
-  flex-shrink: 0; z-index: 110; position: relative;
+/* ═══ TOPBAR ═══ */
+.topbar{
+  height:var(--topbar-h);
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:stretch;
+  flex-shrink:0;position:relative;z-index:200;
+  /* subtle accent line at very top */
 }
-#icon-bar::after {
-  content: ''; position: absolute; top: 0; right: -1px;
-  width: 1px; height: 100%;
-  background: linear-gradient(to bottom, var(--accent-glow), transparent 60%);
-  pointer-events: none;
+.topbar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent) 0%,var(--purple) 40%,var(--teal) 100%);
+  opacity:.7;
 }
-.ib-logo {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--accent), #1f6feb);
-  border-radius: var(--radius);
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 17px;
-  box-shadow: 0 0 12px var(--accent-glow);
-  margin-bottom: 8px; flex-shrink: 0;
+
+/* ── Brand zone (aligns with icon bar) ── */
+.tb-brand{
+  width:var(--icon-bar-w);
+  display:flex;align-items:center;justify-content:center;
+  border-right:1px solid var(--border);flex-shrink:0;
+  background:linear-gradient(160deg,rgba(88,166,255,.06) 0%,transparent 100%);
 }
-.ib-divider { width: 28px; height: 1px; background: var(--border); margin: 4px 0; }
-.ib-spacer  { flex: 1; }
-.ib-btn {
-  position: relative; width: 36px; height: 36px;
-  border-radius: var(--radius); border: none;
-  background: transparent; color: var(--text2);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 18px; transition: background .15s, color .15s;
+.tb-brand-icon{
+  width:32px;height:32px;
+  background:linear-gradient(135deg,var(--accent) 0%,#1f6feb 100%);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:15px;
+  box-shadow:0 0 14px var(--accent-glow),0 2px 4px rgba(0,0,0,.3);
+  transition:box-shadow .2s;
 }
-.ib-btn:hover  { background: var(--surface); color: var(--text); }
-.ib-btn.active { background: var(--accent-dim); color: var(--accent); }
-.ib-tip {
-  position: absolute; left: calc(100% + 10px); top: 50%;
-  transform: translateY(-50%);
-  background: var(--surface2); color: var(--text);
-  font-size: 11.5px; padding: 5px 10px; border-radius: 6px;
-  white-space: nowrap; pointer-events: none; opacity: 0;
-  transition: opacity .15s; border: 1px solid var(--border2);
-  z-index: 200; font-family: var(--font);
+.tb-brand-icon:hover{box-shadow:0 0 22px var(--accent-glow),0 2px 8px rgba(0,0,0,.4);}
+
+/* ── App title (aligns with sub-bar) ── */
+.tb-app{
+  width:var(--sub-bar-w);
+  border-right:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 16px;gap:10px;flex-shrink:0;
 }
-.ib-btn:hover .ib-tip { opacity: 1; }
-
-/* ── Sub-bar ── */
-#sub-bar {
-  width: var(--sub-bar-w);
-  background: var(--bg2); border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  flex-shrink: 0; overflow: hidden;
-  transition: width .25s cubic-bezier(.4,0,.2,1); z-index: 100;
+.tb-app-name{
+  font-size:13px;font-weight:700;
+  color:var(--text);letter-spacing:-.015em;
+  line-height:1.2;white-space:nowrap;
 }
-#sub-bar.collapsed { width: 0; }
-.sb2-header {
-  padding: 16px 14px 10px; font-size: 10px; font-weight: 700;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--text3);
-  border-bottom: 1px solid var(--border); flex-shrink: 0; white-space: nowrap;
-  display: flex; align-items: center; gap: 8px;
+.tb-app-sub{
+  font-size:10px;color:var(--text3);
+  letter-spacing:.04em;text-transform:uppercase;
+  margin-top:2px;white-space:nowrap;
 }
-.sb2-header i { font-size: 14px; color: var(--accent); }
-.sb2-nav { flex: 1; overflow-y: auto; padding: 8px; }
-.sb2-nav::-webkit-scrollbar { width: 3px; }
-.sb2-nav::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-.sb2-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 8px 10px; border-radius: var(--radius);
-  cursor: pointer; font-size: 13px; color: var(--text2);
-  transition: all .15s; user-select: none; white-space: nowrap;
-  border: 1px solid transparent; margin-bottom: 2px;
+.tb-live-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--teal);
+  box-shadow:0 0 6px var(--teal);
+  flex-shrink:0;margin-left:auto;
 }
-.sb2-item i { font-size: 15px; flex-shrink: 0; }
-.sb2-item:hover  { background: var(--surface); color: var(--text); border-color: var(--border); }
-.sb2-item.active { background: var(--accent-dim); color: var(--accent); border-color: rgba(88,166,255,.2); font-weight: 500; }
 
-/* BUG 2 FIX: flex-direction row → sub-bar and iframe sit side by side */
-.main { flex: 1; display: flex; flex-direction: row; overflow: hidden; min-width: 0; }
+/* ── Main strip ── */
+.tb-strip{
+  flex:1;display:flex;align-items:center;
+  padding:0 18px;gap:8px;min-width:0;
+}
 
-/* ── Page iframe ── */
-#main-frame { flex: 1; border: none; background: var(--bg); width: 100%; height: 100%; }
+/* page context */
+.tb-page-ctx{
+  display:flex;align-items:center;gap:10px;
+  padding-right:18px;
+  border-right:1px solid var(--border);
+  flex-shrink:0;
+}
+.tb-page-pill{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.tb-page-label{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;}
+.tb-page-sub2{font-size:10.5px;color:var(--text3);margin-top:1px;}
 
-/* ── Hide unused elements ── */
-.hamburger    { display: none !important; }
-.theme-toggle { display: none !important; }
+/* shortcuts */
+.tb-shortcuts{
+  display:flex;align-items:center;gap:5px;
+  padding:0 14px;border-right:1px solid var(--border);
+  flex-shrink:0;
+}
+.tb-sc{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:0 12px;height:32px;
+  border-radius:7px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text2);
+  font-size:12px;font-weight:500;cursor:pointer;
+  font-family:var(--font);transition:all .15s;white-space:nowrap;
+}
+.tb-sc i{font-size:14px;flex-shrink:0;}
+.tb-sc:hover{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+.tb-sc.emp{color:var(--accent);border-color:rgba(88,166,255,.3);background:var(--accent-dim);}
+.tb-sc.emp:hover{background:var(--accent);color:#fff;box-shadow:0 0 10px var(--accent-glow);}
+.tb-sc.bike{color:var(--teal);border-color:rgba(57,211,83,.3);background:var(--teal-dim);}
+.tb-sc.bike:hover{background:var(--teal);color:#fff;}
+.tb-sc.adv{color:var(--amber);border-color:rgba(227,179,65,.3);background:var(--amber-dim);}
+.tb-sc.adv:hover{background:var(--amber);color:#0d1117;}
 
-/* ── BUTTONS ── */
-.tb-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); font-weight: 500; transition: all .18s; white-space: nowrap; }
-.tb-btn:hover { background: var(--surface2); }
-.tb-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.tb-btn.primary:hover { filter: brightness(1.1); box-shadow: 0 0 0 3px var(--accent-glow); }
-.tb-btn.danger  { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+/* spacer */
+.tb-gap{flex:1;}
 
-/* ── BADGE ── */
-.badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-.badge.blue   { background: var(--accent-dim);  color: var(--accent);  border: 1px solid rgba(88,166,255,.3); }
-.badge.green  { background: var(--teal-dim);    color: var(--teal);    border: 1px solid rgba(57,211,83,.3); }
-.badge.amber  { background: var(--amber-dim);   color: var(--amber);   border: 1px solid rgba(227,179,65,.3); }
-.badge.red    { background: var(--red-dim);     color: var(--red);     border: 1px solid rgba(248,81,73,.3); }
-.badge.purple { background: var(--purple-dim);  color: var(--purple);  border: 1px solid rgba(163,113,247,.3); }
-.badge.gray   { background: rgba(110,118,129,.18); color: #8b949e;     border: 1px solid rgba(110,118,129,.3); }
-.badge.orange { background: var(--orange-dim);  color: var(--orange);  border: 1px solid rgba(240,136,62,.3); }
+/* datetime */
+.tb-clock{
+  display:flex;align-items:center;gap:10px;
+  padding:0 14px;height:32px;
+  border-radius:7px;
+  background:var(--bg3);border:1px solid var(--border);
+  flex-shrink:0;
+}
+.tb-clock i{font-size:13px;color:var(--teal);}
+.tb-time{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text);letter-spacing:.04em;}
+.tb-clock-sep{width:1px;height:14px;background:var(--border2);}
+.tb-date-txt{font-size:11px;color:var(--text2);white-space:nowrap;}
 
-/* ── TABLE ── */
-.data-table-card   { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
-.data-table-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
-.data-table-title  { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.data-table-title i { color: var(--purple); }
-.data-table-wrap { overflow-x: auto; }
-.data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
-.data-table thead th { position: sticky; top: 0; z-index: 2; background: var(--bg3); text-align: left; font-size: 10.5px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; padding: 11px 14px; border-bottom: 2px solid var(--border); white-space: nowrap; }
-.data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tbody tr { transition: background .12s; }
-.data-table tbody tr:hover td { background: var(--bg3); }
-.empty-state   { text-align: center; padding: 40px 20px; color: var(--text3); }
-.empty-state i { font-size: 36px; display: block; margin-bottom: 10px; opacity: .4; }
-.empty-state p { font-size: 13px; }
+/* theme toggle */
+.tb-theme{
+  width:32px;height:32px;border-radius:7px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;transition:all .15s;flex-shrink:0;
+}
+.tb-theme:hover{background:var(--surface2);color:var(--text);}
 
-/* ── CARD ── */
-.card        { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
-.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-.card-title  { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.card-title i { color: var(--purple); font-size: 16px; }
+/* user chip */
+.tb-user{
+  display:flex;align-items:center;gap:8px;
+  padding:0 12px;height:32px;
+  border-radius:7px;
+  border:1px solid var(--border);background:var(--surface);
+  cursor:pointer;transition:all .15s;flex-shrink:0;
+}
+.tb-user:hover{background:var(--surface2);border-color:var(--border2);}
+.tb-avatar{
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),#6e40c9);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:9px;font-weight:700;flex-shrink:0;
+}
+.tb-uname{font-size:12px;font-weight:600;color:var(--text);line-height:1.1;}
+.tb-urole{font-size:10px;color:var(--text3);}
+.tb-udot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--teal);box-shadow:0 0 5px var(--teal);
+  margin-left:2px;flex-shrink:0;
+}
 
-/* ── MODAL ── */
-.modal-backdrop      { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65); backdrop-filter: blur(4px); z-index: 400; align-items: center; justify-content: center; padding: 20px; }
-.modal-backdrop.open { display: flex; }
-.modal        { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 100%; max-width: 520px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
-.modal.wide   { max-width: 720px; }
-.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.modal-header h2   { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.modal-header h2 i { color: var(--purple); }
-.modal-body   { padding: 20px; overflow-y: auto; flex: 1; }
-.modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); flex-shrink: 0; }
+/* sep */
+.tb-vsep{width:1px;height:20px;background:var(--border);flex-shrink:0;}
 
-/* ── FORM ── */
-.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
-.field label { font-size: 11.5px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
-.field input, .field select, .field textarea { padding: 9px 12px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font-family: var(--font); font-size: 13px; transition: border-color .15s, box-shadow .15s; outline: none; }
-.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-dim); }
-.field input[readonly] { opacity: .6; cursor: default; }
-.field textarea { resize: vertical; min-height: 70px; }
+/* ═══ BODY ROW ═══ */
+.body-row{flex:1;display:flex;overflow:hidden;}
 
-/* ── STATS ── */
-.stats-row { display: grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap: 12px; margin-bottom: 20px; }
-.stat-card  { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-.stat-card.blue::before   { background: var(--accent); }
-.stat-card.green::before  { background: var(--teal); }
-.stat-card.amber::before  { background: var(--amber); }
-.stat-card.red::before    { background: var(--red); }
-.stat-card.orange::before { background: var(--orange); }
-.stat-card.purple::before { background: var(--purple); }
-.stat-label { font-size: 10.5px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-.stat-val   { font-size: 22px; font-weight: 700; color: var(--text); font-family: var(--mono); }
-.stat-sub   { font-size: 11px; color: var(--text3); margin-top: 2px; }
+/* ─── ICON BAR ─── */
+#icon-bar{
+  width:var(--icon-bar-w);
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;
+  padding:10px 0;gap:3px;
+  flex-shrink:0;z-index:110;position:relative;
+}
+#icon-bar::after{
+  content:'';position:absolute;top:0;right:-1px;
+  width:1px;height:100%;
+  background:linear-gradient(to bottom,var(--accent-glow),transparent 55%);
+  pointer-events:none;
+}
+.ib-divider{width:26px;height:1px;background:var(--border);margin:4px 0;}
+.ib-spacer{flex:1;}
+.ib-btn{
+  position:relative;width:36px;height:36px;
+  border-radius:var(--radius);border:none;
+  background:transparent;color:var(--text2);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:18px;transition:background .15s,color .15s;
+}
+.ib-btn:hover{background:var(--surface);color:var(--text);}
+.ib-btn.active{background:var(--accent-dim);color:var(--accent);}
+.ib-tip{
+  position:absolute;left:calc(100% + 10px);top:50%;
+  transform:translateY(-50%);
+  background:var(--surface2);color:var(--text);
+  font-size:11.5px;padding:5px 10px;border-radius:6px;
+  white-space:nowrap;pointer-events:none;opacity:0;
+  transition:opacity .15s;border:1px solid var(--border2);
+  z-index:300;font-family:var(--font);
+}
+.ib-btn:hover .ib-tip{opacity:1;}
 
-/* ── SECTION ── */
-.content         { flex: 1; overflow-y: auto; padding: 24px; }
-.section-header  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
-.section-header h2 { font-size: 18px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 10px; }
-.section-header h2 i { color: var(--purple); }
-.section-desc    { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.section-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+/* ─── SUB BAR ─── */
+#sub-bar{
+  width:var(--sub-bar-w);
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  flex-shrink:0;overflow:hidden;
+  transition:width .25s cubic-bezier(.4,0,.2,1);z-index:100;
+}
+#sub-bar.collapsed{width:0;}
+.sb2-header{
+  padding:14px 14px 10px;
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text3);
+  border-bottom:1px solid var(--border);flex-shrink:0;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;
+}
+.sb2-header i{font-size:14px;color:var(--accent);}
+.sb2-nav{flex:1;overflow-y:auto;padding:8px;}
+.sb2-nav::-webkit-scrollbar{width:3px;}
+.sb2-nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.sb2-section{
+  font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text3);
+  padding:10px 10px 4px;
+}
+.sb2-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:var(--radius);
+  cursor:pointer;font-size:12.5px;color:var(--text2);
+  transition:all .15s;user-select:none;white-space:nowrap;
+  border:1px solid transparent;margin-bottom:2px;
+}
+.sb2-item i{font-size:15px;flex-shrink:0;}
+.sb2-item:hover{background:var(--surface);color:var(--text);border-color:var(--border);}
+.sb2-item.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(88,166,255,.2);font-weight:500;}
+.sb2-badge{
+  margin-left:auto;font-size:9.5px;font-weight:700;
+  padding:1px 6px;border-radius:10px;
+  background:var(--red-dim);color:var(--red);
+}
 
-/* ── SEARCH ── */
-.search-wrap   { position: relative; display: inline-flex; align-items: center; }
-.search-wrap i { position: absolute; left: 11px; font-size: 15px; color: var(--text3); pointer-events: none; }
-.search-wrap input { padding: 8px 12px 8px 34px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text); font-family: var(--font); font-size: 13px; outline: none; transition: border-color .15s, box-shadow .15s; min-width: 200px; }
-.search-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+/* ─── MAIN FRAME ─── */
+.main-area{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+#main-frame{flex:1;border:none;background:var(--bg);width:100%;height:100%;}
 
-/* ── TOAST ── */
-.toast       { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 12px 18px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: var(--text); transform: translateY(80px); opacity: 0; transition: all .3s cubic-bezier(.34,1.56,.64,1); z-index: 9999; max-width: 360px; pointer-events: none; }
-.toast.show  { transform: translateY(0); opacity: 1; }
-.toast i     { font-size: 16px; color: var(--teal); }
-.toast.warn i  { color: var(--amber); }
-.toast.error i { color: var(--red); }
-
-/* ── MISC ── */
-.hr-dot { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; }
-.hr-dot::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.hr-dot.active::before   { background: var(--teal); box-shadow: 0 0 5px var(--teal); }
-.hr-dot.inactive::before { background: var(--red);  box-shadow: 0 0 5px var(--red); }
-
-.notif-dot { background: var(--red); color: #fff; font-size: 9px; font-weight: 700; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-
-.action-pair { display: flex; gap: 6px; flex-wrap: wrap; }
-.act-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: var(--radius); border: 1px solid; cursor: pointer; font-size: 11.5px; font-family: var(--font); font-weight: 600; transition: all .15s; white-space: nowrap; }
-.act-btn.accept       { background: var(--teal-dim);   border-color: var(--teal);   color: var(--teal); }
-.act-btn.accept:hover { background: var(--teal);   color: #fff; }
-.act-btn.reject       { background: var(--red-dim);    border-color: var(--red);    color: var(--red); }
-.act-btn.reject:hover { background: var(--red);    color: #fff; }
-.act-btn.pay          { background: var(--orange-dim); border-color: var(--orange); color: var(--orange); }
-.act-btn.pay:hover    { background: var(--orange); color: #fff; }
-.act-btn.view-btn     { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-.act-btn.view-btn:hover { background: var(--accent); color: #fff; }
-
-.info-box   { background: var(--accent-dim); border: 1px solid rgba(88,166,255,.2); border-radius: var(--radius); padding: 12px 14px; font-size: 12.5px; color: var(--text2); display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; }
-.info-box i { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
-.info-box.warn      { background: var(--amber-dim); border-color: rgba(227,179,65,.25); }
-.info-box.warn i    { color: var(--amber); }
-.info-box.success   { background: var(--teal-dim);  border-color: rgba(57,211,83,.25); }
-.info-box.success i { color: var(--teal); }
-
-.filter-tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
-.filter-tab  { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text2); font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s; font-family: var(--font); }
-.filter-tab:hover  { border-color: var(--border2); color: var(--text); }
-.filter-tab.active { background: var(--accent-dim); border-color: rgba(88,166,255,.3); color: var(--accent); font-weight: 600; }
-
-.divider-label { display: flex; align-items: center; gap: 10px; margin: 24px 0 14px; color: var(--text3); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
-.divider-label::before, .divider-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-@keyframes rowIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
-.new-row { animation: rowIn .3s ease; }
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.5;} }
-.pulse { animation: pulse 1.8s ease-in-out infinite; }
-
-/* ── INSTALLMENT ── */
-.inst-progress     { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; }
-.inst-progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.inst-progress-label { font-size: 12px; font-weight: 600; color: var(--text2); }
-.inst-progress-pct   { font-size: 12px; font-family: var(--mono); font-weight: 700; }
-.progress-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-.progress-fill  { height: 100%; border-radius: 4px; transition: width .5s ease; }
-.progress-fill.blue  { background: linear-gradient(90deg,var(--accent),#1f6feb); }
-.progress-fill.green { background: linear-gradient(90deg,var(--teal),#56d068); }
-.progress-fill.amber { background: linear-gradient(90deg,var(--amber),#f0a535); }
-.progress-fill.red   { background: linear-gradient(90deg,var(--red),#ff7b76); }
-.inst-amounts   { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 12px; }
-.inst-amt-box   { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; text-align: center; }
-.inst-amt-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
-.inst-amt-val   { font-size: 14px; font-weight: 700; font-family: var(--mono); }
-.inst-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-.inst-table th { text-align: left; font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; padding: 8px 12px; border-bottom: 2px solid var(--border); background: var(--bg3); }
-.inst-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-.inst-table tr:last-child td { border-bottom: none; }
-.inst-table tbody tr:hover td { background: var(--bg3); }
-
-.scenario-pill           { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid; }
-.scenario-pill.completed { background: var(--teal-dim);   color: var(--teal);   border-color: rgba(57,211,83,.3); }
-.scenario-pill.partial   { background: var(--amber-dim);  color: var(--amber);  border-color: rgba(227,179,65,.3); }
-.scenario-pill.pending   { background: var(--orange-dim); color: var(--orange); border-color: rgba(240,136,62,.3); }
-.scenario-pill.overdue   { background: var(--red-dim);    color: var(--red);    border-color: rgba(248,81,73,.3); }
-
-/* ── UPLOAD ── */
-.upload-zone { border: 2px dashed var(--border2); border-radius: var(--radius-lg); padding: 40px 24px; text-align: center; cursor: pointer; transition: all .2s; background: var(--bg3); position: relative; }
-.upload-zone:hover, .upload-zone.drag { border-color: var(--purple); background: var(--purple-dim); }
-.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.upload-zone i     { font-size: 40px; color: var(--purple); margin-bottom: 10px; display: block; }
-.upload-zone p     { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
-.upload-zone small { font-size: 11px; color: var(--text3); }
-
-/* ── LIGHT THEME OVERRIDES ── */
-[data-theme="light"] .tb-btn.primary { color: #fff; }
-[data-theme="light"] .data-table thead th { background: var(--bg3); }
-[data-theme="light"] .data-table tbody tr:hover td { background: var(--bg3); }
-[data-theme="light"] input, [data-theme="light"] select, [data-theme="light"] textarea { background: var(--bg2); color: var(--text); }
-
-/* ── MOBILE ── */
-@media (max-width: 768px) {
-  #sub-bar { position: fixed; left: var(--icon-bar-w); top: 0; height: 100%; z-index: 99; }
-  #sub-bar.collapsed { width: 0; }
-  .content { padding: 14px; }
-  .stats-row    { grid-template-columns: 1fr 1fr; }
-  .inst-amounts { grid-template-columns: 1fr 1fr; }
+/* ═══ MOBILE ═══ */
+@media(max-width:768px){
+  .tb-app{display:none;}
+  .tb-page-ctx{display:none;}
+  .tb-shortcuts{display:none;}
+  .tb-date-txt{display:none;}
+  #sub-bar{position:fixed;left:var(--icon-bar-w);top:0;height:100%;z-index:99;}
 }
 </style>
 </head>
 
 <body>
-<div class="app">
+<div class="shell">
 
-  <!-- ════════════ ICON BAR ════════════ -->
-  <nav id="icon-bar" aria-label="Main navigation">
+  <!-- ══════════════════════════════════════
+       TOPBAR
+       ══════════════════════════════════════ -->
+  <header class="topbar">
 
-    <div class="ib-divider"></div>
-
-		<button class="ib-btn" onclick="loadPage('pages/employees.html', this)">
-		  <i class="ti ti-users"></i>
-		</button>
-
-		<button class="ib-btn" onclick="loadPage('pages/bikes.html', this)">
-		  <i class="ti ti-motorbike"></i>
-		</button>
-
-		<button class="ib-btn" onclick="loadPage('pages/advance.html', this)">
-		  <i class="ti ti-cash"></i>
-		</button>
-
-	
-	
-	
-	
-    <div style="position:relative;display:flex;align-items:center;justify-content:center;">
-      <button class="ib-btn" aria-label="Alerts" title="Expiry alerts">
-        <i class="ti ti-bell"></i>
-        <span class="ib-tip">Alerts</span>
-      </button>
-      <div class="notif-dot" id="alert-count" style="display:none;position:absolute;top:2px;right:2px;">0</div>
-    </div>
-
-  </nav>
-
-  <!-- BUG 2 FIX: .main wraps both sub-bar and iframe so flex layout works correctly -->
-  <div class="main">
-
-    <div id="sub-bar" class="collapsed">
-      <!-- Pinned Employee List — fixed at top, always visible regardless of scroll or section -->
-      <div style="padding:6px 8px 4px;border-bottom:1px solid var(--border);flex-shrink:0;">
-        <div class="sb2-item" id="sb2-pinned-emp" onclick="loadPage('pages/employees.html', this)">
-          <i class="ti ti-list"></i>Employee List
-          <span style="margin-left:auto;font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--text3);padding:1px 6px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);">pinned</span>
-        </div>
+    <!-- Fleet mgmt icon — brand corner -->
+    <div class="tb-brand">
+      <div class="tb-brand-icon" title="Fleet Management System">
+        <i class="ti ti-truck"></i>
       </div>
     </div>
 
-    <iframe id="main-frame" src="pages/employees.html" title="Page Content"></iframe>
+    <!-- App name (under sub-bar width) -->
+    <div class="tb-app">
+      <div>
+        <div class="tb-app-name">AdminPro UAE</div>
+        <div class="tb-app-sub">HR &amp; Fleet Management</div>
+      </div>
+      <div class="tb-live-dot" title="System online"></div>
+    </div>
+
+    <!-- Main strip -->
+    <div class="tb-strip">
+
+      <!-- Current page context -->
+      <div class="tb-page-ctx">
+        <div class="tb-page-pill" id="tb-pill" style="background:var(--accent-dim);color:var(--accent);">
+          <i class="ti ti-users" id="tb-pill-i"></i>
+        </div>
+        <div>
+          <div class="tb-page-label" id="tb-page-label">Employees</div>
+          <div class="tb-page-sub2" id="tb-page-sub2">Staff directory</div>
+        </div>
+      </div>
+
+      <!-- Quick action shortcuts -->
+      <div class="tb-shortcuts">
+        <button class="tb-sc emp"
+          onclick="loadPage('pages/addEmp.html',null,'Add Employee','ti-user-plus','Register new employee','var(--accent-dim)','var(--accent)')">
+          <i class="ti ti-user-plus"></i> Add Employee
+        </button>
+		
+
+        <button class="tb-sc bike"
+          onclick="loadPage('pages/addBike.html',null,'Add Bike','ti-motorbike','Register vehicle','teal')">
+          <i class="ti ti-motorbike"></i> Add Bike
+        </button>
+        <button class="tb-sc adv"
+          onclick="loadPage('pages/advance.html',null,'Advance Salary','ti-cash','Salary advances','amber')">
+          <i class="ti ti-cash"></i> Advance
+        </button>
+      </div>
+
+      <div class="tb-gap"></div>
+
+      <!-- Live clock + date -->
+      <div class="tb-clock">
+        <i class="ti ti-clock"></i>
+        <span class="tb-time" id="tb-time">00:00:00</span>
+        <div class="tb-clock-sep"></div>
+        <span class="tb-date-txt" id="tb-date">Wed, 1 Jan 2025</span>
+      </div>
+
+      <div class="tb-vsep"></div>
+
+      <!-- Theme toggle -->
+      <button class="tb-theme" onclick="toggleTheme()" title="Toggle theme">
+        <i class="ti ti-moon" id="theme-icon"></i>
+      </button>
+
+      <div class="tb-vsep"></div>
+
+      <!-- User chip -->
+      <div class="tb-user" title="Signed in as Admin">
+        <div class="tb-avatar">AD</div>
+        <div>
+          <div class="tb-uname">Admin</div>
+          <div class="tb-urole">Super Admin</div>
+        </div>
+        <div class="tb-udot"></div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       BODY ROW
+       ══════════════════════════════════════ -->
+  <div class="body-row">
+
+    <!-- ICON BAR -->
+    <nav id="icon-bar" aria-label="Navigation">
+
+      <div class="ib-divider"></div>
+
+      <button class="ib-btn active" id="ib-emp"
+        onclick="ibOpen('ib-emp',this)" title="Employees">
+        <i class="ti ti-users"></i>
+        <span class="ib-tip">Employees</span>
+      </button>
+
+      <button class="ib-btn" id="ib-bike"
+        onclick="ibOpen('ib-bike',this)" title="Bike Fleet">
+        <i class="ti ti-motorbike"></i>
+        <span class="ib-tip">Bike Fleet</span>
+      </button>
+
+      <button class="ib-btn" id="ib-adv"
+        onclick="ibOpen('ib-adv',this)" title="Advance Salary">
+        <i class="ti ti-cash"></i>
+        <span class="ib-tip">Advance Salary</span>
+      </button>
+
+      <button class="ib-btn" id="ib-docs"
+        onclick="ibOpen('ib-docs',this)" title="Expiring Docs">
+        <i class="ti ti-file-alert"></i>
+        <span class="ib-tip">Expiring Docs</span>
+      </button>
+
+      <div class="ib-spacer"></div>
+      <div class="ib-divider"></div>
+
+      <button class="ib-btn" onclick="toggleTheme()" title="Toggle theme">
+        <i class="ti ti-moon" id="ib-theme-icon"></i>
+        <span class="ib-tip">Toggle theme</span>
+      </button>
+
+    </nav>
+
+    <!-- SUB BAR -->
+    <div id="sub-bar">
+      <div class="sb2-header">
+        <i class="ti ti-users" id="sb2-icon"></i>
+        <span id="sb2-title">Employees</span>
+      </div>
+      <div class="sb2-nav" id="sb2-nav"></div>
+    </div>
+
+    <!-- IFRAME -->
+    <div class="main-area">
+      <iframe id="main-frame" src="pages/employees.html" title="Content"></iframe>
+    </div>
 
   </div>
 
 </div>
 
 <script>
-// ── Page map: each icon button ID → its label + submenu items ──
-const PAGES = {
+'use strict';
 
-  'ib-employees': {
-    label: 'Advance',
-    items: [
-      { label: 'Add Employee',  file: 'pages/employees.html',      icon: 'ti-user-plus' },
-    ]
+/* ══ SECTION MAP ══ */
+const SECTIONS = {
+  'ib-emp': {
+    icon:'ti-users', label:'Employees',
+    pageLabel:'Employees', pageSub:'Staff directory',
+    pillBg:'var(--accent-dim)', pillColor:'var(--accent)', pillIcon:'ti-users',
+    groups:[
+      { label:'Directory', items:[
+        { label:'Employee List', file:'pages/employees.html',    icon:'ti-list',      sub:'All staff records'    },
+        { label:'Add Employee',  file:'Reg/addEmp.html',      icon:'ti-user-plus', sub:'Register new employee'},
+      ]},
+      { label:'Documents', items:[
+        { label:'Expiring Docs', file:'pages/emp-expiring.html', icon:'ti-file-x',    sub:'Visa · EID · Labour', badge:true },
+      ]},
+    ],
   },
-  'ib-bikes': {
-    label: 'bikes',
-    items: [
-      { label: 'Bike List',     file: 'pages/bikes.html',     icon: 'ti-list' },
-    ]
+  'ib-bike': {
+    icon:'ti-motorbike', label:'Bike Fleet',
+    pageLabel:'Bike Fleet', pageSub:'Fleet registry',
+    pillBg:'var(--teal-dim)', pillColor:'var(--teal)', pillIcon:'ti-motorbike',
+    groups:[
+      { label:'Fleet', items:[
+        { label:'Bike List',      file:'pages/bikes.html',          icon:'ti-list',      sub:'All registered bikes' },
+        { label:'Register Bike',  file:'Reg/addBike.html',       icon:'ti-plus',      sub:'Add new vehicle'      },
+      ]},
+      { label:'Documents', items:[
+        { label:'Expiring Docs',  file:'pages/bike-expiring.html',  icon:'ti-file-x',    sub:'Mulkiya · Insurance',  badge:true },
+      ]},
+    ],
   },
-    'ib-advance': {
-    label: 'bikes',
-    items: [
-      { label: 'Bike List',     file: 'pages/advance.html',     icon: 'ti-list' },
-    ]
-  }
-
-
+  'ib-adv': {
+    icon:'ti-cash', label:'Advance Salary',
+    pageLabel:'Advance Salary', pageSub:'Salary advances',
+    pillBg:'var(--amber-dim)', pillColor:'var(--amber)', pillIcon:'ti-cash',
+    groups:[
+      { label:'Salary', items:[
+        { label:'All Requests',   file:'pages/advance.html',     icon:'ti-list',  sub:'Advance history' },
+        { label:'New Request',    file:'pages/adv-new.html',     icon:'ti-plus',  sub:'Submit an advance'},
+      ]},
+    ],
+  },
+  'ib-docs': {
+    icon:'ti-file-alert', label:'Expiring Docs',
+    pageLabel:'Expiring Docs', pageSub:'Document tracker',
+    pillBg:'var(--red-dim)', pillColor:'var(--red)', pillIcon:'ti-file-alert',
+    groups:[
+      { label:'Expiry Tracker', items:[
+        { label:'Employee Docs',  file:'pages/emp-expiring.html',  icon:'ti-users',     sub:'Visa · EID · Labour',  badge:true },
+        { label:'Bike Docs',      file:'pages/bike-expiring.html', icon:'ti-motorbike', sub:'Mulkiya · Insurance',   badge:true },
+      ]},
+    ],
+  },
 };
 
 let activeSection = null;
+let subOpen = true;
 
-function ibOpen(sectionId, btn) {
-  const section = PAGES[sectionId];
-  if (!section) return;
+/* ── Open icon section ── */
+function ibOpen(id, btn) {
+  const sec = SECTIONS[id];
+  if (!sec) return;
+  const sb = document.getElementById('sub-bar');
 
-  const subBar = document.getElementById('sub-bar');
-  const nav    = document.getElementById('sb2-nav');
-  const title  = document.getElementById('sb2-title');
-
-  // Same icon clicked again → collapse sub-bar (toggle)
-  if (activeSection === sectionId && !subBar.classList.contains('collapsed')) {
-    subBar.classList.add('collapsed');
-    activeSection = null;
-    return;
+  if (activeSection === id && subOpen) {
+    subOpen = false; sb.classList.add('collapsed'); return;
   }
 
-  // Highlight the active icon button
   document.querySelectorAll('.ib-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 
-  // Render submenu items — no auto-load, pinned Employee List stays active
-  title.textContent = section.label;
-  nav.innerHTML = section.items.map(item => `
-    <div class="sb2-item" onclick="loadPage('${pages/employees.file}', this)">
-      <i class="ti ${item.icon}"></i>${item.label}
-    </div>
+  document.getElementById('sb2-icon').className = 'ti ' + sec.icon;
+  document.getElementById('sb2-title').textContent = sec.label;
+
+  const nav = document.getElementById('sb2-nav');
+  nav.innerHTML = sec.groups.map(g => `
+    <div class="sb2-section">${g.label}</div>
+    ${g.items.map(item => `
+      <div class="sb2-item" onclick="loadPage('${item.file}',this,'${item.label}','${item.icon||sec.icon}','${item.sub}','${sec.pillBg.replace(/'/g,'"')}','${sec.pillColor}')">
+        <i class="ti ${item.icon}"></i>${item.label}
+        ${item.badge ? '<span class="sb2-badge">!</span>' : ''}
+      </div>`).join('')}
   `).join('');
 
-  // Always keep pinned Employee List highlighted when switching sections
-  document.querySelectorAll('.sb2-item').forEach(i => i.classList.remove('active'));
-  const pinned = document.getElementById('sb2-pinned-emp');
-  if (pinned) pinned.classList.add('active');
-
-  subBar.classList.remove('collapsed');
-  activeSection = sectionId;
+  setCtx(sec.pageLabel, sec.pageSub, sec.pillBg, sec.pillColor, sec.pillIcon);
+  subOpen = true; sb.classList.remove('collapsed');
+  activeSection = id;
 }
 
-// Load any sub-page into the iframe
-function loadPage(file, el) {
+/* ── Load page ── */
+function loadPage(file, el, label, icon, sub, pillBg, pillColor) {
   const frame = document.getElementById('main-frame');
-
-  // highlight active icon
-  document.querySelectorAll('.ib-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sb2-item').forEach(i => i.classList.remove('active'));
   if (el) el.classList.add('active');
-
-  // prevent reload
-  if (frame.src.includes(file)) return;
-
-  frame.src = file;
+  if (!frame.src.endsWith(file)) frame.src = file;
+  if (label) setCtx(label, sub||'', pillBg||'var(--accent-dim)', pillColor||'var(--accent)', icon||'ti-circle');
 }
 
-// Theme toggle
+/* ── Update topbar page context ── */
+function setCtx(label, sub, bg, color, iconCls) {
+  const pill = document.getElementById('tb-pill');
+  const pillI = document.getElementById('tb-pill-i');
+  const lbl = document.getElementById('tb-page-label');
+  const s = document.getElementById('tb-page-sub2');
+  if (pill)  { pill.style.background = bg; pill.style.color = color; }
+  if (pillI) pillI.className = 'ti ' + iconCls;
+  if (lbl)   lbl.textContent = label;
+  if (s)     s.textContent   = sub;
+}
+
+/* ── Theme ── */
 function toggleTheme() {
-  const html   = document.documentElement;
-  const isDark = html.getAttribute('data-theme') !== 'light';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  const icon = document.getElementById('ib-theme-icon');
-  const tip  = document.getElementById('ib-theme-tip');
-  icon.className  = isDark ? 'ti ti-sun'  : 'ti ti-moon';
-  tip.textContent = isDark ? 'Light mode' : 'Dark mode';
+  const html = document.documentElement;
+  const dark = html.getAttribute('data-theme') !== 'light';
+  html.setAttribute('data-theme', dark ? 'light' : 'dark');
+  ['theme-icon','ib-theme-icon'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = dark ? 'ti ti-sun' : 'ti ti-moon';
+  });
+  localStorage.setItem('theme', dark ? 'light' : 'dark');
 }
 
-// Open the sidebar UI only — never reassign frame.src on initial load.
-// The iframe has src="pages/emp-list.html" in the HTML; it loads and
-// fetches data on its own 'load' event. We just set up the sidebar UI
-// after the parent DOM is ready.
-window.addEventListener('DOMContentLoaded', () => {
-  ibOpen('ib-employees', document.getElementById('ib-employees'));
-});
-
-
-function loadPage(file, el) {
-  const frame = document.getElementById('main-frame');
-
-  // ✅ Prevent reload if same page
-  if (frame.src.includes(file)) {
-    document.querySelectorAll('.sb2-item').forEach(i => i.classList.remove('active'));
-    if (el) el.classList.add('active');
-    return;
+/* ── Clock ── */
+(function tick() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const t = document.getElementById('tb-time');
+  const d = document.getElementById('tb-date');
+  if (t) t.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  if (d) {
+    const days  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months= ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    d.textContent = `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
   }
+  setTimeout(tick, 1000);
+})();
 
-  frame.src = file;
-
-  document.querySelectorAll('.sb2-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-}
-
+/* ── Init ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  ['theme-icon','ib-theme-icon'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = saved === 'light' ? 'ti ti-sun' : 'ti ti-moon';
+  });
+  ibOpen('ib-emp', document.getElementById('ib-emp'));
+});
 </script>
-
 </body>
 </html>
