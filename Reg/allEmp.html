@@ -3,209 +3,285 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AdminPro UAE — HR &amp; Fleet Management</title>
+<title>All Employees</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css" />
-<link rel="stylesheet" href="style.css" />
+<style>
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Design Tokens — DARK (default) ── */
+:root, [data-theme="dark"] {
+  --bg: #0d1117; --bg2: #161b22; --bg3: #1c2333;
+  --surface: #21262d; --surface2: #2d333b;
+  --border: #30363d; --border2: #444c56;
+  --text: #e6edf3; --text2: #8b949e; --text3: #6e7681;
+  --accent: #58a6ff; --accent-dim: rgba(88,166,255,.12); --accent-glow: rgba(88,166,255,.25);
+  --teal: #39d353; --teal-dim: rgba(57,211,83,.12);
+  --amber: #e3b341; --amber-dim: rgba(227,179,65,.12);
+  --red: #f85149; --red-dim: rgba(248,81,73,.12);
+  --purple: #a371f7; --purple-dim: rgba(163,113,247,.12);
+  --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+  --font: 'Sora', sans-serif; --mono: 'JetBrains Mono', monospace;
+  --shadow: 0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.6);
+}
+[data-theme="light"] {
+  --bg: #f0f2f5; --bg2: #ffffff; --bg3: #e8ecf0;
+  --surface: #ffffff; --surface2: #e2e7ed;
+  --border: #c8d0d9; --border2: #9aa5b1;
+  --text: #0d1117; --text2: #3d454f; --text3: #5a6370;
+  --accent: #0550ae; --accent-dim: rgba(5,80,174,.12); --accent-glow: rgba(5,80,174,.22);
+  --teal: #116329; --teal-dim: rgba(17,99,41,.13);
+  --amber: #7d4e00; --amber-dim: rgba(125,78,0,.13);
+  --red: #a8111b; --red-dim: rgba(168,17,27,.11);
+  --purple: #6639c8; --purple-dim: rgba(102,57,200,.13);
+  --shadow: 0 1px 3px rgba(0,0,0,.10); --shadow-lg: 0 8px 32px rgba(0,0,0,.15);
+}
+
+html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* ── Page wrapper ── */
+.page { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+/* ── Page header ── */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.page-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text); }
+.page-title i { color: var(--accent); font-size: 20px; }
+
+/* ── Theme toggle ── */
+.theme-toggle { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; padding: 0; font-family: var(--font); }
+.theme-toggle-track { position: relative; width: 44px; height: 24px; background: var(--surface2); border: 1.5px solid var(--border2); border-radius: 999px; transition: background .22s, border-color .22s; flex-shrink: 0; }
+.theme-toggle:hover .theme-toggle-track { border-color: var(--accent); }
+.theme-toggle-thumb { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; transition: transform .25s cubic-bezier(.4,0,.2,1), background .22s; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+.theme-toggle-thumb i { font-size: 10px; color: var(--text2); }
+.theme-toggle .theme-toggle-track { background: #1c2333; }
+.theme-toggle .theme-toggle-thumb { transform: translateX(0); background: #21262d; }
+.theme-toggle .theme-toggle-thumb i { color: #58a6ff; }
+.theme-toggle.light-mode .theme-toggle-track { background: #fde68a; border-color: #f59e0b; }
+.theme-toggle.light-mode .theme-toggle-thumb { transform: translateX(20px); background: #ffffff; border-color: #f59e0b; }
+.theme-toggle.light-mode .theme-toggle-thumb i { color: #d97706; }
+.theme-toggle-label { font-size: 12px; font-weight: 500; color: var(--text2); min-width: 30px; }
+
+/* ── Cache banner ── */
+.cache-banner { margin-bottom: 8px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--bg3); font-size: 12px; }
+.cache-banner-main { display: flex; align-items: center; gap: 10px; padding: 7px 12px; }
+.cache-banner-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
+.cache-banner-status.synced  { background: var(--teal-dim); color: var(--teal); }
+.cache-banner-status.syncing { background: var(--amber-dim); color: var(--amber); }
+.cache-banner-datetime { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--text3); font-family: var(--mono); }
+.cache-banner-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: none; border: 1px solid var(--border2); color: var(--text3); cursor: pointer; font-size: 13px; transition: all .15s; margin-left: auto; flex-shrink: 0; }
+.cache-banner-icon-btn + .cache-banner-icon-btn { margin-left: 4px; }
+.cache-banner-icon-btn:hover { background: var(--surface2); color: var(--text); }
+.cache-banner-sub { display: none; flex-direction: column; border-top: 1px solid var(--border); padding: 6px 12px 8px; background: var(--bg2); gap: 2px; }
+.cache-banner-sub.open { display: flex; }
+.cache-sub-link { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--accent); text-decoration: none; padding: 5px 6px; border-radius: 5px; transition: background .14s; }
+.cache-sub-link:hover { background: var(--accent-dim); }
+.cache-sub-link i { font-size: 13px; flex-shrink: 0; }
+.cache-sub-note { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text3); padding: 4px 6px; margin-top: 2px; }
+
+/* ── Toolbar ── */
+.emp-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+.search-wrap { position: relative; flex: 1; min-width: 160px; max-width: 280px; }
+.search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 16px; }
+.search-wrap input { width: 100%; padding: 9px 12px 9px 36px; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface); color: var(--text); font-family: var(--font); font-size: 13px; transition: border .18s, box-shadow .18s; }
+.search-wrap input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.search-wrap input::placeholder { color: var(--text3); }
+.hr-filter-pills { display: flex; gap: 5px; flex-shrink: 0; }
+.hr-filter-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text2); font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .18s; white-space: nowrap; }
+.hr-filter-btn i { font-size: 12px; }
+.hr-filter-btn:hover { background: var(--surface2); color: var(--text); }
+.hr-filter-btn.active   { background: var(--surface2); color: var(--text); border-color: var(--border2); box-shadow: 0 0 0 2px var(--accent); }
+.hr-filter-btn.expired  { border-color: var(--red);   color: var(--red); }
+.hr-filter-btn.expired.active  { background: var(--red-dim); box-shadow: 0 0 0 2px var(--red); }
+.hr-filter-btn.expiring { border-color: var(--amber); color: var(--amber); }
+.hr-filter-btn.expiring.active { background: var(--amber-dim); box-shadow: 0 0 0 2px var(--amber); }
+.hr-filter-btn.valid    { border-color: var(--teal);  color: var(--teal); }
+.hr-filter-btn.valid.active    { background: var(--teal-dim); box-shadow: 0 0 0 2px var(--teal); }
+
+/* ── Table ── */
+.emp-table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+.emp-table-wrap { overflow-x: auto; max-height: calc(100vh - 260px); min-height: 200px; }
+.emp-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+.emp-table thead th { position: sticky; top: 0; z-index: 2; background: var(--bg3); text-align: left; font-size: 10.5px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; padding: 11px 14px; border-bottom: 2px solid var(--border); white-space: nowrap; }
+.emp-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+.emp-table tr:last-child td { border-bottom: none; }
+.emp-table tbody tr { transition: background .12s; }
+.emp-table tbody tr:hover td { background: var(--bg3); }
+
+/* ── Badges ── */
+.badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.badge.valid, .badge.green   { background: rgba(57,211,83,.18);  color: #39d353; border: 1px solid rgba(57,211,83,.35); }
+.badge.expired, .badge.red   { background: rgba(248,81,73,.18);  color: #f85149; border: 1px solid rgba(248,81,73,.35); }
+.badge.expiring_soon,.badge.pink { background: rgba(227,179,65,.18); color: #e3b341; border: 1px solid rgba(227,179,65,.35); }
+.badge.gray { background: rgba(110,118,129,.18); color: #8b949e; border: 1px solid rgba(110,118,129,.3); }
+[data-theme="light"] .badge.valid,.badge.green   { background: rgba(17,99,41,.13);  color: #0d4f20; border-color: rgba(17,99,41,.35); }
+[data-theme="light"] .badge.expired,.badge.red   { background: rgba(168,17,27,.11); color: #8b0b14; border-color: rgba(168,17,27,.35); }
+[data-theme="light"] .badge.expiring_soon,.badge.pink { background: rgba(125,78,0,.13); color: #5e3900; border-color: rgba(125,78,0,.35); }
+
+/* ── Row action buttons ── */
+.row-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; border: 1.5px solid; font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .16s; white-space: nowrap; line-height: 1; }
+.row-btn i { font-size: 14px; flex-shrink: 0; }
+.row-btn-view { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
+.row-btn-view:hover { background: var(--teal); color: #fff; box-shadow: 0 0 10px var(--teal-dim); }
+.row-btn-adv { background: var(--purple-dim); border-color: var(--purple); color: var(--purple); }
+.row-btn-adv:hover { background: var(--purple); color: #fff; }
+.emp-table td button:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 28px; right: 28px; background: var(--surface2); color: var(--text); border: 1px solid var(--border2); padding: 13px 20px; border-radius: var(--radius-lg); font-size: 13px; font-weight: 500; z-index: 999; opacity: 0; transform: translateY(12px); transition: all .28s cubic-bezier(.34,1.56,.64,1); pointer-events: none; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); max-width: 340px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--teal-dim); color: var(--teal); border-color: rgba(57,211,83,.25); }
+.toast.error   { background: var(--red-dim);  color: var(--red);  border-color: rgba(248,81,73,.25); }
+
+/* ── Modal ── */
+.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 200; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(4px); }
+.modal-backdrop.open { display: flex; }
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-xl); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: modalIn .22s cubic-bezier(.34,1.56,.64,1); }
+@keyframes modalIn { from { opacity: 0; transform: scale(.95) translateY(10px); } to { opacity: 1; transform: none; } }
+.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.modal-header h2 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.modal-header h2 i { color: var(--accent); }
+.modal-body { padding: 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+.tb-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); font-weight: 500; transition: all .18s; white-space: nowrap; }
+.tb-btn:hover { background: var(--surface2); }
+.tb-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+.tb-btn.primary:hover { background: #79c0ff; }
+.tb-btn.icon-only { padding: 8px 10px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+label { font-size: 12px; font-weight: 600; color: var(--text3); letter-spacing: .02em; }
+input[type=text], input[type=date], input[type=number], input[type=tel], select, textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--bg3); color: var(--text); font-family: var(--font); font-size: 13.5px; transition: border .18s, box-shadow .18s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+input::placeholder, textarea::placeholder { color: var(--text3); }
+select option { background: var(--surface2); color: var(--text); }
+[data-theme="light"] input, [data-theme="light"] select, [data-theme="light"] textarea { background: var(--bg2); }
+
+/* Advance modal strips */
+.adv-emp-strip { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; }
+.adv-emp-strip span { color: var(--text3); }
+.adv-emp-strip strong { color: var(--text); }
+
+/* ── Detail panel ── */
+#detail-panel { position: fixed; inset: 0; z-index: 300; pointer-events: none; display: flex; justify-content: flex-end; }
+#detail-panel.open { pointer-events: auto; }
+.dp-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(3px); opacity: 0; transition: opacity .28s; }
+#detail-panel.open .dp-backdrop { opacity: 1; }
+.dp-sheet { position: relative; width: min(480px, 100%); background: var(--bg2); border-left: 1px solid var(--border2); display: flex; flex-direction: column; transform: translateX(100%); transition: transform .3s cubic-bezier(.4,0,.2,1); box-shadow: -8px 0 40px rgba(0,0,0,.4); overflow: hidden; }
+#detail-panel.open .dp-sheet { transform: translateX(0); }
+.dp-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-shrink: 0; background: var(--bg2); }
+.dp-header-info { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.dp-header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.dp-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+.dp-name { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -.01em; }
+.dp-sub  { font-size: 12px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+.dp-status-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; border: 1.5px solid; }
+.dp-badge-green  { background: var(--teal-dim);  color: var(--teal);  border-color: var(--teal); }
+.dp-badge-amber  { background: var(--amber-dim); color: var(--amber); border-color: var(--amber); }
+.dp-badge-red    { background: var(--red-dim);   color: var(--red);   border-color: var(--red); }
+.dp-badge-accent { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); border-radius: 20px; font-size: 11px; font-weight: 600; padding: 2px 9px; display: inline-block; }
+.dp-close-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); transition: all .15s; }
+.dp-close-btn:hover { background: var(--red-dim); color: var(--red); border-color: var(--red); }
+.dp-close-btn i { font-size: 15px; }
+.dp-body { flex: 1; overflow-y: auto; padding: 0; display: flex; flex-direction: column; gap: 0; }
+.dp-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 60px 24px; color: var(--text3); font-size: 13px; }
+.dp-spinner { width: 28px; height: 28px; border: 2.5px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: dpSpin .75s linear infinite; }
+@keyframes dpSpin { to { transform: rotate(360deg); } }
+.dp-section { padding: 18px 22px; border-bottom: 1px solid var(--border); }
+.dp-section:last-child { border-bottom: none; }
+.dp-section-title { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--text3); display: flex; align-items: center; gap: 7px; margin-bottom: 14px; }
+.dp-section-title i { color: var(--accent); font-size: 15px; }
+.dp-fields { display: flex; flex-direction: column; gap: 0; }
+.dp-field { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.dp-field:last-child { border-bottom: none; }
+.dp-fl { color: var(--text3); font-size: 11.5px; flex-shrink: 0; width: 130px; }
+.dp-fv { color: var(--text); text-align: right; flex: 1; word-break: break-word; }
+.dp-mono { font-family: var(--mono); font-size: 12px; }
+.dp-edit-input { width: 100%; padding: 6px 10px; border: 1.5px solid var(--accent); border-radius: 5px; background: var(--bg3); color: var(--text); font-family: var(--font); font-size: 13px; }
+.dp-edit-input:focus { outline: none; box-shadow: 0 0 0 3px var(--accent-dim); }
+[data-theme="light"] .dp-edit-input { background: var(--bg2); }
+.dp-ex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
+.dp-ex-card { border-radius: 8px; padding: 11px 13px; border: 1.5px solid; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.dp-ex-icon  { font-size: 18px; }
+.dp-ex-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; opacity: .8; }
+.dp-ex-status { font-size: 12px; font-weight: 700; }
+.dp-ex-date  { font-size: 10.5px; font-family: var(--mono); opacity: .75; }
+.dp-ex-valid    { background: var(--teal-dim);  color: var(--teal);  border-color: var(--teal); }
+.dp-ex-expiring { background: var(--amber-dim); color: var(--amber); border-color: var(--amber); }
+.dp-ex-expired  { background: var(--red-dim);   color: var(--red);   border-color: var(--red); }
+.dp-ex-na       { background: var(--surface);   color: var(--text3); border-color: var(--border2); }
+.dp-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; justify-content: flex-end; flex-shrink: 0; background: var(--bg2); }
+.dp-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all .18s; white-space: nowrap; }
+.dp-btn i { font-size: 15px; }
+.dp-btn-secondary { background: var(--surface); color: var(--text2); border-color: var(--border2); }
+.dp-btn-secondary:hover { background: var(--surface2); color: var(--text); }
+.dp-btn-edit { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+.dp-btn-edit:hover { background: var(--accent); color: #fff; box-shadow: 0 0 12px var(--accent-glow); }
+.dp-btn-save { background: var(--teal-dim); color: var(--teal); border-color: var(--teal); }
+.dp-btn-save:hover { background: var(--teal); color: #fff; }
+.dp-btn-save:disabled { opacity: .5; cursor: not-allowed; }
+.dp-btn-cancel { background: var(--surface); color: var(--text3); border-color: var(--border2); }
+.dp-btn-cancel:hover { background: var(--red-dim); color: var(--red); border-color: var(--red); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .page { padding: 14px; }
+  .emp-toolbar { flex-wrap: wrap; gap: 6px; }
+  .hr-filter-pills { flex-wrap: wrap; }
+  .hr-filter-btn { padding: 5px 10px; font-size: 11px; }
+  .emp-table-wrap { max-height: calc(100vh - 300px); }
+  .dp-sheet { width: 100%; border-left: none; }
+  .dp-fl { width: 100px; }
+  .dp-ex-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .emp-table th:nth-child(3), .emp-table td:nth-child(3) { display: none; }
+  .emp-table th:nth-child(4), .emp-table td:nth-child(4) { display: none; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 </head>
 <body>
 
-<div class="app">
+<div class="page">
 
-  <!-- ═══════════════ SIDEBAR ═══════════════ -->
-  <aside class="sidebar" id="sidebar">
-
-    <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="ti ti-building-skyscraper"></i></div>
-      <div>
-        <div class="sb-logo-text">AdminPro UAE</div>
-        <div class="sb-logo-sub">HR &amp; Fleet Management</div>
-      </div>
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-title">
+      <i class="ti ti-users"></i>
+      All Employees
     </div>
-
-    <nav class="sb-nav" role="navigation" aria-label="Main navigation">
-
-      <div class="nav-section">Overview</div>
-      <div class="nav-item" data-view="dashboard" onclick="showView('dashboard',this)" role="button" tabindex="0">
-        <i class="ti ti-layout-dashboard nav-icon"></i>Dashboard
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+      <div class="theme-toggle-track">
+        <div class="theme-toggle-thumb"><i class="ti ti-moon" id="theme-icon"></i></div>
       </div>
-
-      <div class="nav-section">Employees</div>
-      <div class="nav-parent" id="parent-emp" onclick="toggleParent('emp')" role="button" tabindex="0">
-        <i class="ti ti-users nav-icon"></i>
-        <span class="nav-parent-label">Employees</span>
-        <span class="nav-badge info" id="emp-nav-badge">0</span>
-        <i class="ti ti-chevron-right nav-chevron" id="chevron-emp"></i>
-      </div>
-      <div class="nav-sub" id="sub-emp">
-        <div class="nav-sub-item" data-view="emp-list" onclick="showView('emp-list',this)" role="button" tabindex="0">
-          <i class="ti ti-list"></i>All Employees
-        </div>
-        <div class="nav-sub-item" data-view="emp-add" onclick="showView('emp-add',this)" role="button" tabindex="0">
-          <i class="ti ti-user-plus"></i>Add Employee
-        </div>
-        <div class="nav-sub-item" data-view="emp-expiring" onclick="showView('emp-expiring',this)" role="button" tabindex="0">
-          <i class="ti ti-file-x"></i>Expiring Docs
-          <span class="nav-badge danger" id="emp-exp-badge">0</span>
-        </div>
-      </div>
-
-      <div class="nav-section">Bike Fleet</div>
-      <div class="nav-parent" id="parent-bike" onclick="toggleParent('bike')" role="button" tabindex="0">
-        <i class="ti ti-motorbike nav-icon"></i>
-        <span class="nav-parent-label">Bike Fleet</span>
-        <span class="nav-badge info" id="bike-nav-badge">0</span>
-        <i class="ti ti-chevron-right nav-chevron" id="chevron-bike"></i>
-      </div>
-      <div class="nav-sub" id="sub-bike">
-        <div class="nav-sub-item" data-view="bike-list" onclick="showView('bike-list',this)" role="button" tabindex="0">
-          <i class="ti ti-list"></i>All Bikes
-        </div>
-        <div class="nav-sub-item" data-view="bike-add" onclick="showView('bike-add',this)" role="button" tabindex="0">
-          <i class="ti ti-plus"></i>Register Bike
-        </div>
-        <div class="nav-sub-item" data-view="bike-expiring" onclick="showView('bike-expiring',this)" role="button" tabindex="0">
-          <i class="ti ti-file-x"></i>Expiring Docs
-          <span class="nav-badge danger" id="bike-exp-badge">0</span>
-        </div>
-      </div>
-	  <div class="nav-section">Checkout</div>
-      <div class="nav-parent" id="parent-checkout" onclick="toggleParent('checkout')" role="button" tabindex="0">
-        <i class="ti ti-bicycle nav-icon"></i>
-        <span class="nav-parent-label">Fleet Checkout</span>
-        <i class="ti ti-chevron-right nav-chevron" id="chevron-checkout"></i>
-      </div>
-      <div class="nav-sub" id="sub-checkout">
-        <div class="nav-sub-item" data-view="checkout-portal" onclick="showView('checkout-portal',this)" role="button" tabindex="0">
-          <i class="ti ti-arrow-right-left"></i>Check In / Out
-        </div>
-        <div class="nav-sub-item" data-view="checkout-active" onclick="showView('checkout-active',this)" role="button" tabindex="0">
-          <i class="ti ti-activity"></i>Active &amp; History
-        </div>
-        <div class="nav-sub-item" data-view="checkout-manage" onclick="showView('checkout-manage',this)" role="button" tabindex="0">
-          <i class="ti ti-settings"></i>Manage Fleet
-        </div>
-      </div>
-
-    </nav>
-
-    <div class="sb-footer">
-      <div class="sb-user">
-        <div class="sb-avatar">AD</div>
-        <div>
-          <div class="sb-user-name">Admin</div>
-          <div class="sb-user-role">Super Administrator</div>
-        </div>
-        <div class="sb-user-dot"></div>
-      </div>
-    </div>
-  </aside>
-
-  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-  <!-- ═══════════════ MAIN ═══════════════ -->
-  <div class="main">
-
-    <header class="topbar">
-      <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle sidebar">
-        <i class="ti ti-menu-2"></i>
-      </button>
-      <div>
-        <div class="topbar-title" id="topbar-title">Dashboard</div>
-      </div>
-      <div class="topbar-actions">
-        <!-- Theme toggle pill -->
-        <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle light/dark mode">
-          <span class="theme-toggle-track">
-            <span class="theme-toggle-thumb" id="theme-thumb">
-              <i id="theme-icon" class="ti ti-moon"></i>
-            </span>
-          </span>
-          <span class="theme-toggle-label" id="theme-label">Dark</span>
-        </button>
-        <!-- Alert bell -->
-        <div class="notif-wrap">
-          <button class="tb-btn icon-only" aria-label="Alerts" title="Expiry alerts">
-            <i class="ti ti-bell" style="font-size:17px;"></i>
-          </button>
-          <div class="notif-dot" id="alert-count" style="display:none;">0</div>
-        </div>
-        <!-- Add new -->
-        <button class="tb-btn primary" id="topbar-add-btn" onclick="topbarAdd()" style="display:none;">
-          <i class="ti ti-plus"></i><span>Add New</span>
-        </button>
-      </div>
-    </header>
-
-    <main class="content" id="main-content">
-
-      <!-- DASHBOARD -->
-      <div class="view active" id="view-dashboard">
-        <div class="dash-welcome">
-          <div>
-            <h2>Welcome back, Admin</h2>
-            <p>UAE HR &amp; Fleet compliance overview — all data at a glance.</p>
-          </div>
-          <i class="ti ti-building-skyscraper dash-welcome-icon"></i>
-        </div>
-        <div class="stat-grid" id="dash-stats"></div>
-        <div class="dash-grid">
-          <div class="dash-section">
-            <div class="dash-section-header">
-              <h3><i class="ti ti-users"></i> Recent Employees</h3>
-              <button class="action-btn" onclick="showView('emp-list',null)">View all</button>
-            </div>
-            <div class="dash-section-body" id="dash-emp-list"></div>
-          </div>
-          <div class="dash-section">
-            <div class="dash-section-header">
-              <h3><i class="ti ti-motorbike"></i> Recent Bikes</h3>
-              <button class="action-btn" onclick="showView('bike-list',null)">View all</button>
-            </div>
-            <div class="dash-section-body" id="dash-bike-list"></div>
-          </div>
-        </div>
-      </div>
-
-<!-- EMPLOYEE LIST -->
-<div class="view" id="view-emp-list">
-
-  <div class="stat-grid" id="emp-stats"></div>
-
-  <!-- SINGLE TOOLBAR LINE: search + filters + actions -->
-  <div class="emp-toolbar">
-
-    <div class="search-wrap" style="flex:1;min-width:160px;max-width:280px;">
-      <i class="ti ti-search"></i>
-      <input type="text" id="emp-search-input"
-             placeholder="Search name, EID, ID, ref..."
-             oninput="filterEmps(this.value)" />
-    </div>
-
-    <!-- Filter pills inline -->
-    <div class="hr-filter-pills">
-      <button class="hr-filter-btn active" data-filter="all" onclick="filterHR('all')">All</button>
-      <button class="hr-filter-btn expired" data-filter="expired" onclick="filterHR('expired')">
-        <i class="ti ti-alert-circle"></i> Expired
-      </button>
-      <button class="hr-filter-btn expiring" data-filter="expiring_soon" onclick="filterHR('expiring_soon')">
-        <i class="ti ti-clock"></i> Expiring
-      </button>
-      <button class="hr-filter-btn valid" data-filter="valid" onclick="filterHR('valid')">
-        <i class="ti ti-circle-check"></i> Valid
-      </button>
-    </div>
-
-    <div style="display:flex;gap:8px;margin-left:auto;flex-shrink:0;">
-      <button class="tb-btn primary" onclick="showView('emp-add',null)">
-        <i class="ti ti-plus"></i><span class="btn-label">Add</span>
-      </button>
-    </div>
-
+      <span class="theme-toggle-label" id="theme-label">Dark</span>
+    </button>
   </div>
 
-  <!-- SCROLLABLE TABLE CONTAINER -->
+  <!-- Toolbar -->
+  <div class="emp-toolbar">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input type="text" id="emp-search-input" placeholder="Search name, EID, ID, ref..." oninput="filterEmps(this.value)" />
+    </div>
+    <div class="hr-filter-pills">
+      <button class="hr-filter-btn active" data-filter="all"          onclick="filterHR('all')">All</button>
+      <button class="hr-filter-btn expired"  data-filter="expired"    onclick="filterHR('expired')"><i class="ti ti-alert-circle"></i> Expired</button>
+      <button class="hr-filter-btn expiring" data-filter="expiring_soon" onclick="filterHR('expiring_soon')"><i class="ti ti-clock"></i> Expiring</button>
+      <button class="hr-filter-btn valid"    data-filter="valid"      onclick="filterHR('valid')"><i class="ti ti-circle-check"></i> Valid</button>
+    </div>
+  </div>
+
+  <!-- Table -->
   <div class="emp-table-card">
     <div class="emp-table-wrap">
       <table class="emp-table">
@@ -225,587 +301,17 @@
 
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- ADD EMPLOYEE -->
-
-
-<!-- Hidden iframe -->
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(typeof clearForm==='function')clearForm()"></iframe>
-
-
-<div class="view" id="view-emp-add">
-
-  <div class="form-card">
-    <div class="form-section-title">
-      <i class="ti ti-user"></i> Personal Information
-    </div>
-
-    <form id="employeeForm"
-      action="https://docs.google.com/forms/d/e/1FAIpQLSekyWrAEOqXpE2Zb3k5dGV0Y_4Ka1pUSrnEWev_hH-HJxL87A/formResponse"
-      method="POST"
-      target="hidden_iframe">
-
-      <div class="form-grid">
-		<!-- Hidden field for the Employee ID -->
-		<input type="hidden" name="entry.108507522" id="ef-gen-id" />
-
-        <!-- Full Name -->
-        <div class="field">
-          <label>Full Name *</label>
-          <input type="text" name="entry.1124526098" id="ef-name" required />
-        </div>
-
-        <!-- Emirates ID -->
-        <div class="field">
-          <label>EID Number *</label>
-          <input type="text" name="entry.605013500" id="ef-eid" placeholder="784-XXXX-XXXXXXX-X" maxlength="18" required />
-        </div>
-
-        <!-- Date of Birth -->
-        <div class="field">
-          <label>Date of Birth *</label>
-          <input type="date" name="entry.312378018" id="ef-dob" required />
-        </div>
-
-        <!-- UAE Mobile -->
-        <div class="field">
-          <label>UAE Mobile *</label>
-          <input type="tel" name="entry.439131661" id="ef-mobile" placeholder="+971 50 123 4567" required />
-        </div>
-
-        <!-- Emergency / Other Mobile -->
-        <div class="field">
-          <label>Emergency Contact *</label>
-          <input type="tel" name="entry.1139688451" id="ef-emergency" required />
-        </div>
-
-        <!-- Reference -->
-        <div class="field">
-          <label>Reference *</label>
-          <input type="text" name="entry.642094797" id="ef-ref" required />
-        </div>
-
-        <!-- EID Expiry -->
-        <div class="field">
-          <label>EID Expiry Date</label>
-          <input type="date" name="entry.1962789080" id="ef-eid-exp" />
-        </div>
-
-        <!-- License Expiry -->
-        <div class="field">
-          <label>License Expiry</label>
-          <input type="date" name="entry.2090960301" id="ef-license-exp" />
-        </div>
-
-        <!-- Labour Expiry -->
-        <div class="field">
-          <label>Labour Card Expiry</label>
-          <input type="date" name="entry.1595041081" id="ef-labour-exp" />
-        </div>
-
-        <!-- Insurance Expiry -->
-        <div class="field">
-          <label>Insurance Expiry</label>
-          <input type="date" name="entry.203686715" id="ef-insurance-exp" />
-        </div>
-
-      </div>
-
-      <!-- ACTIONS -->
-      <div class="form-actions">
-        <button type="submit" class="tb-btn primary"><i class="ti ti-device-floppy"></i> Save Employee</button>
-        <button type="reset" class="tb-btn"><i class="ti ti-refresh"></i> Clear</button>
-        <button type="button" class="tb-btn" onclick="showView('emp-list',null)">Cancel</button>
-      </div>
-
-    </form>
-  </div>
-
-</div>
-
-
-
-
-
-
-
-
-      <!-- EMPLOYEE EXPIRING -->
-      <div class="view" id="view-emp-expiring">
-        <div class="table-card">
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Employee</th><th>EID Number</th><th>EID Expiry</th><th>Company</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="emp-exp-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- BIKE LIST -->
-      <div class="view" id="view-bike-list">
-        <div class="stat-grid" id="bike-stats"></div>
-
-        <!-- TOOLBAR: search + status filters + actions -->
-        <div class="emp-toolbar">
-
-          <div class="search-wrap" style="flex:1;min-width:160px;max-width:280px;">
-            <i class="ti ti-search"></i>
-            <input type="text" id="bike-search-input"
-                   placeholder="Search plate, make, owner..."
-                   oninput="filterBikes(this.value)" />
-          </div>
-
-          <!-- Status filter pills -->
-          <div class="hr-filter-pills">
-            <button class="hr-filter-btn bike-filter-btn active" data-filter="all" onclick="filterBikeStatus('all')">All</button>
-            <button class="hr-filter-btn bike-filter-btn expired" data-filter="expired" onclick="filterBikeStatus('expired')">
-              <i class="ti ti-alert-circle"></i> Expired
-            </button>
-            <button class="hr-filter-btn bike-filter-btn expiring" data-filter="expiring" onclick="filterBikeStatus('expiring')">
-              <i class="ti ti-clock"></i> Expiring
-            </button>
-            <button class="hr-filter-btn bike-filter-btn valid" data-filter="active" onclick="filterBikeStatus('active')">
-              <i class="ti ti-circle-check"></i> Active
-            </button>
-          </div>
-
-          <div style="display:flex;gap:8px;margin-left:auto;flex-shrink:0;">
-            <button class="tb-btn primary" onclick="showView('bike-add',null)">
-              <i class="ti ti-plus"></i><span class="btn-label">Register Bike</span>
-            </button>
-          </div>
-
-        </div>
-
-        <div class="table-card">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Bike / Owner</th><th>Plate No</th><th>Mulkiya Exp</th>
-                  <th>Insurance Exp</th><th>Documents</th><th>RTA Fine</th><th>Status</th><th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="bike-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-<!-- ADD BIKE -------------------------------------->
-	  
-      <!-- Hidden iframe for Google Form silent submission -->
-      <iframe name="hidden_bike_iframe" id="hidden_bike_iframe" style="display:none;" onload="if(typeof clearBikeForm==='function')clearBikeForm()"></iframe>
-
-      <div class="view" id="view-bike-add">
-        <form id="bikeForm"
-          action="https://docs.google.com/forms/d/e/1FAIpQLSc8UUpeV1Ac1vMjLVCvijvSQ2GgjHfrKdzoR2lPSI4CYpzYSg/formResponse"
-          method="POST"
-          target="hidden_bike_iframe">
-
-          <!-- Hidden Bike ID: generated as BIKE-{year}-{sequence} -->
-          <input type="hidden" name="entry.354020397" id="bf-bike-id" />
-
-          <div class="form-card">
-            <div class="form-section-title"><i class="ti ti-motorbike"></i> Vehicle Information</div>
-            <div class="form-grid">
-              <div class="field"><label>Plate Number (UAE) *</label><input type="text" name="entry.1249091876" id="bf-plate" placeholder="e.g. A 12345 Dubai" /></div>
-              <div class="field"><label>Chassis / VIN Number</label><input type="text" name="entry.1168599508" id="bf-chassis" placeholder="17-char VIN" /></div>
-              <div class="field"><label>Make / Brand</label><input type="text" name="entry.1333703377" id="bf-make" placeholder="e.g. Yamaha, Honda" /></div>
-              <div class="field"><label>Model</label><input type="text" name="entry.1241869390" id="bf-model" placeholder="e.g. NMAX 155" /></div>
-              <div class="field"><label>Emirate Registered</label>
-                <select name="entry.2125370088" id="bf-emirate">
-                  <option value="">Select emirate...</option>
-                  <option>Dubai</option><option>Abu Dhabi</option><option>Sharjah</option>
-                  <option>Ras Al Khaimah</option><option>Ajman</option><option>Fujairah</option><option>Umm Al Quwain</option>
-                </select>
-              </div>
-			  <div class="field"><label>Mulkiya (Registration) Expiry</label><input type="date" name="entry.829713354" id="bf-mulkiya-exp" /></div>
-              <div class="field"><label>Insurance Expiry</label><input type="date" name="entry.1516692229" id="bf-ins-exp" /></div>
-              <div class="field"><label>Driving Licence Expiry</label><input type="date" name="entry.1136128876" id="bf-lic-exp" /></div>
-            </div>
-          </div>
-
-          <div class="form-card">
-            <div class="form-actions">
-              <button type="submit" class="tb-btn primary"><i class="ti ti-device-floppy"></i> Save Bike</button>
-              <button type="button" class="tb-btn" onclick="resetBikeForm()"><i class="ti ti-refresh"></i> Clear</button>
-              <button type="button" class="tb-btn" onclick="showView('bike-list',null)">Cancel</button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- BIKE EXPIRING -->
-      <div class="view" id="view-bike-expiring">
-        <div class="table-card">
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Bike</th><th>Plate</th><th>Owner</th><th>Mulkiya Exp</th><th>Insurance Exp</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="bike-exp-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-	  
-	  <!-- CHECKOUT PORTAL (Check Out + Check In combined) -->
-      <div class="view" id="view-checkout-portal">
-        <!-- Two-column layout: Check Out | Check In -->
-        <div class="co-split-layout">
-
-          <!-- ── LEFT: Check Out ── -->
-          <div class="table-card co-split-card">
-            <div style="padding:20px 24px 0;">
-              <div class="form-section-title"><i class="ti ti-arrow-right"></i> Check Out Bike</div>
-            </div>
-            <div id="co-alert" style="margin:12px 24px 0;"></div>
-            <div style="padding:16px 24px 24px;">
-              <div class="form-grid" style="grid-template-columns:1fr;">
-                <div class="field">
-                  <label>Bike</label>
-                  <select id="co-bike"><option value="">— Select Bike —</option></select>
-                </div>
-                <div class="field">
-                  <label>Rider / Employee</label>
-                  <div style="position:relative;">
-                    <input type="text" id="co-emp-input" placeholder="Search name or EMP ID..." autocomplete="off" oninput="coSearchEmp()" onfocus="coSearchEmp()" />
-                    <div class="co-dd-list" id="co-emp-dd"></div>
-                  </div>
-                  <input type="hidden" id="co-emp-id" />
-                </div>
-                <div class="field">
-                  <label>Employee Name</label>
-                  <input type="text" id="co-emp-name" placeholder="Auto-filled" readonly />
-                </div>
-                <div class="field">
-                  <label>Checkout Time</label>
-                  <input type="datetime-local" id="co-time" readonly />
-                </div>
-                <div class="field">
-                  <label>Purpose / Notes</label>
-                  <input type="text" id="co-notes" placeholder="Optional notes..." />
-                </div>
-                <div class="field">
-                  <button class="tb-btn primary" style="width:100%;" onclick="coDoCheckout()"><i class="ti ti-bicycle"></i> Confirm Check Out</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── RIGHT: Check In / Return ── -->
-          <div class="table-card co-split-card">
-            <div style="padding:20px 24px;border-bottom:1px solid var(--border);">
-              <div class="form-section-title" style="margin-bottom:4px;"><i class="ti ti-arrow-back-up"></i> Return Bike (Check In)</div>
-              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                <div class="search-wrap" style="flex:1;min-width:160px;">
-                  <i class="ti ti-search"></i>
-                  <input type="text" id="co-ci-search" placeholder="Search employee or bike..." oninput="coRenderCheckin()" />
-                </div>
-              </div>
-            </div>
-            <div id="co-ci-alert" style="padding:8px 24px 0;"></div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Bike</th><th>Employee</th><th>EMP ID</th><th>Checked Out</th><th>Action</th></tr></thead>
-                <tbody id="co-ci-table"></tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ACTIVE CHECKOUTS + HISTORY (combined) -->
-      <div class="view" id="view-checkout-active">
-        <!-- Tabs -->
-        <div class="co-tab-bar">
-          <button class="co-tab active" id="tab-active" onclick="coSwitchTab('active')"><i class="ti ti-activity"></i> Active Checkouts</button>
-          <button class="co-tab" id="tab-history" onclick="coSwitchTab('history')"><i class="ti ti-clock"></i> History</button>
-        </div>
-
-        <!-- Active Checkouts Panel -->
-        <div id="co-panel-active">
-          <div class="toolbar" style="margin-bottom:16px;">
-            <div class="search-wrap">
-              <i class="ti ti-search"></i>
-              <input type="text" id="co-a-search" placeholder="Search employee or bike..." oninput="coRenderActive()" />
-            </div>
-          </div>
-          <div class="table-card" style="margin-bottom:16px;">
-            <div style="padding:16px 24px;border-bottom:1px solid var(--border);">
-              <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-activity"></i> Currently Active Checkouts</div>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Bike</th><th>Employee</th><th>EMP ID</th><th>Checkout Time</th><th>Duration</th><th>Notes</th><th>Action</th></tr></thead>
-                <tbody id="co-a-table"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="table-card">
-            <div style="padding:16px 24px;border-bottom:1px solid var(--border);">
-              <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-circle-check"></i> Available Bikes</div>
-            </div>
-            <div id="co-avail-list" style="padding:16px 24px;"></div>
-          </div>
-        </div>
-
-        <!-- History Panel -->
-        <div id="co-panel-history" style="display:none;">
-          <div class="toolbar" style="margin-bottom:16px;">
-            <div class="search-wrap">
-              <i class="ti ti-search"></i>
-              <input type="text" id="co-h-search" placeholder="Search EMP ID, name, bike..." oninput="coRenderHistory()" />
-            </div>
-            <select id="co-h-status" onchange="coRenderHistory()" style="width:auto;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;">
-              <option value="">All Status</option>
-              <option value="returned">Returned</option>
-              <option value="active">Active</option>
-            </select>
-          </div>
-          <div class="table-card">
-            <div style="padding:16px 24px;border-bottom:1px solid var(--border);">
-              <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-clock"></i> All Transactions</div>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Bike</th><th>Employee</th><th>EMP ID</th><th>Out</th><th>In</th><th>Duration</th><th>Status</th></tr></thead>
-                <tbody id="co-h-table"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CHECKOUT MANAGE -->
-      <div class="view" id="view-checkout-manage">
-        <div class="form-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
-            <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-bicycle"></i> Fleet Management</div>
-            <button class="tb-btn" onclick="coFetchFromSheet()"><i class="ti ti-table-import"></i> Fetch from Sheet</button>
-          </div>
-          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;">
-            <div class="field" style="flex:1;min-width:140px;"><label>Bike ID / Name</label><input type="text" id="co-new-bike-id" placeholder="e.g. B-007" /></div>
-            <div class="field" style="flex:2;min-width:200px;"><label>Description</label><input type="text" id="co-new-bike-desc" placeholder="e.g. Trek FX3 Red" /></div>
-            <button class="tb-btn primary" onclick="coAddBike()"><i class="ti ti-plus"></i> Add Bike</button>
-          </div>
-          <div class="search-wrap" style="margin-bottom:12px;">
-            <i class="ti ti-search"></i>
-            <input type="text" id="co-fleet-search" placeholder="Search bikes..." oninput="coRenderFleet()" />
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Bike ID</th><th>Description</th><th>Status</th><th>Total Trips</th><th>Action</th></tr></thead>
-              <tbody id="co-fleet-table"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="form-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
-            <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-users"></i> Rider Registry</div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <span style="font-size:12px;color:var(--text3);">&#10003; Checked riders appear in Check Out</span>
-              <button class="tb-btn" onclick="coSaveRiderSelection()"><i class="ti ti-device-floppy"></i> Save Selection</button>
-            </div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;">
-            <div class="field" style="flex:1;min-width:120px;"><label>EMP ID</label><input type="text" id="co-new-emp-id" placeholder="e.g. EMP-042" /></div>
-            <div class="field" style="flex:2;min-width:160px;"><label>Full Name</label><input type="text" id="co-new-emp-name" placeholder="e.g. Ravi Sharma" /></div>
-            <div class="field" style="flex:1;min-width:120px;"><label>Department</label><input type="text" id="co-new-emp-dept" placeholder="e.g. Operations" /></div>
-            <button class="tb-btn primary" onclick="coAddEmployee()"><i class="ti ti-plus"></i> Add</button>
-          </div>
-          <div class="search-wrap" style="margin-bottom:12px;">
-            <i class="ti ti-search"></i>
-            <input type="text" id="co-emp-search" placeholder="Search riders..." oninput="coRenderEmpTable()" />
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th style="width:44px;"><input type="checkbox" id="co-emp-select-all" onchange="coToggleAllRiders(this)" title="Select all" style="width:16px;height:16px;cursor:pointer;" /></th><th>EMP ID</th><th>Name</th><th>Department</th><th>Total Trips</th><th>Action</th></tr></thead>
-              <tbody id="co-emp-table"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="form-card" id="co-fetch-preview" style="display:none;">
-          <div class="form-section-title"><i class="ti ti-table-import"></i> Sheet Import</div>
-          <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Paste data from Google Sheets (Tab-separated). Columns: <strong style="color:var(--text2);">EMP ID &nbsp; Name &nbsp; Department</strong></div>
-          <textarea id="co-sheet-input" placeholder="Paste sheet rows here..." style="width:100%;height:120px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:12px;padding:10px;resize:vertical;"></textarea>
-          <div style="display:flex;gap:8px;margin-top:12px;">
-            <button class="tb-btn primary" onclick="coImportSheet()"><i class="ti ti-check"></i> Import Riders</button>
-            <button class="tb-btn" onclick="document.getElementById('co-fetch-preview').style.display='none'">Cancel</button>
-          </div>
-        </div>
-        <div class="form-card">
-          <div class="form-section-title"><i class="ti ti-adjustments"></i> System Settings</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-            <div><div style="font-size:13px;font-weight:500;color:var(--text);">Prevent duplicate active checkout per employee</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Block same employee from having 2 active checkouts simultaneously</div></div>
-            <label style="position:relative;width:40px;height:22px;cursor:pointer;display:inline-block;flex-shrink:0;"><input type="checkbox" id="co-set-nodupe" checked style="opacity:0;width:0;height:0;" /><span class="co-toggle-slider"></span></label>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-            <div><div style="font-size:13px;font-weight:500;color:var(--text);">Auto-fill checkout timestamp</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Automatically populate current date &amp; time on checkout form</div></div>
-            <label style="position:relative;width:40px;height:22px;cursor:pointer;display:inline-block;flex-shrink:0;"><input type="checkbox" id="co-set-autots" checked style="opacity:0;width:0;height:0;" /><span class="co-toggle-slider"></span></label>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
-            <div><div style="font-size:13px;font-weight:500;color:var(--text);">Require notes on checkout</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Make purpose/notes field mandatory before confirming</div></div>
-            <label style="position:relative;width:40px;height:22px;cursor:pointer;display:inline-block;flex-shrink:0;"><input type="checkbox" id="co-set-regnotes" style="opacity:0;width:0;height:0;" /><span class="co-toggle-slider"></span></label>
-          </div>
-          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
-            <button class="tb-btn danger" onclick="coConfirmClear()"><i class="ti ti-trash"></i> Clear All Records</button>
-          </div>
-        </div>
-      </div>
-
-
-    </main>
-  </div>
-</div>
-<!-- ═══════════════ CHECKOUT CLEAR MODAL ═══════════════ -->
-<div class="modal-backdrop" id="co-modal-clear">
-  <div class="modal">
-    <div class="modal-header">
-      <h2><i class="ti ti-alert-triangle"></i> Clear All Records</h2>
-      <button class="action-btn" onclick="closeModal('co-modal-clear')"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="modal-body" style="padding-top:12px;">
-      <p style="font-size:13px;color:var(--text2);line-height:1.6;">This will permanently delete all checkout history and return all bikes to available. Bike and employee lists will be kept. This cannot be undone.</p>
-    </div>
-    <div class="modal-footer">
-      <button class="tb-btn" onclick="closeModal('co-modal-clear')">Cancel</button>
-      <button class="tb-btn danger" onclick="coClearAll()"><i class="ti ti-trash"></i> Yes, Clear All</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ═══════════════ EMPLOYEE EDIT MODAL ═══════════════ -->
-<div class="modal-backdrop" id="emp-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <h2><i class="ti ti-user-edit"></i> Edit Employee</h2>
-      <button class="action-btn" onclick="closeModal('emp-modal')"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="field"><label>Full Name</label><input type="text" id="em-name" /></div>
-        <div class="field"><label>EID Number</label><input type="text" id="em-eid" /></div>
-        <div class="field"><label>Mobile (UAE)</label><input type="tel" id="em-mobile" /></div>
-        <div class="field"><label>Mobile (Pakistan)</label><input type="tel" id="em-mobile-pak" /></div>
-        <div class="field"><label>Company</label><input type="text" id="em-company" /></div>
-        <div class="field"><label>Reference</label><input type="text" id="em-ref" /></div>
-        <div class="field"><label>Visa Expiry</label><input type="date" id="em-visa-exp" /></div>
-        <div class="field"><label>EID Expiry</label><input type="date" id="em-eid-exp" /></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="tb-btn danger" onclick="deleteEmployee()"><i class="ti ti-trash"></i> Delete</button>
-      <button class="tb-btn" onclick="closeModal('emp-modal')">Cancel</button>
-      <button class="tb-btn primary" onclick="updateEmployee()"><i class="ti ti-check"></i> Update</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ BIKE EDIT MODAL ═══════════════ -->
-<div class="modal-backdrop" id="bike-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <h2><i class="ti ti-motorbike"></i> Edit Bike Record</h2>
-      <button class="action-btn" onclick="closeModal('bike-modal')"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="field"><label>Plate Number</label><input type="text" id="bm-plate" /></div>
-        <div class="field"><label>Make &amp; Model</label><input type="text" id="bm-makemodel" /></div>
-        <div class="field"><label>Owner / Rider</label><input type="text" id="bm-owner" /></div>
-        <div class="field"><label>Mobile</label><input type="tel" id="bm-mobile" /></div>
-        <div class="field"><label>Mulkiya Expiry</label><input type="date" id="bm-mulkiya" /></div>
-        <div class="field"><label>Insurance Expiry</label><input type="date" id="bm-ins" /></div>
-        <div class="field"><label>Licence Expiry</label><input type="date" id="bm-lic" /></div>
-        <div class="field"><label>RTA Fine (AED)</label><input type="number" id="bm-fine" min="0" /></div>
-        <div class="field"><label>Emirate</label>
-          <select id="bm-emirate">
-            <option>Dubai</option><option>Abu Dhabi</option><option>Sharjah</option>
-            <option>Ras Al Khaimah</option><option>Ajman</option><option>Fujairah</option><option>Umm Al Quwain</option>
-          </select>
-        </div>
-        <div class="field"><label>Reference / Company</label><input type="text" id="bm-ref" /></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="tb-btn danger" onclick="deleteBike()"><i class="ti ti-trash"></i> Delete</button>
-      <button class="tb-btn" onclick="closeModal('bike-modal')">Cancel</button>
-      <button class="tb-btn primary" onclick="updateBike()"><i class="ti ti-check"></i> Update</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ DOCUMENT MODAL ═══════════════ -->
-<div class="modal-backdrop" id="doc-modal">
-  <div class="modal modal-doc">
-    <div class="modal-header">
-      <h2><i class="ti ti-file-description"></i> <span id="doc-modal-title">Document</span></h2>
-      <button class="action-btn" onclick="closeModal('doc-modal')"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="modal-body">
-      <div class="doc-status-banner" id="doc-status-banner">
-        <i class="ti" id="doc-status-icon"></i>
-        <div>
-          <div id="doc-status-text" style="font-weight:600;font-size:13px;"></div>
-          <div id="doc-status-sub" style="font-size:11px;opacity:.8;margin-top:1px;"></div>
-        </div>
-      </div>
-      <div class="doc-preview-area" id="doc-preview-area">
-        <i class="ti ti-file-off" style="font-size:40px;color:var(--text3);margin-bottom:10px;"></i>
-        <div style="font-size:13px;color:var(--text2);font-weight:500;">No document uploaded</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Upload a file below to attach this document</div>
-      </div>
-      <div style="margin-top:16px;">
-        <div class="form-grid">
-          <div class="field">
-            <label>Expiry Date <span style="color:var(--text3);font-weight:400;">(if applicable)</span></label>
-            <input type="date" id="doc-expiry-input" />
-          </div>
-          <div class="field">
-            <label>Document Notes</label>
-            <input type="text" id="doc-notes-input" placeholder="Reference number, remarks..." />
-          </div>
-        </div>
-        <div class="doc-upload-row">
-          <button class="tb-btn" onclick="triggerDocUpload()"><i class="ti ti-upload"></i> Upload / Replace File</button>
-          <span class="doc-filename" id="doc-filename-display">No file selected</span>
-          <input type="file" id="doc-file-input" style="display:none;" onchange="handleDocFileSelect(event)" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" />
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="tb-btn danger" id="doc-remove-btn" onclick="removeDoc()" style="display:none;"><i class="ti ti-trash"></i> Remove Doc</button>
-      <button class="tb-btn" onclick="closeModal('doc-modal')">Cancel</button>
-      <button class="tb-btn primary" onclick="saveDoc()"><i class="ti ti-device-floppy"></i> Save Document</button>
-    </div>
-  </div>
-</div>
-
 <!-- Toast -->
 <div class="toast" id="toast" role="alert" aria-live="polite">
   <i id="toast-icon" class="ti ti-circle-check"></i>
   <span id="toast-msg">Saved</span>
 </div>
 
-<!-- ═══════════════ ADVANCE SALARY REQUEST MODAL (full module from advance portal) ═══════════════ -->
+<!-- Advance Salary Request Modal -->
 <div class="modal-backdrop" id="modal-request">
   <div class="modal">
     <div class="modal-header">
-      <h2><i class="ti ti-cash"></i>Advance Salary Request</h2>
+      <h2><i class="ti ti-cash"></i> Advance Salary Request</h2>
       <button class="tb-btn icon-only" onclick="closeModal('modal-request')"><i class="ti ti-x"></i></button>
     </div>
     <div class="modal-body">
@@ -816,9 +322,7 @@
       </div>
       <div class="field">
         <label>Advance For Month <span style="color:var(--red);">*</span></label>
-        <select id="m-month">
-          <option value="">— Select Month —</option>
-        </select>
+        <select id="m-month"><option value="">— Select Month —</option></select>
       </div>
       <div class="field">
         <label>Advance Amount (AED) <span style="color:var(--red);">*</span></label>
@@ -865,12 +369,632 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="tb-btn" onclick="closeModal('modal-request')"><i class="ti ti-x"></i>Cancel</button>
-      <button class="tb-btn primary" onclick="advSubmitRequest()"><i class="ti ti-send"></i>Submit Request</button>
+      <button class="tb-btn" onclick="closeModal('modal-request')"><i class="ti ti-x"></i> Cancel</button>
+      <button class="tb-btn primary" onclick="advSubmitRequest()"><i class="ti ti-send"></i> Submit Request</button>
     </div>
   </div>
 </div>
 
-<script src="app.js"></script>
+<script>
+'use strict';
+
+/* ═══════════ CONSTANTS ═══════════ */
+const EMP_SHEET_URL  = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPLL0uP8GlonjZ29ASKoBuXNDeIhtPg8D9Rw6jYE4RX5Zg6ky_yR24qg/exec?type=employee';
+const SHEET_POST_URL = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPLL0uP8GlonjZ29ASKoBuXNDeIhtPg8D9Rw6jYE4RX5Zg6ky_yR24qg/exec';
+const WARN_DAYS = 60;
+
+const AV_FG  = ['#58a6ff','#3fb950','#e3b341','#d2a8ff','#ffa198','#22d3ee'];
+const AV_BG2 = ['rgba(31,111,235,.2)','rgba(26,127,55,.2)','rgba(154,103,0,.2)','rgba(110,64,201,.2)','rgba(191,69,66,.2)','rgba(14,116,144,.2)'];
+
+let employees = [];
+let empSearchQuery = '';
+let currentHRFilter = 'all';
+const EMP_PAGE_SIZE = 100;
+let empCurrentPage  = 1;
+
+/* ═══════════ UTILITY ═══════════ */
+function today() { return new Date(); }
+function daysUntil(d) { if (!d) return Infinity; return Math.ceil((new Date(d) - today()) / 86400000); }
+function isExpired(d)  { return daysUntil(d) < 0; }
+function isExpiring(d) { const n = daysUntil(d); return n >= 0 && n <= WARN_DAYS; }
+
+function computeExpiry(dateStr) {
+  if (!dateStr || String(dateStr).trim() === '') return { date: null, status: 'not_available', color: 'gray' };
+  const d = String(dateStr).trim();
+  if (isExpired(d))  return { date: d, status: 'expired',       color: 'red'  };
+  if (isExpiring(d)) return { date: d, status: 'expiring_soon', color: 'pink' };
+  return               { date: d, status: 'valid',           color: 'green'};
+}
+
+function normaliseRow(r, i) {
+  if (!r) return null;
+  if (Array.isArray(r)) {
+    const [id, name, eid, dob, mobile, emergency, reference, timestamp, hrStatus, checkoutException, eidDate, licenseDate, labourDate, insuranceDate] = r;
+    if ((id === undefined || id === null || id === '') && (name === undefined || name === null || name === '')) return null;
+    return {
+      id:   (id !== undefined && id !== null && id !== '') ? id : (i + 1),
+      name: (name !== undefined && name !== null) ? String(name) : '',
+      eid:  (eid  !== undefined && eid  !== null) ? String(eid)  : '',
+      dob:  dob       ? String(dob)       : '',
+      mobile:    mobile     ? String(mobile)    : '',
+      emergency: emergency  ? String(emergency) : '',
+      reference: reference  ? String(reference) : '',
+      timestamp: timestamp  ? String(timestamp) : '',
+      hrStatus:  hrStatus   ? String(hrStatus)  : '',
+      checkoutException: checkoutException ? String(checkoutException) : '',
+      expiry: {
+        eid:      computeExpiry(eidDate),
+        license:  computeExpiry(licenseDate),
+        labour:   computeExpiry(labourDate),
+        insurance:computeExpiry(insuranceDate),
+      }
+    };
+  }
+  const rehydrate = (o) => {
+    if (!o || typeof o !== 'object') return computeExpiry(null);
+    if (o.status) return o;
+    return computeExpiry(o.date || null);
+  };
+  const rawExpiry = r.expiry || {};
+  return {
+    id: r.id || (i + 1), name: r.name || '', eid: r.eid || '',
+    dob: r.dob || '', mobile: r.mobile || '', emergency: r.emergency || '',
+    reference: r.reference || '', timestamp: r.timestamp || '',
+    hrStatus: r.hrStatus || '', checkoutException: r.checkoutException || '',
+    expiry: {
+      eid:      rehydrate(rawExpiry.eid),
+      license:  rehydrate(rawExpiry.license),
+      labour:   rehydrate(rawExpiry.labour),
+      insurance:rehydrate(rawExpiry.insurance),
+    }
+  };
+}
+
+function parseRows(raw) {
+  let rows = Array.isArray(raw) ? raw
+    : Array.isArray(raw.data)   ? raw.data
+    : Array.isArray(raw.values) ? raw.values
+    : Array.isArray(raw.rows)   ? raw.rows : [];
+  const HEADER_RE = /^[a-z_\s]+$/i, DATE_RE = /^\d{4}-\d{2}-\d{2}/;
+  if (rows.length > 0 && Array.isArray(rows[0]) && typeof rows[0][0] === 'string' && HEADER_RE.test(rows[0][0]) && !DATE_RE.test(rows[0][0])) rows = rows.slice(1);
+  return rows;
+}
+
+/* ═══════════ CACHE ═══════════ */
+const EMP_CACHE_KEY = 'emp_cache_v1';
+const EMP_CACHE_TTL = 5 * 60 * 1000;
+
+function empCacheSave(rows) { try { localStorage.setItem(EMP_CACHE_KEY, JSON.stringify({ ts: Date.now(), rows })); } catch(e) {} }
+function empCacheLoad() { try { const raw = localStorage.getItem(EMP_CACHE_KEY); if (!raw) return null; const { ts, rows } = JSON.parse(raw); if (Date.now() - ts > EMP_CACHE_TTL) return null; return rows; } catch(e) { return null; } }
+function empCacheClear() { localStorage.removeItem(EMP_CACHE_KEY); }
+
+function showCacheBanner(show) {
+  let banner = document.getElementById('emp-cache-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'emp-cache-banner';
+    banner.className = 'cache-banner';
+    const tbl = document.getElementById('emp-tbody')?.closest('table');
+    tbl?.parentElement?.parentElement?.insertBefore(banner, tbl.parentElement);
+  }
+  if (show) {
+    banner.innerHTML = `<div class="cache-banner-main"><span class="cache-banner-status syncing"><i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i> Refreshing data…</span></div>`;
+  } else {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const dateStr = now.toLocaleDateString([], { day:'2-digit', month:'short' });
+    banner.innerHTML = `
+      <div class="cache-banner-main">
+        <span class="cache-banner-status synced"><i class="ti ti-circle-check"></i> Synced</span>
+        <span class="cache-banner-datetime"><i class="ti ti-clock"></i> ${dateStr}, ${timeStr}</span>
+        <button class="cache-banner-icon-btn" onclick="empCacheClear();loadEmployees();" title="Force refresh"><i class="ti ti-refresh"></i></button>
+        <button class="cache-banner-icon-btn" onclick="toggleCacheSub()" title="More options"><i class="ti ti-chevron-down"></i></button>
+      </div>
+      <div class="cache-banner-sub" id="emp-cache-sub">
+        <a href="#" class="cache-sub-link" onclick="empCacheClear();loadEmployees();return false;"><i class="ti ti-refresh"></i> Force refresh from Google Sheet</a>
+        <a href="#" class="cache-sub-link" onclick="empCacheClear();return false;"><i class="ti ti-database-off"></i> Clear local cache only</a>
+        <span class="cache-sub-note"><i class="ti ti-info-circle"></i> Data auto-refreshes every 5 minutes</span>
+      </div>`;
+  }
+}
+
+function toggleCacheSub() {
+  const sub = document.getElementById('emp-cache-sub');
+  if (sub) sub.classList.toggle('open');
+}
+
+/* ═══════════ LOAD ═══════════ */
+async function loadEmployees() {
+  const tbody = document.getElementById('emp-tbody');
+
+  const cached = empCacheLoad();
+  if (cached && cached.length) {
+    employees = cached.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+    renderEmpTable(employees);
+    showCacheBanner(true);
+  } else {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;">
+      <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;font-size:22px;color:var(--text3);"></i>
+      <div style="margin-top:8px;color:var(--text3);font-size:13px;">Loading employees…</div>
+    </td></tr>`;
+  }
+
+  try {
+    const res  = await fetch(EMP_SHEET_URL + '&nocache=' + Date.now());
+    const raw  = await res.json();
+    const rows = parseRows(raw);
+    empCacheSave(rows);
+    employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+    renderEmpTable(employees);
+    showCacheBanner(false);
+  } catch (err) {
+    console.error('loadEmployees error:', err);
+    if (!cached || !cached.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--red);">Error loading data — check console.</td></tr>`;
+    } else {
+      showCacheBanner(false);
+    }
+  }
+}
+
+/* ═══════════ FILTER / TABLE ═══════════ */
+function calcOverall(ex) {
+  const ss = [ex.eid?.status, ex.license?.status, ex.labour?.status, ex.insurance?.status];
+  const present = ss.filter(s => s && s !== 'not_available');
+  if (present.length === 0) return 'expired';
+  if (present.includes('expired') || present.includes('invalid')) return 'expired';
+  if (present.includes('expiring_soon')) return 'expiring_soon';
+  return 'valid';
+}
+
+function getFilteredEmps(list) {
+  const lq = (empSearchQuery || '').toLowerCase().trim();
+  return list.filter(emp => {
+    if (lq) {
+      const m = (emp.name||'').toLowerCase().includes(lq) || (emp.eid||'').toLowerCase().includes(lq) || (String(emp.id)||'').includes(lq) || (emp.reference||'').toLowerCase().includes(lq) || (emp.ref||'').toLowerCase().includes(lq);
+      if (!m) return false;
+    }
+    if (currentHRFilter !== 'all') {
+      const overall = calcOverall(emp.expiry || {});
+      if (overall !== currentHRFilter) return false;
+    }
+    return true;
+  });
+}
+
+function buildEmpRow(emp, idx) {
+  const ex      = emp.expiry || {};
+  const overall = calcOverall(ex);
+  let rowStyle  = overall === 'expired' ? 'style="border-left:3px solid var(--red);background:rgba(248,81,73,.04);"' : overall === 'expiring_soon' ? 'style="border-left:3px solid var(--amber);background:rgba(227,179,65,.04);"' : 'style="border-left:3px solid transparent;"';
+  const dotColor = overall === 'expired' ? 'var(--red)' : overall === 'expiring_soon' ? 'var(--amber)' : 'var(--teal)';
+  const dotTitle = overall === 'expired' ? 'Expired' : overall === 'expiring_soon' ? 'Expiring Soon' : 'Valid';
+  const initials = (emp.name || '?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const avBg = AV_BG2[idx % AV_BG2.length];
+  const avFg = AV_FG [idx % AV_FG.length];
+  const eidDisplay = emp.eid
+    ? `<span style="font-family:var(--mono);font-size:10.5px;color:var(--text3);letter-spacing:.03em;">${emp.eid}</span>`
+    : `<span style="color:var(--text3);font-size:11px;">No EID</span>`;
+  const hrBadge = emp.hrStatus
+    ? `<span class="badge" style="background:rgba(88,166,255,.15);color:var(--accent);border:1px solid rgba(88,166,255,.3);font-size:11px;white-space:nowrap;">${emp.hrStatus}</span>`
+    : `<span style="color:var(--text3);font-size:12px;">—</span>`;
+  const coExc = emp.checkoutException
+    ? `<span class="badge" style="background:rgba(227,179,65,.18);color:var(--amber);border:1px solid rgba(227,179,65,.3);font-size:11px;">${emp.checkoutException}</span>`
+    : `<span style="color:var(--text3);font-size:12px;">—</span>`;
+  const mob = emp.mobile
+    ? `<a href="tel:${emp.mobile}" style="font-family:var(--mono);font-size:12px;color:var(--text);text-decoration:none;">${emp.mobile}</a>`
+    : `<span style="color:var(--text3);">—</span>`;
+
+  return `
+    <tr ${rowStyle} data-emp-id="${emp.id}">
+      <td style="padding:10px 14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;background:${avBg};color:${avFg};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;position:relative;">
+            ${initials}
+            <span title="${dotTitle}" style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:${dotColor};border:2px solid var(--bg2);"></span>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-family:var(--mono);font-size:10.5px;color:var(--text3);line-height:1.2;">#${emp.id || '—'}</div>
+            <div style="font-weight:600;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;">${emp.name || '—'}</div>
+            <div style="margin-top:1px;">${eidDisplay}</div>
+          </div>
+        </div>
+      </td>
+      <td style="white-space:nowrap;">${mob}</td>
+      <td>${hrBadge}</td>
+      <td>${coExc}</td>
+      <td style="white-space:nowrap;padding:8px 12px;">
+        <div style="display:flex;gap:5px;align-items:center;flex-wrap:nowrap;">
+          <button class="row-btn row-btn-view" title="View details" onclick="viewEmployee(${JSON.stringify(emp.id)})"><i class="ti ti-eye"></i><span>View</span></button>
+          <button class="row-btn row-btn-adv"  title="Advance request" onclick="openAdvModal(${JSON.stringify(emp.id)})"><i class="ti ti-cash"></i><span>Advance</span></button>
+        </div>
+      </td>
+    </tr>`;
+}
+
+function renderEmpPagination(total, page) {
+  const totalPages = Math.ceil(total / EMP_PAGE_SIZE);
+  let el = document.getElementById('emp-pagination');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'emp-pagination';
+    el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:12px 4px;flex-wrap:wrap;';
+    const tbl = document.getElementById('emp-tbody')?.closest('table');
+    tbl?.parentElement?.parentElement?.appendChild(el);
+  }
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+  const btn = (label, pg, disabled, active) =>
+    `<button onclick="empGoToPage(${pg})" style="padding:5px 11px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:${active?'var(--accent)':'var(--surface)'};color:${active?'#fff':'var(--text)'};cursor:${disabled?'default':'pointer'};opacity:${disabled?'.4':'1'};" ${disabled?'disabled':''}>${label}</button>`;
+  const start = (page-1)*EMP_PAGE_SIZE+1, end = Math.min(page*EMP_PAGE_SIZE, total);
+  let pages = '';
+  const win = 2;
+  for (let p = 1; p <= totalPages; p++) {
+    if (p===1||p===totalPages||(p>=page-win&&p<=page+win)) pages += btn(p,p,false,p===page);
+    else if (p===page-win-1||p===page+win+1) pages += `<span style="color:var(--text3);padding:0 2px;">…</span>`;
+  }
+  el.innerHTML = btn('‹ Prev',page-1,page===1,false)+pages+btn('Next ›',page+1,page===totalPages,false)+`<span style="font-size:12px;color:var(--text3);margin-left:6px;">${start}–${end} of ${total}</span>`;
+}
+
+function renderEmpTable(list) {
+  const tbody = document.getElementById('emp-tbody');
+  tbody.innerHTML = '';
+  const filtered = getFilteredEmps(list);
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;"><div style="color:var(--text3);display:flex;flex-direction:column;align-items:center;gap:10px;"><i class="ti ti-users-minus" style="font-size:36px;opacity:.4;"></i><span style="font-size:13px;">No employees match this filter</span></div></td></tr>`;
+    renderEmpPagination(0, 1); return;
+  }
+  const totalPages = Math.ceil(filtered.length / EMP_PAGE_SIZE);
+  if (empCurrentPage > totalPages) empCurrentPage = totalPages;
+  if (empCurrentPage < 1) empCurrentPage = 1;
+  const start = (empCurrentPage - 1) * EMP_PAGE_SIZE;
+  tbody.innerHTML = filtered.slice(start, start + EMP_PAGE_SIZE).map((emp, i) => buildEmpRow(emp, start + i)).join('');
+  renderEmpPagination(filtered.length, empCurrentPage);
+}
+
+function empGoToPage(page) {
+  empCurrentPage = page;
+  renderEmpTable(employees);
+  document.getElementById('emp-tbody')?.closest('table')?.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function filterEmps(q) { empSearchQuery = q||''; empCurrentPage = 1; renderEmpTable(employees); }
+
+function filterHR(type) {
+  currentHRFilter = type; empCurrentPage = 1;
+  document.querySelectorAll('.hr-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === type));
+  renderEmpTable(employees);
+}
+
+/* ═══════════ DETAIL PANEL ═══════════ */
+let _panelType = null, _panelId = null;
+const _empDetailCache = {};
+const EMIRATE_OPTS = ['Dubai','Abu Dhabi','Sharjah','Ras Al Khaimah','Ajman','Fujairah','Umm Al Quwain'];
+
+function _ensurePanel() {
+  if (document.getElementById('detail-panel')) return;
+  const el = document.createElement('div');
+  el.id = 'detail-panel';
+  el.innerHTML = `
+    <div class="dp-backdrop" onclick="closeDetailPanel()"></div>
+    <div class="dp-sheet">
+      <div class="dp-header">
+        <div class="dp-header-info">
+          <div class="dp-avatar" id="dp-avatar"></div>
+          <div>
+            <div class="dp-name" id="dp-name">—</div>
+            <div class="dp-sub"  id="dp-sub">—</div>
+          </div>
+        </div>
+        <div class="dp-header-actions">
+          <span class="dp-status-badge" id="dp-status-badge"></span>
+          <button class="dp-close-btn" onclick="closeDetailPanel()" title="Close"><i class="ti ti-x"></i></button>
+        </div>
+      </div>
+      <div class="dp-body" id="dp-body">
+        <div class="dp-loading"><div class="dp-spinner"></div><span>Loading details…</span></div>
+      </div>
+      <div class="dp-footer">
+        <button class="dp-btn dp-btn-secondary" onclick="closeDetailPanel()"><i class="ti ti-x"></i> Close</button>
+        <button class="dp-btn dp-btn-edit"   id="dp-edit-btn"   onclick="_dpEnterEdit()"><i class="ti ti-pencil"></i> Edit</button>
+        <button class="dp-btn dp-btn-save"   id="dp-save-btn"   onclick="_dpSave()" style="display:none;"><i class="ti ti-device-floppy"></i> Save</button>
+        <button class="dp-btn dp-btn-cancel" id="dp-cancel-btn" onclick="_dpCancelEdit()" style="display:none;"><i class="ti ti-arrow-back-up"></i> Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+function closeDetailPanel() {
+  const p = document.getElementById('detail-panel');
+  if (p) p.classList.remove('open');
+  _panelType = null; _panelId = null;
+}
+
+async function viewEmployee(empId) {
+  const emp = employees.find(e => String(e.id) === String(empId));
+  if (!emp) return;
+  _panelType = 'emp'; _panelId = empId;
+  _ensurePanel();
+  const idx      = employees.indexOf(emp);
+  const avBg     = AV_BG2[idx % AV_BG2.length];
+  const avFg     = AV_FG [idx % AV_FG.length];
+  const initials = (emp.name || '?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const ex       = emp.expiry || {};
+  const overall  = calcOverall(ex);
+  const stBadge  = overall === 'expired' ? 'dp-badge-red' : overall === 'expiring_soon' ? 'dp-badge-amber' : 'dp-badge-green';
+  const stLabels = { valid:'Valid', expiring_soon:'Expiring Soon', expired:'Expired' };
+
+  document.getElementById('dp-avatar').style.cssText = `background:${avBg};color:${avFg};`;
+  document.getElementById('dp-avatar').textContent   = initials;
+  document.getElementById('dp-name').textContent     = emp.name || '—';
+  document.getElementById('dp-sub').textContent      = emp.eid ? 'EID: ' + emp.eid : 'No EID on record';
+  document.getElementById('dp-status-badge').className   = 'dp-status-badge ' + stBadge;
+  document.getElementById('dp-status-badge').textContent = stLabels[overall] || overall;
+
+  _dpResetButtons();
+  document.getElementById('dp-body').innerHTML = `<div class="dp-loading"><div class="dp-spinner"></div><span>Loading details…</span></div>`;
+  document.getElementById('detail-panel').classList.add('open');
+  _renderEmpDetail(emp, ex);
+
+  if (!_empDetailCache[empId]) {
+    try {
+      const res  = await fetch(EMP_SHEET_URL.replace('?type=employee', '?type=employeeDetail&empId=' + encodeURIComponent(empId)) + '&nocache=' + Date.now());
+      const data = await res.json();
+      if (data && (data.id || data.empId)) {
+        _empDetailCache[empId] = data;
+        const merged = Object.assign({}, emp, {
+          dob:      data.dob      || emp.dob      || '',
+          hrStatus: data.hrStatus || emp.hrStatus || '',
+          checkoutException: data.checkoutException || emp.checkoutException || '',
+          expiry: {
+            eid:      computeExpiry(data.eidExpiry   || (emp.expiry?.eid?.date)      || ''),
+            license:  computeExpiry(data.licExpiry   || (emp.expiry?.license?.date)  || ''),
+            labour:   computeExpiry(data.labourExpiry|| (emp.expiry?.labour?.date)   || ''),
+            insurance:computeExpiry(data.insExpiry   || (emp.expiry?.insurance?.date)|| ''),
+          }
+        });
+        if (_panelType === 'emp' && String(_panelId) === String(empId)) _renderEmpDetail(merged, merged.expiry);
+      }
+    } catch(e) { console.warn('detail fetch failed:', e.message); }
+  } else {
+    _renderEmpDetail(Object.assign({}, emp, _empDetailCache[empId], { expiry: emp.expiry }), ex);
+  }
+}
+
+function _renderEmpDetail(emp, ex) {
+  if (_panelType !== 'emp') return;
+  function fmtDate(d) {
+    if (!d) return '<span style="color:var(--text3);">—</span>';
+    try { return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }); } catch { return d; }
+  }
+  function exCard(label, exObj) {
+    const s   = exObj?.status || 'not_available';
+    const d   = exObj?.date   || null;
+    const cls = s==='valid'?'dp-ex-valid':s==='expired'?'dp-ex-expired':s==='expiring_soon'?'dp-ex-expiring':'dp-ex-na';
+    const icon= s==='valid'?'ti-circle-check':s==='expired'?'ti-alert-triangle':s==='expiring_soon'?'ti-clock':'ti-circle-off';
+    const lbl = s==='valid'?'Valid':s==='expired'?'Expired':s==='expiring_soon'?'Expiring':'No Data';
+    return `<div class="dp-ex-card ${cls}"><i class="ti ${icon} dp-ex-icon"></i><div class="dp-ex-label">${label}</div><div class="dp-ex-status">${lbl}</div><div class="dp-ex-date">${d?fmtDate(d):'—'}</div></div>`;
+  }
+  const html = `
+    <div class="dp-section">
+      <div class="dp-section-title"><i class="ti ti-user"></i> Personal Information</div>
+      <div class="dp-fields" id="dp-emp-fields">
+        <div class="dp-field"><span class="dp-fl">Emp ID</span><span class="dp-fv dp-mono">${emp.id||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Full Name</span><span class="dp-fv" data-field="name" data-type="text">${emp.name||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">EID Number</span><span class="dp-fv dp-mono" data-field="eid" data-type="text">${emp.eid||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Date of Birth</span><span class="dp-fv">${fmtDate(emp.dob)}</span></div>
+        <div class="dp-field"><span class="dp-fl">UAE Mobile</span><span class="dp-fv dp-mono" data-field="mobile" data-type="tel">${emp.mobile||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Emergency</span><span class="dp-fv dp-mono" data-field="mobilePak" data-type="tel">${emp.mobilePak||emp.emergency||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Reference</span><span class="dp-fv" data-field="ref" data-type="text">${emp.ref||emp.reference||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">HR Status</span><span class="dp-fv">${emp.hrStatus?`<span class="dp-badge-accent">${emp.hrStatus}</span>`:'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">CO Exception</span><span class="dp-fv">${emp.checkoutException||'—'}</span></div>
+      </div>
+    </div>
+    <div class="dp-section">
+      <div class="dp-section-title"><i class="ti ti-calendar-stats"></i> Document Expiry</div>
+      <div class="dp-ex-grid">
+        ${exCard('Emirates ID', ex.eid)}
+        ${exCard('Driving Licence', ex.license)}
+        ${exCard('Labour Card', ex.labour)}
+        ${exCard('Insurance', ex.insurance)}
+      </div>
+      <div class="dp-fields" style="margin-top:12px;">
+        <div class="dp-field"><span class="dp-fl">EID Expiry</span><span class="dp-fv dp-mono" data-field="eidExp" data-type="date">${ex.eid?.date||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Licence Expiry</span><span class="dp-fv dp-mono" data-field="licExpiry" data-type="date">${ex.license?.date||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Labour Expiry</span><span class="dp-fv dp-mono" data-field="labourExpiry" data-type="date">${ex.labour?.date||'—'}</span></div>
+        <div class="dp-field"><span class="dp-fl">Insurance Expiry</span><span class="dp-fv dp-mono" data-field="insExpiry" data-type="date">${ex.insurance?.date||'—'}</span></div>
+      </div>
+    </div>`;
+  document.getElementById('dp-body').innerHTML = html;
+}
+
+function _dpResetButtons() {
+  document.getElementById('dp-edit-btn').style.display   = '';
+  document.getElementById('dp-save-btn').style.display   = 'none';
+  document.getElementById('dp-cancel-btn').style.display = 'none';
+}
+
+function _dpEnterEdit() {
+  document.querySelectorAll('#dp-body [data-field]').forEach(span => {
+    const field = span.dataset.field, type = span.dataset.type || 'text';
+    const rawVal = span.textContent.trim() === '—' ? '' : span.textContent.trim();
+    let inp;
+    if (type === 'date') {
+      inp = document.createElement('input'); inp.type = 'date';
+      try { const d = new Date(rawVal); if (!isNaN(d)) inp.value = d.toISOString().split('T')[0]; } catch(e) {}
+      if (!inp.value) inp.value = rawVal;
+    } else if (type === 'select-emirate') {
+      inp = document.createElement('select');
+      EMIRATE_OPTS.forEach(o => { const opt = document.createElement('option'); opt.value=o; opt.textContent=o; if(o===rawVal) opt.selected=true; inp.appendChild(opt); });
+    } else {
+      inp = document.createElement('input'); inp.type = type; inp.value = rawVal;
+    }
+    inp.dataset.field = field; inp.className = 'dp-edit-input';
+    span.replaceWith(inp);
+  });
+  document.getElementById('dp-edit-btn').style.display   = 'none';
+  document.getElementById('dp-save-btn').style.display   = '';
+  document.getElementById('dp-cancel-btn').style.display = '';
+}
+
+function _dpCancelEdit() {
+  const emp = employees.find(e => String(e.id) === String(_panelId));
+  if (emp) _renderEmpDetail(emp, emp.expiry || {});
+  _dpResetButtons();
+}
+
+async function _dpSave() {
+  const saveBtn = document.getElementById('dp-save-btn');
+  saveBtn.disabled = true; saveBtn.innerHTML = '<i class="ti ti-loader-2"></i> Saving…';
+  const vals = {};
+  document.querySelectorAll('#dp-body [data-field]').forEach(inp => { vals[inp.dataset.field] = inp.value; });
+
+  const emp = employees.find(e => String(e.id) === String(_panelId));
+  if (!emp) { saveBtn.disabled=false; saveBtn.innerHTML='<i class="ti ti-device-floppy"></i> Save'; return; }
+
+  if (vals.name      !== undefined) emp.name     = vals.name;
+  if (vals.eid       !== undefined) emp.eid      = vals.eid;
+  if (vals.mobile    !== undefined) emp.mobile   = vals.mobile;
+  if (vals.mobilePak !== undefined) emp.mobilePak = vals.mobilePak;
+  if (vals.ref       !== undefined) emp.ref      = vals.ref;
+  if (vals.eidExp    !== undefined) { emp.eidExp = vals.eidExp; emp.expiry.eid = computeExpiry(vals.eidExp); }
+  if (vals.licExpiry !== undefined) emp.expiry.license  = computeExpiry(vals.licExpiry);
+  if (vals.labourExpiry !== undefined) emp.expiry.labour = computeExpiry(vals.labourExpiry);
+  if (vals.insExpiry !== undefined) emp.expiry.insurance = computeExpiry(vals.insExpiry);
+
+  renderEmpTable(employees); empCacheClear();
+  _dpResetButtons(); _renderEmpDetail(emp, emp.expiry || {});
+
+  const payload = { action:'updateEmployee', empId:String(emp.id), name:emp.name, eid:emp.eid, mobile:emp.mobile, mobilePak:emp.mobilePak||'', reference:emp.ref||'', eidExpiry:vals.eidExp||'', licExpiry:vals.licExpiry||'', labourExpiry:vals.labourExpiry||'', insExpiry:vals.insExpiry||'' };
+  try {
+    await fetch(SHEET_POST_URL, { method:'POST', mode:'no-cors', body: new URLSearchParams(payload) });
+    toast('Employee saved to sheet.');
+  } catch(err) { toast('Sheet save failed: ' + err.message, 'error'); }
+
+  saveBtn.disabled=false; saveBtn.innerHTML='<i class="ti ti-device-floppy"></i> Save';
+}
+
+/* ═══════════ ADVANCE MODAL ═══════════ */
+const ADV_REF_KEY = 'advPortalRefSeq';
+function advGenRef() {
+  const now = new Date(), yymm = now.getFullYear()+String(now.getMonth()+1).padStart(2,'0');
+  const stored = JSON.parse(localStorage.getItem(ADV_REF_KEY)||'{}');
+  const seq = (stored.prefix===yymm ? stored.seq : 0) + 1;
+  localStorage.setItem(ADV_REF_KEY, JSON.stringify({ prefix:yymm, seq }));
+  return `ADV-${yymm}-${seq.toString(36).toUpperCase().padStart(4,'0')}`;
+}
+function advFmt(n) { return Number(n).toLocaleString('en-AE', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+
+function advSubmitToGoogleForm(ref, empId, amount, installments, returnMonthsList, forMonth, reason) {
+  const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdk9P7t7zXGmAppTB0BhL5TvisDCHtsmXhv9jq6QOh0Qz6HAQ/formResponse';
+  const body = new FormData();
+  const fields = { 'entry.1370945224':ref,'entry.1724987333':String(empId),'entry.1726107212':String(amount),'entry.2138931162':String(installments),'entry.2022826562':returnMonthsList,'entry.877659064':forMonth,'entry.1496219485':reason };
+  Object.entries(fields).forEach(([k,v]) => body.append(k,v));
+  fetch(FORM_ACTION, { method:'POST', mode:'no-cors', body });
+}
+
+function openAdvModal(empId) {
+  const emp = employees.find(e => String(e.id) === String(empId));
+  if (!emp) return;
+  document.getElementById('m-name').textContent  = emp.name  || '—';
+  document.getElementById('m-empid').textContent = `#${emp.id}`;
+  document.getElementById('m-eid').textContent   = emp.eid   || 'No EID';
+  document.getElementById('m-amount').value = '';
+  document.getElementById('m-repay').selectedIndex = 0;
+  document.getElementById('m-reason').value = '';
+  document.getElementById('adv-repay-preview').style.display = 'none';
+  const mSel = document.getElementById('m-month');
+  mSel.innerHTML = '<option value="">— Select Month —</option>';
+  const now = new Date();
+  for (let i = 0; i <= 5; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    mSel.innerHTML += `<option value="${d.toISOString().slice(0,7)}"${i===0?' selected':''}>${d.toLocaleString('en-GB',{month:'long',year:'numeric'})}</option>`;
+  }
+  document.getElementById('modal-request').dataset.empId = emp.id;
+  openModal('modal-request');
+}
+
+function advUpdateRepayPreview() {
+  const amt = parseFloat(document.getElementById('m-amount').value) || 0;
+  const months = parseInt(document.getElementById('m-repay').value) || 0;
+  const prev = document.getElementById('adv-repay-preview');
+  const lump = document.getElementById('adv-repay-lump-msg');
+  const split = document.getElementById('adv-repay-split-wrap');
+  if (amt > 0) {
+    prev.style.display = 'block';
+    if (months === 0) { lump.style.display='block'; split.style.display='none'; }
+    else {
+      lump.style.display='none'; split.style.display='block';
+      const monthly = amt / months;
+      document.getElementById('adv-repay-monthly').textContent = 'AED ' + advFmt(monthly);
+      document.getElementById('adv-repay-months').textContent  = months;
+      document.getElementById('adv-repay-total').textContent   = 'AED ' + advFmt(amt);
+      const pills = document.getElementById('adv-repay-inst-pills');
+      const start = new Date(); start.setDate(1);
+      pills.innerHTML = Array.from({ length: months }, (_, i) => {
+        const last = i===months-1;
+        const installAmt = last ? amt-(Math.round(monthly*100)/100)*(months-1) : Math.round(monthly*100)/100;
+        const due = new Date(start); due.setMonth(due.getMonth()+i+1);
+        return `<span style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;font-family:var(--mono);color:var(--accent);display:inline-flex;gap:5px;align-items:center;"><span style="color:var(--text3);font-size:10px;">#${i+1}</span> AED ${advFmt(installAmt)}<span style="color:var(--text2);font-size:10px;">→ ${due.toLocaleString('en-GB',{month:'short',year:'numeric'})}</span></span>`;
+      }).join('');
+    }
+  } else { prev.style.display = 'none'; }
+}
+
+function advSubmitRequest() {
+  const modal    = document.getElementById('modal-request');
+  const empId    = modal.dataset.empId;
+  const amount   = document.getElementById('m-amount').value.trim();
+  const reason   = document.getElementById('m-reason').value.trim();
+  const forMonth = document.getElementById('m-month').value;
+  const months   = parseInt(document.getElementById('m-repay').value);
+  if (!forMonth) { toast('Please select the advance month.','error'); return; }
+  if (!amount||isNaN(amount)||Number(amount)<=0) { toast('Please enter a valid advance amount.','error'); return; }
+  if (!reason) { toast('Please provide a reason for the request.','error'); return; }
+  const ref = advGenRef();
+  const effectiveMonths = months===0?1:months;
+  const base = new Date(); base.setDate(1);
+  const returnMonthsList = Array.from({ length:effectiveMonths },(_,i) => { const d=new Date(base); d.setMonth(d.getMonth()+i+1); return d.toLocaleString('en-GB',{month:'short',year:'numeric'}); }).join(', ');
+  advSubmitToGoogleForm(ref, empId, Number(amount), months, returnMonthsList, forMonth, reason);
+  const repayLabel = months===0?'No Installments (Lump-Sum)':months===1?'Next Month Deduction':months+' Monthly Installments';
+  closeModal('modal-request');
+  toast(`Advance request ${ref} submitted — ${repayLabel} — AED ${Number(amount).toLocaleString()}`);
+}
+
+/* ═══════════ MODAL HELPERS ═══════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* ═══════════ TOAST ═══════════ */
+let toastTimer;
+function toast(msg, type='success') {
+  const el=document.getElementById('toast'), msgEl=document.getElementById('toast-msg'), icon=document.getElementById('toast-icon');
+  clearTimeout(toastTimer); el.className='toast'; msgEl.textContent=msg;
+  icon.className=type==='error'?'ti ti-x-circle':'ti ti-circle-check';
+  requestAnimationFrame(()=>{ el.classList.add('show',type); });
+  toastTimer=setTimeout(()=>{ el.classList.remove('show'); }, 3500);
+}
+
+/* ═══════════ THEME ═══════════ */
+function setTheme(mode, save=true) {
+  document.documentElement.setAttribute('data-theme', mode);
+  const icon=document.getElementById('theme-icon'), label=document.getElementById('theme-label'), btn=document.getElementById('theme-toggle-btn');
+  if(icon) icon.className=mode==='light'?'ti ti-sun':'ti ti-moon';
+  if(label) label.textContent=mode==='light'?'Light':'Dark';
+  if(btn) btn.classList.toggle('light-mode', mode==='light');
+  if(save) localStorage.setItem('theme', mode);
+}
+function toggleTheme() { const c=document.documentElement.getAttribute('data-theme')||'dark'; setTheme(c==='dark'?'light':'dark'); }
+
+/* ═══════════ INIT ═══════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!document.getElementById('spin-style')) {
+    const s = document.createElement('style');
+    s.id = 'spin-style';
+    s.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+    document.head.appendChild(s);
+  }
+  setTheme(localStorage.getItem('theme') || 'dark', false);
+  loadEmployees();
+});
+</script>
 </body>
 </html>
