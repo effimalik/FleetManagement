@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AdminPro UAE — HR &amp; Fleet Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="ti ti-building-skyscraper"></i></div>
+      <div>
+        <div class="sb-logo-text">AdminPro UAE</div>
+        <div class="sb-logo-sub">HR &amp; Fleet Management</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav" role="navigation" aria-label="Main navigation">
+
+      <div class="nav-section">Overview</div>
+      <div class="nav-item" data-view="dashboard" onclick="showView('dashboard',this)" role="button" tabindex="0">
+        <i class="ti ti-layout-dashboard nav-icon"></i>Dashboard
+      </div>
+
+      <div class="nav-section">Employees</div>
+      <div class="nav-parent" id="parent-emp" onclick="toggleParent('emp')" role="button" tabindex="0">
+        <i class="ti ti-users nav-icon"></i>
+        <span class="nav-parent-label">Employees</span>
+        <span class="nav-badge info" id="emp-nav-badge">0</span>
+        <i class="ti ti-chevron-right nav-chevron" id="chevron-emp"></i>
+      </div>
+      <div class="nav-sub" id="sub-emp">
+        <div class="nav-sub-item" data-view="emp-list" onclick="showView('emp-list',this)" role="button" tabindex="0">
+          <i class="ti ti-list"></i>All Employees
+        </div>
+        <div class="nav-sub-item" data-view="emp-add" onclick="showView('emp-add',this)" role="button" tabindex="0">
+          <i class="ti ti-user-plus"></i>Add Employee
+        </div>
+        <div class="nav-sub-item" data-view="emp-expiring" onclick="showView('emp-expiring',this)" role="button" tabindex="0">
+          <i class="ti ti-file-x"></i>Expiring Docs
+          <span class="nav-badge danger" id="emp-exp-badge">0</span>
+        </div>
+      </div>
+
+      <div class="nav-section">Bike Fleet</div>
+      <div class="nav-parent" id="parent-bike" onclick="toggleParent('bike')" role="button" tabindex="0">
+        <i class="ti ti-motorbike nav-icon"></i>
+        <span class="nav-parent-label">Bike Fleet</span>
+        <span class="nav-badge info" id="bike-nav-badge">0</span>
+        <i class="ti ti-chevron-right nav-chevron" id="chevron-bike"></i>
+      </div>
+      <div class="nav-sub" id="sub-bike">
+        <div class="nav-sub-item" data-view="bike-list" onclick="showView('bike-list',this)" role="button" tabindex="0">
+          <i class="ti ti-list"></i>All Bikes
+        </div>
+        <div class="nav-sub-item" data-view="bike-add" onclick="showView('bike-add',this)" role="button" tabindex="0">
+          <i class="ti ti-plus"></i>Register Bike
+        </div>
+        <div class="nav-sub-item" data-view="bike-expiring" onclick="showView('bike-expiring',this)" role="button" tabindex="0">
+          <i class="ti ti-file-x"></i>Expiring Docs
+          <span class="nav-badge danger" id="bike-exp-badge">0</span>
+        </div>
+      </div>
+	  <div class="nav-section">Checkout</div>
+      <div class="nav-parent" id="parent-checkout" onclick="toggleParent('checkout')" role="button" tabindex="0">
+        <i class="ti ti-bicycle nav-icon"></i>
+        <span class="nav-parent-label">Fleet Checkout</span>
+        <i class="ti ti-chevron-right nav-chevron" id="chevron-checkout"></i>
+      </div>
+      <div class="nav-sub" id="sub-checkout">
+        <div class="nav-sub-item" data-view="checkout-portal" onclick="showView('checkout-portal',this)" role="button" tabindex="0">
+          <i class="ti ti-arrow-right-left"></i>Check In / Out
+        </div>
+        <div class="nav-sub-item" data-view="checkout-active" onclick="showView('checkout-active',this)" role="button" tabindex="0">
+          <i class="ti ti-activity"></i>Active &amp; History
+        </div>
+        <div class="nav-sub-item" data-view="checkout-manage" onclick="showView('checkout-manage',this)" role="button" tabindex="0">
+          <i class="ti ti-settings"></i>Manage Fleet
+        </div>
+      </div>
+
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">AD</div>
+        <div>
+          <div class="sb-user-name">Admin</div>
+          <div class="sb-user-role">Super Administrator</div>
+        </div>
+        <div class="sb-user-dot"></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <div class="main">
+
+    <header class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <i class="ti ti-menu-2"></i>
+      </button>
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+      </div>
+      <div class="topbar-actions">
+        <!-- Theme toggle pill -->
+        <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle light/dark mode">
+          <span class="theme-toggle-track">
+            <span class="theme-toggle-thumb" id="theme-thumb">
+              <i id="theme-icon" class="ti ti-moon"></i>
+            </span>
+          </span>
+          <span class="theme-toggle-label" id="theme-label">Dark</span>
+        </button>
+        <!-- Alert bell -->
+        <div class="notif-wrap">
+          <button class="tb-btn icon-only" aria-label="Alerts" title="Expiry alerts">
+            <i class="ti ti-bell" style="font-size:17px;"></i>
+          </button>
+          <div class="notif-dot" id="alert-count" style="display:none;">0</div>
+        </div>
+        <!-- Add new -->
+        <button class="tb-btn primary" id="topbar-add-btn" onclick="topbarAdd()" style="display:none;">
+          <i class="ti ti-plus"></i><span>Add New</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content" id="main-content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="dash-welcome">
+          <div>
+            <h2>Welcome back, Admin</h2>
+            <p>UAE HR &amp; Fleet compliance overview — all data at a glance.</p>
+          </div>
+          <i class="ti ti-building-skyscraper dash-welcome-icon"></i>
+        </div>
+        <div class="stat-grid" id="dash-stats"></div>
+        <div class="dash-grid">
+          <div class="dash-section">
+            <div class="dash-section-header">
+              <h3><i class="ti ti-users"></i> Recent Employees</h3>
+              <button class="action-btn" onclick="showView('emp-list',null)">View all</button>
+            </div>
+            <div class="dash-section-body" id="dash-emp-list"></div>
+          </div>
+          <div class="dash-section">
+            <div class="dash-section-header">
+              <h3><i class="ti ti-motorbike"></i> Recent Bikes</h3>
+              <button class="action-btn" onclick="showView('bike-list',null)">View all</button>
+            </div>
+            <div class="dash-section-body" id="dash-bike-list"></div>
+          </div>
+        </div>
+      </div>
+
+<!-- EMPLOYEE LIST -->
+<div class="view" id="view-emp-list">
+
+  <div class="stat-grid" id="emp-stats"></div>
+
+  <!-- SINGLE TOOLBAR LINE: search + filters + actions -->
+  <div class="emp-toolbar">
+
+    <div class="search-wrap" style="flex:1;min-width:160px;max-width:280px;">
+      <i class="ti ti-search"></i>
+      <input type="text" id="emp-search-input"
+             placeholder="Search name, EID, ID, ref..."
+             oninput="filterEmps(this.value)" />
+    </div>
+
+    <!-- Filter pills inline -->
+    <div class="hr-filter-pills">
+      <button class="hr-filter-btn active" data-filter="all" onclick="filterHR('all')">All</button>
+      <button class="hr-filter-btn expired" data-filter="expired" onclick="filterHR('expired')">
+        <i class="ti ti-alert-circle"></i> Expired
+      </button>
+      <button class="hr-filter-btn expiring" data-filter="expiring_soon" onclick="filterHR('expiring_soon')">
+        <i class="ti ti-clock"></i> Expiring
+      </button>
+      <button class="hr-filter-btn valid" data-filter="valid" onclick="filterHR('valid')">
+        <i class="ti ti-circle-check"></i> Valid
+      </button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-left:auto;flex-shrink:0;">
+      <button class="tb-btn primary" onclick="showView('emp-add',null)">
+        <i class="ti ti-plus"></i><span class="btn-label">Add</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- SCROLLABLE TABLE CONTAINER -->
+  <div class="emp-table-card">
+    <div class="emp-table-wrap">
+      <table class="emp-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Mobile</th>
+            <th>HR Status</th>
+            <th>CO Exc.</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="emp-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ADD EMPLOYEE -->
+
+
+<!-- Hidden iframe -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(typeof clearForm==='function')clearForm()"></iframe>
+
+
+<div class="view" id="view-emp-add">
+
+  <div class="form-card">
+    <div class="form-section-title">
+      <i class="ti ti-user"></i> Personal Information
+    </div>
+
+    <form id="employeeForm"
+      action="https://docs.google.com/forms/d/e/1FAIpQLSekyWrAEOqXpE2Zb3k5dGV0Y_4Ka1pUSrnEWev_hH-HJxL87A/formResponse"
+      method="POST"
+      target="hidden_iframe">
+
+      <div class="form-grid">
+		<!-- Hidden field for the Employee ID -->
+		<input type="hidden" name="entry.108507522" id="ef-gen-id" />
+
+        <!-- Full Name -->
+        <div class="field">
+          <label>Full Name *</label>
+          <input type="text" name="entry.1124526098" id="ef-name" required />
+        </div>
+
+        <!-- Emirates ID -->
+        <div class="field">
+          <label>EID Number *</label>
+          <input type="text" name="entry.605013500" id="ef-eid" placeholder="784-XXXX-XXXXXXX-X" maxlength="18" required />
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="field">
+          <label>Date of Birth *</label>
+          <input type="date" name="entry.312378018" id="ef-dob" required />
+        </div>
+
+        <!-- UAE Mobile -->
+        <div class="field">
+          <label>UAE Mobile *</label>
+          <input type="tel" name="entry.439131661" id="ef-mobile" placeholder="+971 50 123 4567" required />
+        </div>
+
+        <!-- Emergency / Other Mobile -->
+        <div class="field">
+          <label>Emergency Contact *</label>
+          <input type="tel" name="entry.1139688451" id="ef-emergency" required />
+        </div>
+
+        <!-- Reference -->
+        <div class="field">
+          <label>Reference *</label>
+          <input type="text" name="entry.642094797" id="ef-ref" required />
+        </div>
+
+        <!-- EID Expiry -->
+        <div class="field">
+          <label>EID Expiry Date</label>
+          <input type="date" name="entry.1962789080" id="ef-eid-exp" />
+        </div>
+
+        <!-- License Expiry -->
+        <div class="field">
+          <label>License Expiry</label>
+          <input type="date" name="entry.2090960301" id="ef-license-exp" />
+        </div>
+
+        <!-- Labour Expiry -->
+        <div class="field">
+          <label>Labour Card Expiry</label>
+          <input type="date" name="entry.1595041081" id="ef-labour-exp" />
+        </div>
+
+        <!-- Insurance Expiry -->
+        <div class="field">
+          <label>Insurance Expiry</label>
+          <input type="date" name="entry.203686715" id="ef-insurance-exp" />
+        </div>
+
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+        <button type="submit" class="tb-btn primary"><i class="ti ti-device-floppy"></i> Save Employee</button>
+        <button type="reset" class="tb-btn"><i class="ti ti-refresh"></i> Clear</button>
+        <button type="button" class="tb-btn" onclick="showView('emp-list',null)">Cancel</button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+      <!-- EMPLOYEE EXPIRING -->
+      <div class="view" id="view-emp-expiring">
+        <div class="table-card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Employee</th><th>EID Number</th><th>EID Expiry</th><th>Company</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="emp-exp-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BIKE LIST -->
+      <div class="view" id="view-bike-list">
+        <div class="stat-grid" id="bike-stats"></div>
+
+        <!-- TOOLBAR: search + status filters + actions -->
+        <div class="emp-toolbar">
+
+          <div class="search-wrap" style="flex:1;min-width:160px;max-width:280px;">
+            <i class="ti ti-search"></i>
+            <input type="text" id="bike-search-input"
+                   placeholder="Search plate, make, owner..."
+                   oninput="filterBikes(this.value)" />
+          </div>
+
+          <!-- Status filter pills -->
+          <div class="hr-filter-pills">
+            <button class="hr-filter-btn bike-filter-btn active" data-filter="all" onclick="filterBikeStatus('all')">All</button>
+            <button class="hr-filter-btn bike-filter-btn expired" data-filter="expired" onclick="filterBikeStatus('expired')">
+              <i class="ti ti-alert-circle"></i> Expired
+            </button>
+            <button class="hr-filter-btn bike-filter-btn expiring" data-filter="expiring" onclick="filterBikeStatus('expiring')">
+              <i class="ti ti-clock"></i> Expiring
+            </button>
+            <button class="hr-filter-btn bike-filter-btn valid" data-filter="active" onclick="filterBikeStatus('active')">
+              <i class="ti ti-circle-check"></i> Active
+            </button>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-left:auto;flex-shrink:0;">
+            <button class="tb-btn primary" onclick="showView('bike-add',null)">
+              <i class="ti ti-plus"></i><span class="btn-label">Register Bike</span>
+            </button>
+          </div>
+
+        </div>
+
+        <div class="table-card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Bike / Owner</th><th>Plate No</th><th>Mulkiya Exp</th>
+                  <th>Insurance Exp</th><th>Documents</th><th>RTA Fine</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bike-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+<!-- ADD BIKE -------------------------------------->
+	  
+      <!-- Hidden iframe for Google Form silent submission -->
+      <iframe name="hidden_bike_iframe" id="hidden_bike_iframe" style="display:none;" onload="if(typeof clearBikeForm==='function')clearBikeForm()"></iframe>
+
+      <div class="view" id="view-bike-add">
+        <form id="bikeForm"
+          action="https://docs.google.com/forms/d/e/1FAIpQLSc8UUpeV1Ac1vMjLVCvijvSQ2GgjHfrKdzoR2lPSI4CYpzYSg/formResponse"
+          method="POST"
+          target="hidden_bike_iframe">
+
+          <!-- Hidden Bike ID: generated as BIKE-{year}-{sequence} -->
+          <input type="hidden" name="entry.354020397" id="bf-bike-id" />
+
+          <div class="form-card">
+            <div class="form-section-title"><i class="ti ti-motorbike"></i> Vehicle Information</div>
+            <div class="form-grid">
+              <div class="field"><label>Plate Number (UAE) *</label><input type="text" name="entry.1249091876" id="bf-plate" placeholder="e.g. A 12345 Dubai" /></div>
+              <div class="field"><label>Chassis / VIN Number</label><input type="text" name="entry.1168599508" id="bf-chassis" placeholder="17-char VIN" /></div>
+              <div class="field"><label>Make / Brand</label><input type="text" name="entry.1333703377" id="bf-make" placeholder="e.g. Yamaha, Honda" /></div>
+              <div class="field"><label>Model</label><input type="text" name="entry.1241869390" id="bf-model" placeholder="e.g. NMAX 155" /></div>
+              <div class="field"><label>Emirate Registered</label>
+                <select name="entry.2125370088" id="bf-emirate">
+                  <option value="">Select emirate...</option>
+                  <option>Dubai</option><option>Abu Dhabi</option><option>Sharjah</option>
+                  <option>Ras Al Khaimah</option><option>Ajman</option><option>Fujairah</option><option>Umm Al Quwain</option>
+                </select>
+              </div>
+			  <div class="field"><label>Mulkiya (Registration) Expiry</label><input type="date" name="entry.829713354" id="bf-mulkiya-exp" /></div>
+              <div class="field"><label>Insurance Expiry</label><input type="date" name="entry.1516692229" id="bf-ins-exp" /></div>
+              <div class="field"><label>Driving Licence Expiry</label><input type="date" name="entry.1136128876" id="bf-lic-exp" /></div>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-actions">
+              <button type="submit" class="tb-btn primary"><i class="ti ti-device-floppy"></i> Save Bike</button>
+              <button type="button" class="tb-btn" onclick="resetBikeForm()"><i class="ti ti-refresh"></i> Clear</button>
+              <button type="button" class="tb-btn" onclick="showView('bike-list',null)">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- BIKE EXPIRING -->
+      <div class="view" id="view-bike-expiring">
+        <div class="table-card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Bike</th><th>Plate</th><th>Owner</th><th>Mulkiya Exp</th><th>Insurance Exp</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="bike-exp-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+	  
+	  <!-- CHECKOUT PORTAL (Check Out + Check In combined) -->
+      <div class="view" id="view-checkout-portal">
+        <!-- Two-column layout: Check Out | Check In -->
+        <div class="co-split-layout">
+
+          <!-- ── LEFT: Check Out ── -->
+          <div class="table-card co-split-card">
+            <div style="padding:20px 24px 0;">
+              <div class="form-section-title"><i class="ti ti-arrow-right"></i> Check Out Bike</div>
+            </div>
+            <div id="co-alert" style="margin:12px 24px 0;"></div>
+            <div style="padding:16px 24px 24px;">
+              <div class="form-grid" style="grid-template-columns:1fr;">
+                <div class="field">
+                  <label>Bike</label>
+                  <select id="co-bike"><option value="">— Select Bike —</option></select>
+                </div>
+                <div class="field">
+                  <label>Rider / Employee</label>
+                  <div style="position:relative;">
+                    <input type="text" id="co-emp-input" placeholder="Search name or EMP ID..." autocomplete="off" oninput="coSearchEmp()" onfocus="coSearchEmp()" />
+                    <div class="co-dd-list" id="co-emp-dd"></div>
+                  </div>
+                  <input type="hidden" id="co-emp-id" />
+                </div>
+                <div class="field">
+                  <label>Employee Name</label>
+                  <input type="text" id="co-emp-name" placeholder="Auto-filled" readonly />
+                </div>
+                <div class="field">
+                  <label>Checkout Time</label>
+                  <input type="datetime-local" id="co-time" readonly />
+                </div>
+                <div class="field">
+                  <label>Purpose / Notes</label>
+                  <input type="text" id="co-notes" placeholder="Optional notes..." />
+                </div>
+                <div class="field">
+                  <button class="tb-btn primary" style="width:100%;" onclick="coDoCheckout()"><i class="ti ti-bicycle"></i> Confirm Check Out</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── RIGHT: Check In / Return ── -->
+          <div class="table-card co-split-card">
+            <div style="padding:20px 24px;border-bottom:1px solid var(--border);">
+              <div class="form-section-title" style="margin-bottom:4px;"><i class="ti ti-arrow-back-up"></i> Return Bike (Check In)</div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <div class="search-wrap" style="flex:1;min-width:160px;">
+                  <i class="ti ti-search"></i>
+                  <input type="text" id="co-ci-search" placeholder="Search employee or bike..." oninput="coRenderCheckin()" />
+                </div>
+              </div>
+            </div>
+            <div id="co-ci-alert" style="padding:8px 24px 0;"></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Bike</th><th>Employee</th><th>EMP ID</th><th>Checked Out</th><th>Action</th></tr></thead>
+                <tbody id="co-ci-table"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ACTIVE CHECKOUTS + HISTORY (combined) -->
+      <div class="view" id="view-checkout-active">
+        <!-- Tabs -->
+        <div class="co-tab-bar">
+          <button class="co-tab active" id="tab-active" onclick="coSwitchTab('active')"><i class="ti ti-activity"></i> Active Checkouts</button>
+          <button class="co-tab" id="tab-history" onclick="coSwitchTab('history')"><i class="ti ti-clock"></i> History</button>
+        </div>
+
+        <!-- Active Checkouts Panel -->
+        <div id="co-panel-active">
+          <div class="toolbar" style="margin-bottom:16px;">
+            <div class="search-wrap">
+              <i class="ti ti-search"></i>
+              <input type="text" id="co-a-search" placeholder="Search employee or bike..." oninput="coRenderActive()" />
+            </div>
+          </div>
+          <div class="table-card" style="margin-bottom:16px;">
+            <div style="padding:16px 24px;border-bottom:1px solid var(--border);">
+              <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-activity"></i> Currently Active Checkouts</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Bike</th><th>Employee</th><th>EMP ID</th><th>Checkout Time</th><th>Duration</th><th>Notes</th><th>Action</th></tr></thead>
+                <tbody id="co-a-table"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="table-card">
+            <div style="padding:16px 24px;border-bottom:1px solid var(--border);">
+              <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-circle-check"></i> Available Bikes</div>
+            </div>
+            <div id="co-avail-list" style="padding:16px 24px;"></div>
+          </div>
+        </div>
+
+        <!-- History Panel -->
+        <div id="co-panel-history" style="display:none;">
+          <div class="toolbar" style="margin-bottom:16px;">
+            <div class="search-wrap">
+              <i class="ti ti-search"></i>
+              <input type="text" id="co-h-search" placeholder="Search EMP ID, name, bike..." oninput="coRenderHistory()" />
+            </div>
+            <select id="co-h-status" onchange="coRenderHistory()" style="width:auto;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;">
+              <option value="">All Status</option>
+              <option value="returned">Returned</option>
+              <option value="active">Active</option>
+            </select>
+          </div>
+          <div class="table-card">
+            <div style="padding:16px 24px;border-bottom:1px solid var(--border);">
+              <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-clock"></i> All Transactions</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Bike</th><th>Employee</th><th>EMP ID</th><th>Out</th><th>In</th><th>Duration</th><th>Status</th></tr></thead>
+                <tbody id="co-h-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECKOUT MANAGE -->
+      <div class="view" id="view-checkout-manage">
+        <div class="form-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-bicycle"></i> Fleet Management</div>
+            <button class="tb-btn" onclick="coFetchFromSheet()"><i class="ti ti-table-import"></i> Fetch from Sheet</button>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;">
+            <div class="field" style="flex:1;min-width:140px;"><label>Bike ID / Name</label><input type="text" id="co-new-bike-id" placeholder="e.g. B-007" /></div>
+            <div class="field" style="flex:2;min-width:200px;"><label>Description</label><input type="text" id="co-new-bike-desc" placeholder="e.g. Trek FX3 Red" /></div>
+            <button class="tb-btn primary" onclick="coAddBike()"><i class="ti ti-plus"></i> Add Bike</button>
+          </div>
+          <div class="search-wrap" style="margin-bottom:12px;">
+            <i class="ti ti-search"></i>
+            <input type="text" id="co-fleet-search" placeholder="Search bikes..." oninput="coRenderFleet()" />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Bike ID</th><th>Description</th><th>Status</th><th>Total Trips</th><th>Action</th></tr></thead>
+              <tbody id="co-fleet-table"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="form-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <div class="form-section-title" style="margin-bottom:0;"><i class="ti ti-users"></i> Rider Registry</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:12px;color:var(--text3);">&#10003; Checked riders appear in Check Out</span>
+              <button class="tb-btn" onclick="coSaveRiderSelection()"><i class="ti ti-device-floppy"></i> Save Selection</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;">
+            <div class="field" style="flex:1;min-width:120px;"><label>EMP ID</label><input type="text" id="co-new-emp-id" placeholder="e.g. EMP-042" /></div>
+            <div class="field" style="flex:2;min-width:160px;"><label>Full Name</label><input type="text" id="co-new-emp-name" placeholder="e.g. Ravi Sharma" /></div>
+            <div class="field" style="flex:1;min-width:120px;"><label>Department</label><input type="text" id="co-new-emp-dept" placeholder="e.g. Operations" /></div>
+            <button class="tb-btn primary" onclick="coAddEmployee()"><i class="ti ti-plus"></i> Add</button>
+          </div>
+          <div class="search-wrap" style="margin-bottom:12px;">
+            <i class="ti ti-search"></i>
+            <input type="text" id="co-emp-search" placeholder="Search riders..." oninput="coRenderEmpTable()" />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:44px;"><input type="checkbox" id="co-emp-select-all" onchange="coToggleAllRiders(this)" title="Select all" style="width:16px;height:16px;cursor:pointer;" /></th><th>EMP ID</th><th>Name</th><th>Department</th><th>Total Trips</th><th>Action</th></tr></thead>
+              <tbody id="co-emp-table"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="form-card" id="co-fetch-preview" style="display:none;">
+          <div class="form-section-title"><i class="ti ti-table-import"></i> Sheet Import</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Paste data from Google Sheets (Tab-separated). Columns: <strong style="color:var(--text2);">EMP ID &nbsp; Name &nbsp; Department</strong></div>
+          <textarea id="co-sheet-input" placeholder="Paste sheet rows here..." style="width:100%;height:120px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:12px;padding:10px;resize:vertical;"></textarea>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="tb-btn primary" onclick="coImportSheet()"><i class="ti ti-check"></i> Import Riders</button>
+            <button class="tb-btn" onclick="document.getElementById('co-fetch-preview').style.display='none'">Cancel</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-section-title"><i class="ti ti-adjustments"></i> System Settings</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+            <div><div style="font-size:13px;font-weight:500;color:var(--text);">Prevent duplicate active checkout per employee</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Block same employee from having 2 active checkouts simultaneously</div></div>
+            <label style="position:relative;width:40px;height:22px;cursor:pointer;display:inline-block;flex-shrink:0;"><input type="checkbox" id="co-set-nodupe" checked style="opacity:0;width:0;height:0;" /><span class="co-toggle-slider"></span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+            <div><div style="font-size:13px;font-weight:500;color:var(--text);">Auto-fill checkout timestamp</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Automatically populate current date &amp; time on checkout form</div></div>
+            <label style="position:relative;width:40px;height:22px;cursor:pointer;display:inline-block;flex-shrink:0;"><input type="checkbox" id="co-set-autots" checked style="opacity:0;width:0;height:0;" /><span class="co-toggle-slider"></span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
+            <div><div style="font-size:13px;font-weight:500;color:var(--text);">Require notes on checkout</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">Make purpose/notes field mandatory before confirming</div></div>
+            <label style="position:relative;width:40px;height:22px;cursor:pointer;display:inline-block;flex-shrink:0;"><input type="checkbox" id="co-set-regnotes" style="opacity:0;width:0;height:0;" /><span class="co-toggle-slider"></span></label>
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+            <button class="tb-btn danger" onclick="coConfirmClear()"><i class="ti ti-trash"></i> Clear All Records</button>
+          </div>
+        </div>
+      </div>
+
+
+    </main>
+  </div>
+</div>
+<!-- ═══════════════ CHECKOUT CLEAR MODAL ═══════════════ -->
+<div class="modal-backdrop" id="co-modal-clear">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><i class="ti ti-alert-triangle"></i> Clear All Records</h2>
+      <button class="action-btn" onclick="closeModal('co-modal-clear')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" style="padding-top:12px;">
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;">This will permanently delete all checkout history and return all bikes to available. Bike and employee lists will be kept. This cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn" onclick="closeModal('co-modal-clear')">Cancel</button>
+      <button class="tb-btn danger" onclick="coClearAll()"><i class="ti ti-trash"></i> Yes, Clear All</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ EMPLOYEE EDIT MODAL ═══════════════ -->
+<div class="modal-backdrop" id="emp-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><i class="ti ti-user-edit"></i> Edit Employee</h2>
+      <button class="action-btn" onclick="closeModal('emp-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>Full Name</label><input type="text" id="em-name" /></div>
+        <div class="field"><label>EID Number</label><input type="text" id="em-eid" /></div>
+        <div class="field"><label>Mobile (UAE)</label><input type="tel" id="em-mobile" /></div>
+        <div class="field"><label>Mobile (Pakistan)</label><input type="tel" id="em-mobile-pak" /></div>
+        <div class="field"><label>Company</label><input type="text" id="em-company" /></div>
+        <div class="field"><label>Reference</label><input type="text" id="em-ref" /></div>
+        <div class="field"><label>Visa Expiry</label><input type="date" id="em-visa-exp" /></div>
+        <div class="field"><label>EID Expiry</label><input type="date" id="em-eid-exp" /></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn danger" onclick="deleteEmployee()"><i class="ti ti-trash"></i> Delete</button>
+      <button class="tb-btn" onclick="closeModal('emp-modal')">Cancel</button>
+      <button class="tb-btn primary" onclick="updateEmployee()"><i class="ti ti-check"></i> Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ BIKE EDIT MODAL ═══════════════ -->
+<div class="modal-backdrop" id="bike-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><i class="ti ti-motorbike"></i> Edit Bike Record</h2>
+      <button class="action-btn" onclick="closeModal('bike-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>Plate Number</label><input type="text" id="bm-plate" /></div>
+        <div class="field"><label>Make &amp; Model</label><input type="text" id="bm-makemodel" /></div>
+        <div class="field"><label>Owner / Rider</label><input type="text" id="bm-owner" /></div>
+        <div class="field"><label>Mobile</label><input type="tel" id="bm-mobile" /></div>
+        <div class="field"><label>Mulkiya Expiry</label><input type="date" id="bm-mulkiya" /></div>
+        <div class="field"><label>Insurance Expiry</label><input type="date" id="bm-ins" /></div>
+        <div class="field"><label>Licence Expiry</label><input type="date" id="bm-lic" /></div>
+        <div class="field"><label>RTA Fine (AED)</label><input type="number" id="bm-fine" min="0" /></div>
+        <div class="field"><label>Emirate</label>
+          <select id="bm-emirate">
+            <option>Dubai</option><option>Abu Dhabi</option><option>Sharjah</option>
+            <option>Ras Al Khaimah</option><option>Ajman</option><option>Fujairah</option><option>Umm Al Quwain</option>
+          </select>
+        </div>
+        <div class="field"><label>Reference / Company</label><input type="text" id="bm-ref" /></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn danger" onclick="deleteBike()"><i class="ti ti-trash"></i> Delete</button>
+      <button class="tb-btn" onclick="closeModal('bike-modal')">Cancel</button>
+      <button class="tb-btn primary" onclick="updateBike()"><i class="ti ti-check"></i> Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DOCUMENT MODAL ═══════════════ -->
+<div class="modal-backdrop" id="doc-modal">
+  <div class="modal modal-doc">
+    <div class="modal-header">
+      <h2><i class="ti ti-file-description"></i> <span id="doc-modal-title">Document</span></h2>
+      <button class="action-btn" onclick="closeModal('doc-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="doc-status-banner" id="doc-status-banner">
+        <i class="ti" id="doc-status-icon"></i>
+        <div>
+          <div id="doc-status-text" style="font-weight:600;font-size:13px;"></div>
+          <div id="doc-status-sub" style="font-size:11px;opacity:.8;margin-top:1px;"></div>
+        </div>
+      </div>
+      <div class="doc-preview-area" id="doc-preview-area">
+        <i class="ti ti-file-off" style="font-size:40px;color:var(--text3);margin-bottom:10px;"></i>
+        <div style="font-size:13px;color:var(--text2);font-weight:500;">No document uploaded</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Upload a file below to attach this document</div>
+      </div>
+      <div style="margin-top:16px;">
+        <div class="form-grid">
+          <div class="field">
+            <label>Expiry Date <span style="color:var(--text3);font-weight:400;">(if applicable)</span></label>
+            <input type="date" id="doc-expiry-input" />
+          </div>
+          <div class="field">
+            <label>Document Notes</label>
+            <input type="text" id="doc-notes-input" placeholder="Reference number, remarks..." />
+          </div>
+        </div>
+        <div class="doc-upload-row">
+          <button class="tb-btn" onclick="triggerDocUpload()"><i class="ti ti-upload"></i> Upload / Replace File</button>
+          <span class="doc-filename" id="doc-filename-display">No file selected</span>
+          <input type="file" id="doc-file-input" style="display:none;" onchange="handleDocFileSelect(event)" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn danger" id="doc-remove-btn" onclick="removeDoc()" style="display:none;"><i class="ti ti-trash"></i> Remove Doc</button>
+      <button class="tb-btn" onclick="closeModal('doc-modal')">Cancel</button>
+      <button class="tb-btn primary" onclick="saveDoc()"><i class="ti ti-device-floppy"></i> Save Document</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert" aria-live="polite">
+  <i id="toast-icon" class="ti ti-circle-check"></i>
+  <span id="toast-msg">Saved</span>
+</div>
+
+<!-- ═══════════════ ADVANCE SALARY REQUEST MODAL (full module from advance portal) ═══════════════ -->
+<div class="modal-backdrop" id="modal-request">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><i class="ti ti-cash"></i>Advance Salary Request</h2>
+      <button class="tb-btn icon-only" onclick="closeModal('modal-request')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="adv-emp-strip">
+        <div><span>Name: </span><strong id="m-name">—</strong></div>
+        <div><span>Emp ID: </span><strong id="m-empid">—</strong></div>
+        <div style="grid-column:1/-1;"><span>EID: </span><strong style="font-family:var(--mono);font-size:11.5px;" id="m-eid">—</strong></div>
+      </div>
+      <div class="field">
+        <label>Advance For Month <span style="color:var(--red);">*</span></label>
+        <select id="m-month">
+          <option value="">— Select Month —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Advance Amount (AED) <span style="color:var(--red);">*</span></label>
+        <input type="number" id="m-amount" placeholder="e.g. 2500" min="1" step="0.01" oninput="advUpdateRepayPreview()" />
+      </div>
+      <div class="field">
+        <label>Repayment Plan</label>
+        <select id="m-repay" onchange="advUpdateRepayPreview()">
+          <option value="0">No Installments (Full Lump-Sum Deduction)</option>
+          <option value="1">1 Month — Next Salary Deduction</option>
+          <option value="2">2 Monthly Installments</option>
+          <option value="3">3 Monthly Installments</option>
+          <option value="4">4 Monthly Installments</option>
+          <option value="5">5 Monthly Installments</option>
+          <option value="6">6 Monthly Installments</option>
+          <option value="9">9 Monthly Installments</option>
+          <option value="12">12 Monthly Installments</option>
+        </select>
+      </div>
+      <div id="adv-repay-preview" style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--text2);margin-bottom:14px;display:none;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;">Installment Breakdown</div>
+        <div id="adv-repay-lump-msg" style="display:none;color:var(--amber);font-weight:600;"><i class="ti ti-cash" style="font-size:14px;vertical-align:middle;"></i> Full amount deducted in one lump sum from next salary</div>
+        <div id="adv-repay-split-wrap">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:3px;">Monthly</div>
+              <div style="font-size:15px;font-weight:700;font-family:var(--mono);color:var(--teal);" id="adv-repay-monthly">AED 0.00</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:3px;">Months</div>
+              <div style="font-size:15px;font-weight:700;font-family:var(--mono);color:var(--purple);" id="adv-repay-months">0</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:3px;">Total</div>
+              <div style="font-size:15px;font-weight:700;font-family:var(--mono);color:var(--accent);" id="adv-repay-total">AED 0.00</div>
+            </div>
+          </div>
+          <div id="adv-repay-inst-pills" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Reason for Advance <span style="color:var(--red);">*</span></label>
+        <textarea id="m-reason" rows="3" placeholder="State the reason for this advance salary request..." style="resize:vertical;"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn" onclick="closeModal('modal-request')"><i class="ti ti-x"></i>Cancel</button>
+      <button class="tb-btn primary" onclick="advSubmitRequest()"><i class="ti ti-send"></i>Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
