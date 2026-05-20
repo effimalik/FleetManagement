@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Finance Queue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root,[data-theme="dark"]{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;
+  --surface:#21262d;--surface2:#2d333b;
+  --border:#30363d;--border2:#444c56;
+  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+  --accent:#58a6ff;--accent-dim:rgba(88,166,255,.12);--accent-glow:rgba(88,166,255,.25);
+  --teal:#39d353;--teal-dim:rgba(57,211,83,.12);
+  --amber:#e3b341;--amber-dim:rgba(227,179,65,.12);
+  --red:#f85149;--red-dim:rgba(248,81,73,.12);
+  --purple:#a371f7;--purple-dim:rgba(163,113,247,.12);
+  --orange:#f0883e;--orange-dim:rgba(240,136,62,.12);
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 16px rgba(0,0,0,.5);--shadow-lg:0 8px 32px rgba(0,0,0,.6);
+}
+[data-theme="light"]{
+  --bg:#f0f2f5;--bg2:#fff;--bg3:#e8ecf0;
+  --surface:#fff;--surface2:#e2e7ed;
+  --border:#c8d0d9;--border2:#9aa5b1;
+  --text:#0d1117;--text2:#3d454f;--text3:#5a6370;
+  --accent:#0550ae;--accent-dim:rgba(5,80,174,.12);--accent-glow:rgba(5,80,174,.22);
+  --teal:#116329;--teal-dim:rgba(17,99,41,.13);
+  --amber:#7d4e00;--amber-dim:rgba(125,78,0,.13);
+  --red:#a8111b;--red-dim:rgba(168,17,27,.11);
+  --purple:#6639c8;--purple-dim:rgba(102,57,200,.13);
+  --orange:#953800;--orange-dim:rgba(149,56,0,.13);
+  --shadow:0 1px 3px rgba(0,0,0,.10);--shadow-md:0 4px 16px rgba(0,0,0,.12);--shadow-lg:0 8px 32px rgba(0,0,0,.15);
+}
+
+html,body{
+  min-height:100%;
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── PAGE ── */
+.page{ min-height:100vh; padding:24px; }
+
+/* ── SECTION HEADER ── */
+.section-header{
+  display:flex; align-items:flex-start;
+  justify-content:space-between;
+  margin-bottom:20px; gap:12px; flex-wrap:wrap;
+}
+.section-header h2{
+  font-size:18px; font-weight:600; color:var(--text);
+  display:flex; align-items:center; gap:10px;
+}
+.section-header h2 i{ color:var(--teal); }
+.section-desc{ font-size:12px; color:var(--text3); margin-top:2px; }
+.section-actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+/* ── BUTTONS ── */
+.tb-btn{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:8px 16px; border-radius:var(--radius);
+  border:1px solid var(--border2); background:var(--surface);
+  color:var(--text); cursor:pointer; font-size:13px;
+  font-family:var(--font); font-weight:500;
+  transition:all .18s; white-space:nowrap;
+}
+.tb-btn:hover{ background:var(--surface2); }
+.tb-btn.success{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.tb-btn.success:hover{background:var(--teal);color:#fff;}
+.tb-btn.icon-only{padding:8px;}
+.tb-btn i{font-size:15px;}
+.tb-btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+
+/* ── SUMMARY CARD ── */
+.summary-card{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-lg); box-shadow:var(--shadow);
+  padding:20px 24px; margin-bottom:16px;
+}
+.summary-inner{
+  display:flex; align-items:center;
+  justify-content:space-between; flex-wrap:wrap; gap:16px;
+}
+.summary-stats{ display:flex; gap:32px; flex-wrap:wrap; align-items:center; }
+.stat-block{}
+.stat-lbl{
+  font-size:10.5px; color:var(--text3);
+  text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px;
+}
+.stat-val{
+  font-size:22px; font-weight:700;
+  font-family:var(--mono); color:var(--text);
+}
+.stat-val.green{ color:var(--teal); }
+.stat-val.blue{ color:var(--accent); }
+.stat-val.amber{ color:var(--amber); }
+
+/* ── TABLE CARD ── */
+.data-table-card{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-lg); box-shadow:var(--shadow); overflow:hidden;
+}
+.data-table-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; border-bottom:1px solid var(--border); gap:10px; flex-wrap:wrap;
+}
+.data-table-title{
+  font-size:14px; font-weight:600; color:var(--text);
+  display:flex; align-items:center; gap:8px;
+}
+.data-table-title i{ color:var(--teal); }
+.data-table-wrap{ overflow-x:auto; }
+.data-table{
+  width:100%; border-collapse:collapse; font-size:13px; min-width:900px;
+}
+.data-table thead th{
+  position:sticky; top:0; z-index:2;
+  background:var(--bg3); text-align:left;
+  font-size:10.5px; font-weight:600; color:var(--text3);
+  text-transform:uppercase; letter-spacing:.07em;
+  padding:11px 14px; border-bottom:2px solid var(--border); white-space:nowrap;
+}
+.data-table td{
+  padding:11px 14px; border-bottom:1px solid var(--border);
+  color:var(--text); vertical-align:middle;
+}
+.data-table tr:last-child td{ border-bottom:none; }
+.data-table tbody tr{ transition:background .12s; }
+.data-table tbody tr:hover td{ background:var(--bg3); }
+
+/* skeleton shimmer rows */
+.skeleton-row td{ padding:11px 14px; border-bottom:1px solid var(--border); }
+.skeleton-cell{
+  height:16px; border-radius:6px;
+  background:linear-gradient(90deg,var(--surface2) 25%,var(--surface) 50%,var(--surface2) 75%);
+  background-size:400% 100%;
+  animation:shimmer 1.4s ease infinite;
+}
+@keyframes shimmer{ 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+
+/* ── CELL STACKS ── */
+.cell-stack{ display:flex; flex-direction:column; gap:2px; }
+.cell-main{ font-size:12px; font-weight:600; color:var(--text); }
+.cell-sub{ font-size:11px; color:var(--text3); font-family:var(--mono); }
+.cell-amt-approved{ font-size:12px; font-weight:700; color:var(--teal); font-family:var(--mono); }
+.cell-amt-disbursed{ font-size:11px; color:var(--accent); font-family:var(--mono); }
+.cell-amt-none{ font-size:11px; color:var(--text3); }
+
+/* ── BADGES ── */
+.badge{
+  display:inline-block; padding:2px 9px;
+  border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap;
+}
+.badge.blue{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(88,166,255,.3);}
+.badge.green{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(57,211,83,.3);}
+.badge.amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(227,179,65,.3);}
+.badge.red{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,.3);}
+.badge.purple{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(163,113,247,.3);}
+.badge.gray{background:rgba(110,118,129,.18);color:#8b949e;border:1px solid rgba(110,118,129,.3);}
+
+/* ── ACTION BUTTONS ── */
+.act-btn{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:5px 11px; border-radius:var(--radius); border:1px solid;
+  cursor:pointer; font-size:11.5px; font-family:var(--font);
+  font-weight:600; transition:all .15s; white-space:nowrap;
+}
+.act-btn.view-btn{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.act-btn.view-btn:hover{background:var(--accent);color:#fff;}
+
+/* ── EMPTY STATE ── */
+.empty-state{ text-align:center; padding:40px 20px; color:var(--text3); }
+.empty-state i{ font-size:36px; display:block; margin-bottom:10px; opacity:.4; }
+.empty-state p{ font-size:13px; }
+
+/* ── MODAL ── */
+.modal-backdrop{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.65); backdrop-filter:blur(4px);
+  z-index:400; align-items:center; justify-content:center; padding:20px;
+}
+.modal-backdrop.open{ display:flex; }
+.modal{
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--radius-xl); box-shadow:var(--shadow-lg);
+  width:100%; max-width:680px; max-height:90vh;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.modal-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.modal-header h2{
+  font-size:15px; font-weight:600; color:var(--text);
+  display:flex; align-items:center; gap:8px;
+}
+.modal-header h2 i{ color:var(--purple); }
+.modal-body{ padding:20px; overflow-y:auto; flex:1; }
+.modal-footer{
+  display:flex; align-items:center; justify-content:flex-end;
+  gap:8px; padding:14px 20px; border-top:1px solid var(--border); flex-shrink:0;
+}
+
+/* ── EMP STRIP ── */
+.emp-strip{
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:14px; margin-bottom:16px;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:8px; font-size:12.5px;
+}
+.emp-strip span{ color:var(--text3); }
+.emp-strip strong{ color:var(--text); }
+
+/* ── INSTALLMENT PROGRESS ── */
+.inst-progress{
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:16px; margin-bottom:14px;
+}
+.inst-progress-top{
+  display:flex; justify-content:space-between;
+  align-items:center; margin-bottom:10px;
+}
+.inst-progress-label{ font-size:12px; font-weight:600; color:var(--text2); }
+.inst-progress-pct{ font-size:12px; font-family:var(--mono); font-weight:700; }
+.progress-track{ height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+.progress-fill{ height:100%; border-radius:4px; transition:width .5s ease; }
+.progress-fill.green{ background:linear-gradient(90deg,var(--teal),#56d068); }
+.progress-fill.amber{ background:linear-gradient(90deg,var(--amber),#f0a535); }
+.inst-amounts{
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:12px;
+}
+.inst-amt-box{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:10px; text-align:center;
+}
+.inst-amt-label{
+  font-size:10px; font-weight:600; color:var(--text3);
+  text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;
+}
+.inst-amt-val{ font-size:14px; font-weight:700; font-family:var(--mono); }
+
+/* ── INST TABLE ── */
+.inst-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+.inst-table th{
+  text-align:left; font-size:10px; font-weight:600;
+  color:var(--text3); text-transform:uppercase; letter-spacing:.07em;
+  padding:8px 12px; border-bottom:2px solid var(--border); background:var(--bg3);
+}
+.inst-table td{ padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.inst-table tr:last-child td{ border-bottom:none; }
+.inst-table tbody tr:hover td{ background:var(--bg3); }
+
+/* ── DIVIDER ── */
+.divider-label{
+  display:flex; align-items:center; gap:10px;
+  margin:20px 0 12px; color:var(--text3); font-size:11px;
+  font-weight:600; text-transform:uppercase; letter-spacing:.07em;
+}
+.divider-label::before,.divider-label::after{
+  content:''; flex:1; height:1px; background:var(--border);
+}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed; bottom:24px; right:24px;
+  background:var(--surface2); border:1px solid var(--border2);
+  border-radius:var(--radius-lg); box-shadow:var(--shadow-lg);
+  padding:12px 18px; display:flex; align-items:center; gap:10px;
+  font-size:13px; font-weight:500; color:var(--text);
+  transform:translateY(80px); opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  z-index:9999; max-width:360px; pointer-events:none;
+}
+.toast.show{ transform:translateY(0); opacity:1; }
+.toast i{ font-size:16px; color:var(--teal); }
+.toast.warn i{ color:var(--amber); }
+.toast.error i{ color:var(--red); }
+
+/* ── ANIMATIONS ── */
+@keyframes spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.spinning{ animation:spin .7s linear infinite; display:inline-block; }
+@keyframes rowIn{ from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+.new-row{ animation:rowIn .25s ease-out; }
+
+/* ── INLINE LOADING BANNER ── */
+.load-banner{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; background:var(--accent-dim);
+  border:1px solid rgba(88,166,255,.2); border-radius:var(--radius);
+  font-size:12.5px; color:var(--text2); margin-bottom:14px;
+}
+.load-banner i{ color:var(--accent); font-size:15px; flex-shrink:0; }
+.load-banner.hidden{ display:none; }
+
+@media(max-width:768px){
+  .page{ padding:14px; }
+  .inst-amounts{ grid-template-columns:1fr 1fr; }
+  .summary-stats{ gap:18px; }
+}
+[data-theme="light"] .data-table thead th{ background:var(--bg3); }
+[data-theme="light"] .data-table tbody tr:hover td{ background:var(--bg3); }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── SECTION HEADER ── -->
+  <div class="section-header">
+    <div>
+      <h2><i class="ti ti-building-bank"></i>Finance Queue</h2>
+      <div class="section-desc">All approved advance requests. Pending rows can be disbursed via Bulk Upload; disbursed rows are pulled from DissApproved.</div>
+    </div>
+    <div class="section-actions">
+      <button class="tb-btn" id="btn-sync" onclick="syncSheets()">
+        <i class="ti ti-refresh" id="sync-icon"></i>Sync Sheets
+      </button>
+      <button class="tb-btn success" id="btn-download" onclick="downloadDepositSheet()">
+        <i class="ti ti-file-download"></i>Download Deposit Sheet
+      </button>
+    </div>
+  </div>
+
+  <!-- ── INLINE LOADING BANNER ── -->
+  <div class="load-banner hidden" id="load-banner">
+    <i class="ti ti-loader spinning"></i>
+    <span id="load-banner-msg">Loading data from Google Sheets…</span>
+  </div>
+
+  <!-- ── SUMMARY CARD ── -->
+  <div class="summary-card" id="summary-card" style="display:none;">
+    <div class="summary-inner">
+      <div class="summary-stats">
+        <div class="stat-block">
+          <div class="stat-lbl">Total Approved</div>
+          <div class="stat-val green" id="fin-total-amt">AED 0.00</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-lbl">Records</div>
+          <div class="stat-val" id="fin-count">0</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-lbl">Deposited</div>
+          <div class="stat-val blue" id="fin-disbursed">0</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-lbl">Pending</div>
+          <div class="stat-val amber" id="fin-pending">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ALL APPROVED RECORDS TABLE ── -->
+  <div class="data-table-card">
+    <div class="data-table-header">
+      <div class="data-table-title"><i class="ti ti-building-bank"></i>All Approved Records</div>
+      <span class="badge green" id="finance-badge">0 records</span>
+    </div>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>REF # / Emp ID</th>
+            <th>Name / EID</th>
+            <th>Amt Approved / Amt Disbursed</th>
+            <th>Requested Plan</th>
+            <th>For Month</th>
+            <th>Approved At</th>
+            <th>Date Disbursed</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="finance-tbody">
+          <!-- skeleton rows shown immediately -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- .page -->
+
+<!-- ══ LOAN DETAIL MODAL ══ -->
+<div class="modal-backdrop" id="modal-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><i class="ti ti-list-details"></i>Loan Detail — <span id="detail-ref">—</span></h2>
+      <button class="tb-btn icon-only" onclick="closeModal('modal-detail')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-footer">
+      <button class="tb-btn" onclick="closeModal('modal-detail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i id="toast-icon" class="ti ti-circle-check"></i><span id="toast-msg">Done</span></div>
+
+<script>
+// ══════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════
+const EMPLOYEES = [
+  { empId:1, name:'Ahmed Al Mansoori', eid:'784199995170001', dob:'04/06/1999', mobile:'+971509517001', emergency:'+92304750261', ref:'no', eidExp:'13/05/2027', hrStatus:0 },
+  { empId:2, name:'Mohammed Raza',     eid:'784199995170002', dob:'13/03/1995', mobile:'+971509517002', emergency:'+92304750262', ref:'no', eidExp:'13/05/2026', hrStatus:0 },
+  { empId:3, name:'Saif Al Rashidi',   eid:'784199995170003', dob:'22/09/1990', mobile:'+971509517003', emergency:'+92304750263', ref:'no', eidExp:'13/05/2028', hrStatus:0 },
+  { empId:4, name:'Bilal Hussain',     eid:'784199995170004', dob:'11/07/1993', mobile:'+971509517004', emergency:'+92304750264', ref:'no', eidExp:'01/01/2027', hrStatus:0 },
+  { empId:5, name:'Khaled Ibrahim',    eid:'784199995170005', dob:'05/12/1988', mobile:'+971509517005', emergency:'+92304750265', ref:'no', eidExp:'30/06/2026', hrStatus:1 },
+  { empId:6, name:'Tariq Mehmood',     eid:'784199995170006', dob:'28/02/1996', mobile:'+971509517006', emergency:'+92304750266', ref:'no', eidExp:'13/05/2027', hrStatus:0 },
+];
+
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxP_zK-aqHyleejukkvrP0yPSZFhsQR46Ckim24k8CSu9YgfQCQyT-xFmS4IPA8TS3Zdg/exec';
+const CACHE_KEY   = 'financeQueue_cache_v1';
+const CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
+const PAGE_SIZE   = 20;             // rows rendered per batch
+
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let allRequests  = [];   // approved + disbursed combined
+let loans        = [];   // installment schedules (disbursed only)
+let renderOffset = 0;
+let isLoading    = false;
+
+// ══════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════
+function fmt(n){ return Number(n).toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function esc(v){ if(!v&&v!==0)return''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function nowStr(){
+  const now=new Date();
+  return now.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+'.'+String(now.getMilliseconds()).padStart(3,'0');
+}
+function todayVal(){ return new Date().toISOString().slice(0,10); }
+function addMonths(dateStr,n){ const d=new Date(dateStr); d.setMonth(d.getMonth()+n); return d.toISOString().slice(0,10); }
+function forMonthLabel(forMonth){
+  if(!forMonth) return '—';
+  const dt = new Date(forMonth+'-01');
+  return dt.toLocaleString('en-GB',{month:'short',year:'numeric'});
+}
+
+// ══════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════
+let toastTimer;
+function showToast(msg, icon='ti-circle-check', type=''){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-icon').className='ti '+icon;
+  document.getElementById('toast-msg').textContent=msg;
+  t.className='toast'+(type?' '+type:'');
+  requestAnimationFrame(()=>t.classList.add('show'));
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ══════════════════════════════════════
+//  MODAL
+// ══════════════════════════════════════
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.getElementById('modal-detail').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal-detail')) closeModal('modal-detail');
+});
+
+// ══════════════════════════════════════
+//  CACHE
+// ══════════════════════════════════════
+function readCache(){
+  try{
+    const raw=sessionStorage.getItem(CACHE_KEY);
+    if(!raw) return null;
+    const {ts,data}=JSON.parse(raw);
+    if(Date.now()-ts>CACHE_TTL) return null;
+    return data;
+  }catch(e){ return null; }
+}
+function writeCache(data){
+  try{ sessionStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data})); }catch(e){}
+}
+function clearCache(){ try{ sessionStorage.removeItem(CACHE_KEY); }catch(e){} }
+
+// ══════════════════════════════════════
+//  GAS API
+// ══════════════════════════════════════
+async function gasCall(action){
+  const url=GAS_WEB_APP_URL+'?action='+action+'&t='+Date.now();
+  let res,json;
+  try{ res=await fetch(url,{cache:'no-store'}); json=await res.json(); }
+  catch(e){ throw new Error('Network error ('+action+'): '+e.message); }
+  if(!json.success) throw new Error(json.error||'GAS error: '+action);
+  console.log('[GAS]',action,'→',(json.data||[]).length,'rows');
+  return json.data;
+}
+
+// ══════════════════════════════════════
+//  ROW → REQUEST
+//  Approved/Disbursed layout:
+//  [0] Submitted  [1] REF  [2] EmpID  [3] Amount  [4] Installments
+//  [5] ReturnMonths  [6] ForMonth  [7] Reason  [8] DecidedAt
+//  Disbursed extra: [9] DisbursedAt  [10] DissAmount
+// ══════════════════════════════════════
+function rowToRequest(r, status){
+  const ref         = String(r[1]||'').trim();
+  const empId       = parseInt(r[2])||0;
+  const amount      = parseFloat(r[3])||0;
+  const monthsRaw   = parseInt(r[4]);
+  const isLumpSum   = monthsRaw===0||isNaN(monthsRaw);
+  const months      = (isNaN(monthsRaw)||monthsRaw<=0)?1:monthsRaw;
+  const returnMonths= String(r[5]||'');
+  const forMonth    = String(r[6]||'').trim();
+  const reason      = String(r[7]||'').trim();
+  const submittedAt = String(r[0]||'').trim()||nowStr();
+  const decidedAt   = r[8]?String(r[8]).trim():null;
+  const disbursedAt = r[9]?String(r[9]).trim():null;
+  const disbursedAmount = r[10]?(parseFloat(r[10])||null):null;
+
+  if(!ref||!empId) return null;
+
+  const repayLabel = isLumpSum?'No Installments (Lump-Sum)'
+    : months===1?'Next Month Deduction'
+    : months+' Monthly Installments';
+
+  const emp = EMPLOYEES.find(e=>e.empId===empId)||{
+    empId, name:'Emp '+empId, eid:'—', dob:'—', mobile:'—',
+    emergency:'—', ref:'no', eidExp:'—', hrStatus:0
+  };
+
+  const isDisbursed = status==='disbursed';
+
+  return {
+    ref, emp, amount, months, isLumpSum, repayLabel,
+    reason, forMonth, returnMonths, submittedAt,
+    status: isDisbursed?'approved':status,
+    decidedAt,
+    disbursed: isDisbursed,
+    disbursedAt: isDisbursed?(disbursedAt||decidedAt):null,
+    processedAt: isDisbursed?(disbursedAt||decidedAt):null,
+    disbursedAmount: isDisbursed?disbursedAmount:null,
+    fromSheet: true
+  };
+}
+
+// ══════════════════════════════════════
+//  BUILD LOAN SCHEDULES (disbursed only)
+// ══════════════════════════════════════
+function buildLoans(requests){
+  return requests
+    .filter(r=>r.disbursed&&r.disbursedAt)
+    .map(r=>{
+      const monthly = r.amount/r.months;
+      const installments = Array.from({length:r.months},(_,i)=>({
+        no: i+1,
+        dueDate: addMonths(r.disbursedAt, i+1),
+        amount: (i===r.months-1)?r.amount-(Math.round(monthly*100)/100)*(r.months-1):Math.round(monthly*100)/100,
+        status:'pending', paidDate:null, paidMethod:null, notes:''
+      }));
+      return {
+        id:'LN-'+r.ref, ref:r.ref, emp:r.emp,
+        totalAmount:r.amount, months:r.months, monthly,
+        disbursedAt:r.disbursedAt, processedAt:r.processedAt,
+        forMonth:r.forMonth, installments, completedAt:null
+      };
+    });
+}
+
+// ══════════════════════════════════════
+//  LOAD DATA  ─ cache-first, then fetch
+//  1. Paint cached rows immediately (fast first render)
+//  2. Fetch fresh data in background
+//  3. Stream new rows in PAGE_SIZE batches
+// ══════════════════════════════════════
+async function loadData(forceRefresh=false){
+  if(isLoading) return;
+  isLoading=true;
+
+  // ── Step 1: render from cache immediately ────────────────────────────────
+  if(!forceRefresh){
+    const cached=readCache();
+    if(cached&&cached.length){
+      allRequests=cached;
+      loans=buildLoans(allRequests);
+      renderFinance();
+      showBanner('Updating from Google Sheets…');
+    } else {
+      showSkeletons(5);
+      showBanner('Loading data from Google Sheets…');
+    }
+  } else {
+    showSkeletons(3);
+    showBanner('Syncing from Google Sheets…');
+    clearCache();
+  }
+
+  // ── Step 2: fetch fresh data ──────────────────────────────────────────────
+  try{
+    const [approvedRows, disbursedRows] = await Promise.all([
+      gasCall('getApprovedRequests').catch(e=>{ console.error('[GAS] getApprovedRequests failed:',e); return []; }),
+      gasCall('getDisbursedRequests').catch(e=>{ console.error('[GAS] getDisbursedRequests failed:',e); return []; })
+    ]);
+
+    const disbursedRefSet = new Set(disbursedRows.map(r=>String(r[1]||'').trim()).filter(Boolean));
+    const combined = [];
+
+    // Disbursed rows first (most complete data)
+    for(const r of disbursedRows){
+      const req=rowToRequest(r,'disbursed');
+      if(req) combined.push(req);
+    }
+    // Approved (not yet disbursed) — skip any already in disbursed set
+    for(const r of approvedRows){
+      const req=rowToRequest(r,'approved');
+      if(!req) continue;
+      if(disbursedRefSet.has(req.ref)) continue;
+      if(!combined.find(x=>x.ref===req.ref)) combined.push(req);
+    }
+
+    // ── Step 3: stream rows into DOM in batches ───────────────────────────
+    allRequests = combined;
+    loans       = buildLoans(allRequests);
+    writeCache(combined);
+
+    await streamRender(combined);
+
+  } catch(err){
+    console.error('[LOAD] Fatal error:',err);
+    showToast('Could not load data — check GAS URL','ti-alert-circle','error');
+    if(!allRequests.length) clearSkeletons();
+  }
+
+  hideBanner();
+  isLoading=false;
+}
+
+// ── Stream render: paint PAGE_SIZE rows, yield to browser, repeat ──────────
+async function streamRender(records){
+  const tbody = document.getElementById('finance-tbody');
+  tbody.innerHTML = ''; // clear skeletons / old data
+  renderOffset = 0;
+
+  const allApproved = records; // already filtered upstream
+
+  if(!allApproved.length){
+    tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><i class="ti ti-building-bank"></i><p>No approved records found</p></div></td></tr>`;
+    updateSummary(allApproved);
+    return;
+  }
+
+  updateSummary(allApproved);
+
+  // Render first batch synchronously for instant paint
+  const firstBatch = allApproved.slice(0, PAGE_SIZE);
+  tbody.innerHTML = firstBatch.map(buildRow).join('');
+  renderOffset = firstBatch.length;
+
+  // Render remaining batches with yielding
+  while(renderOffset < allApproved.length){
+    await yieldToBrowser();
+    const batch = allApproved.slice(renderOffset, renderOffset+PAGE_SIZE);
+    batch.forEach(r=>{ tbody.insertAdjacentHTML('beforeend', buildRow(r)); });
+    renderOffset += batch.length;
+  }
+}
+
+// Yield control back to browser event loop
+function yieldToBrowser(){ return new Promise(r=>setTimeout(r,0)); }
+
+// ══════════════════════════════════════
+//  BUILD TABLE ROW HTML
+// ══════════════════════════════════════
+function buildRow(r){
+  const refEmpCell=`<div class="cell-stack">
+    <span class="cell-main" style="font-family:var(--mono);font-size:11px;">${esc(r.ref)}</span>
+    <span class="cell-sub"># ${r.emp.empId}</span>
+  </div>`;
+
+  const nameEidCell=`<div class="cell-stack">
+    <span class="cell-main">${esc(r.emp.name)}</span>
+    <span class="cell-sub">${esc(r.emp.eid)}</span>
+  </div>`;
+
+  const disbAmt = r.disbursed&&r.disbursedAmount!=null
+    ? `<span class="cell-amt-disbursed">AED ${fmt(r.disbursedAmount)}</span>`
+    : r.disbursed
+      ? `<span class="cell-amt-disbursed">AED ${fmt(r.amount)}</span>`
+      : `<span class="cell-amt-none">Not yet disbursed</span>`;
+  const amtCell=`<div class="cell-stack">
+    <span class="cell-amt-approved">AED ${fmt(r.amount)}</span>
+    ${disbAmt}
+  </div>`;
+
+  const statusBadge = r.disbursed
+    ? `<span class="badge green"><i class="ti ti-circle-check" style="font-size:10px;vertical-align:middle;"></i> Deposited</span>`
+    : `<span class="badge amber"><i class="ti ti-clock-hour-4" style="font-size:10px;vertical-align:middle;"></i> Pending</span>`;
+
+  const actionBtn = r.disbursed
+    ? `<button class="act-btn view-btn" onclick="openLoanDetail('${r.ref}')"><i class="ti ti-eye"></i>View</button>`
+    : `<span style="font-size:11px;color:var(--text3);">Upload via<br>Bulk Disburse</span>`;
+
+  return `<tr class="new-row" data-ref="${r.ref}">
+    <td>${refEmpCell}</td>
+    <td>${nameEidCell}</td>
+    <td>${amtCell}</td>
+    <td><span class="badge blue" style="white-space:normal;max-width:160px;">${esc(r.repayLabel)}</span></td>
+    <td style="font-size:12px;color:var(--purple);font-weight:600;">${forMonthLabel(r.forMonth)}</td>
+    <td style="font-size:11px;color:var(--teal);">${r.decidedAt||'—'}</td>
+    <td style="font-size:11px;">${r.disbursedAt
+      ?`<span style="color:var(--accent);">${r.disbursedAt}</span>`
+      :'<span style="color:var(--text3);">—</span>'}</td>
+    <td>${statusBadge}</td>
+    <td>${actionBtn}</td>
+  </tr>`;
+}
+
+// ══════════════════════════════════════
+//  UPDATE SUMMARY STATS
+// ══════════════════════════════════════
+function updateSummary(records){
+  const disbursedCount = records.filter(r=>r.disbursed).length;
+  const pendingCount   = records.filter(r=>!r.disbursed).length;
+  const totalAmt       = records.reduce((s,r)=>s+r.amount,0);
+
+  document.getElementById('fin-total-amt').textContent = 'AED '+fmt(totalAmt);
+  document.getElementById('fin-count').textContent     = records.length;
+  document.getElementById('fin-disbursed').textContent = disbursedCount;
+  document.getElementById('fin-pending').textContent   = pendingCount;
+  document.getElementById('finance-badge').textContent = records.length+' records';
+
+  const card=document.getElementById('summary-card');
+  card.style.display = records.length?'block':'none';
+}
+
+// ══════════════════════════════════════
+//  SKELETON ROWS (shown while fetching)
+// ══════════════════════════════════════
+function showSkeletons(n){
+  const tbody=document.getElementById('finance-tbody');
+  tbody.innerHTML=Array.from({length:n},()=>`
+    <tr class="skeleton-row">
+      <td><div class="skeleton-cell" style="width:120px;"></div></td>
+      <td><div class="skeleton-cell" style="width:140px;"></div></td>
+      <td><div class="skeleton-cell" style="width:100px;"></div></td>
+      <td><div class="skeleton-cell" style="width:110px;"></div></td>
+      <td><div class="skeleton-cell" style="width:70px;"></div></td>
+      <td><div class="skeleton-cell" style="width:130px;"></div></td>
+      <td><div class="skeleton-cell" style="width:90px;"></div></td>
+      <td><div class="skeleton-cell" style="width:80px;"></div></td>
+      <td><div class="skeleton-cell" style="width:60px;"></div></td>
+    </tr>`).join('');
+}
+function clearSkeletons(){
+  const tbody=document.getElementById('finance-tbody');
+  tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><i class="ti ti-building-bank"></i><p>No approved records found</p></div></td></tr>`;
+  updateSummary([]);
+}
+
+// ══════════════════════════════════════
+//  BANNER
+// ══════════════════════════════════════
+function showBanner(msg){
+  const b=document.getElementById('load-banner');
+  document.getElementById('load-banner-msg').textContent=msg;
+  b.classList.remove('hidden');
+}
+function hideBanner(){ document.getElementById('load-banner').classList.add('hidden'); }
+
+// ══════════════════════════════════════
+//  SYNC BUTTON
+// ══════════════════════════════════════
+function setSyncBtn(loading){
+  const btn=document.getElementById('btn-sync');
+  const icon=document.getElementById('sync-icon');
+  if(loading){
+    btn.disabled=true;
+    icon.className='ti ti-loader spinning';
+  } else {
+    btn.disabled=false;
+    icon.className='ti ti-refresh';
+  }
+}
+
+async function syncSheets(){
+  setSyncBtn(true);
+  await loadData(true);
+  setSyncBtn(false);
+  showToast('Synced from Google Sheets','ti-circle-check');
+}
+
+// ══════════════════════════════════════
+//  DOWNLOAD DEPOSIT SHEET
+// ══════════════════════════════════════
+function downloadDepositSheet(){
+  const pending=allRequests.filter(r=>!r.disbursed);
+  if(!pending.length){ showToast('No pending disbursements to export','ti-alert-circle','warn'); return; }
+  const headers=['REF ID','Emp ID','Amount','DissDate'];
+  const today=todayVal();
+  const rows=pending.map(r=>[r.ref,r.emp.empId,r.amount.toFixed(2),today]);
+  exportCSV('disbursement-sheet',headers,rows);
+  showToast('Disbursement Sheet downloaded — '+pending.length+' records','ti-file-download');
+}
+
+function exportCSV(name,headers,rows){
+  const csv=[headers.map(h=>`"${h}"`), ...rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`))].map(r=>r.join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=name+'-'+todayVal()+'.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════
+//  LOAN DETAIL MODAL
+// ══════════════════════════════════════
+function openLoanDetail(ref){
+  const loan=loans.find(l=>l.ref===ref);
+  const req=allRequests.find(r=>r.ref===ref);
+  if(!loan){ showToast('Installment schedule not available','ti-info-circle','warn'); return; }
+
+  document.getElementById('detail-ref').textContent=ref;
+  const today=todayVal();
+  const paidAmt=loan.installments.filter(i=>i.status==='paid').reduce((s,i)=>s+i.amount,0);
+  const remaining=loan.totalAmount-paidAmt;
+  const paidCount=loan.installments.filter(i=>i.status==='paid').length;
+  const pct=Math.round((paidAmt/loan.totalAmount)*100);
+  const fml=forMonthLabel(loan.forMonth||(req&&req.forMonth));
+
+  document.getElementById('detail-body').innerHTML=`
+    <div class="emp-strip">
+      <div><span>Employee: </span><strong>${esc(loan.emp.name)}</strong></div>
+      <div><span>Emp ID: </span><strong>${loan.emp.empId}</strong></div>
+      <div><span>EID: </span><strong style="font-family:var(--mono);font-size:11px;">${esc(loan.emp.eid)}</strong></div>
+      <div><span>Mobile: </span><strong style="font-family:var(--mono);">${esc(loan.emp.mobile)}</strong></div>
+      <div><span>REF: </span><strong style="font-family:var(--mono);">${loan.ref}</strong></div>
+      <div><span>For Month: </span><strong style="color:var(--purple);">${fml}</strong></div>
+      <div><span>Date Disbursed: </span><strong style="color:var(--accent);">${loan.disbursedAt||'—'}</strong></div>
+      <div><span>Date Processed: </span><strong style="color:var(--orange);">${loan.processedAt||'—'}</strong></div>
+    </div>
+    <div class="inst-progress">
+      <div class="inst-progress-top">
+        <div class="inst-progress-label">Recovery Progress</div>
+        <div class="inst-progress-pct" style="color:${pct===100?'var(--teal)':pct>50?'var(--accent)':'var(--amber)'};">${pct}%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill ${pct===100?'green':'amber'}" style="width:${pct}%;"></div>
+      </div>
+      <div class="inst-amounts">
+        <div class="inst-amt-box">
+          <div class="inst-amt-label">Total Advance</div>
+          <div class="inst-amt-val" style="color:var(--purple);">AED ${fmt(loan.totalAmount)}</div>
+        </div>
+        <div class="inst-amt-box">
+          <div class="inst-amt-label">Amount Recovered</div>
+          <div class="inst-amt-val" style="color:var(--teal);">AED ${fmt(paidAmt)}</div>
+        </div>
+        <div class="inst-amt-box">
+          <div class="inst-amt-label">Balance Remaining</div>
+          <div class="inst-amt-val" style="color:${remaining>0?'var(--orange)':'var(--teal)'};">AED ${fmt(remaining)}</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text3);">${paidCount} of ${loan.months} installments paid · Monthly: AED ${fmt(loan.monthly)}</div>
+    </div>
+    <div class="divider-label">Installment Schedule</div>
+    <div style="overflow-x:auto;">
+      <table class="inst-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Due Date</th><th>Due Month</th>
+            <th>Amount (AED)</th><th>Status</th>
+            <th>Paid On</th><th>Method</th><th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${loan.installments.map(inst=>{
+            const isOverdue=inst.status==='pending'&&inst.dueDate<today;
+            const dueMonthLbl=(()=>{ const dt=new Date(inst.dueDate); return dt.toLocaleString('en-GB',{month:'short',year:'numeric'}); })();
+            return `<tr style="${isOverdue?'background:rgba(248,81,73,.06);':''}">
+              <td style="font-family:var(--mono);font-weight:700;color:var(--orange);">#${inst.no}</td>
+              <td style="font-family:var(--mono);font-size:12px;">${inst.dueDate}</td>
+              <td style="font-size:12px;color:var(--text2);">${dueMonthLbl}</td>
+              <td style="font-family:var(--mono);font-weight:700;color:var(--teal);">AED ${fmt(inst.amount)}</td>
+              <td>${inst.status==='paid'?'<span class="badge green">Paid</span>':isOverdue?'<span class="badge red">Overdue</span>':'<span class="badge amber">Pending</span>'}</td>
+              <td style="font-size:12px;color:var(--text2);">${inst.paidDate||'—'}</td>
+              <td style="font-size:12px;color:var(--text3);">${esc(inst.paidMethod||'—')}</td>
+              <td style="font-size:11px;color:var(--text3);">${esc(inst.notes||'—')}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  document.getElementById('modal-detail').classList.add('open');
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+(async()=>{ await loadData(); })();
+</script>
+</body>
+</html>

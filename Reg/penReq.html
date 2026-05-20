@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pending Requests</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root,[data-theme="dark"]{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;
+  --surface:#21262d;--surface2:#2d333b;
+  --border:#30363d;--border2:#444c56;
+  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+  --accent:#58a6ff;--accent-dim:rgba(88,166,255,.12);--accent-glow:rgba(88,166,255,.25);
+  --teal:#39d353;--teal-dim:rgba(57,211,83,.12);
+  --amber:#e3b341;--amber-dim:rgba(227,179,65,.12);
+  --red:#f85149;--red-dim:rgba(248,81,73,.12);
+  --purple:#a371f7;--purple-dim:rgba(163,113,247,.12);
+  --orange:#f0883e;--orange-dim:rgba(240,136,62,.12);
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 16px rgba(0,0,0,.5);--shadow-lg:0 8px 32px rgba(0,0,0,.6);
+}
+[data-theme="light"]{
+  --bg:#f0f2f5;--bg2:#fff;--bg3:#e8ecf0;
+  --surface:#fff;--surface2:#e2e7ed;
+  --border:#c8d0d9;--border2:#9aa5b1;
+  --text:#0d1117;--text2:#3d454f;--text3:#5a6370;
+  --accent:#0550ae;--accent-dim:rgba(5,80,174,.12);--accent-glow:rgba(5,80,174,.22);
+  --teal:#116329;--teal-dim:rgba(17,99,41,.13);
+  --amber:#7d4e00;--amber-dim:rgba(125,78,0,.13);
+  --red:#a8111b;--red-dim:rgba(168,17,27,.11);
+  --purple:#6639c8;--purple-dim:rgba(102,57,200,.13);
+  --orange:#953800;--orange-dim:rgba(149,56,0,.13);
+  --shadow:0 1px 3px rgba(0,0,0,.10);--shadow-md:0 4px 16px rgba(0,0,0,.12);--shadow-lg:0 8px 32px rgba(0,0,0,.15);
+}
+
+html,body{
+  min-height:100%;
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── PAGE LAYOUT ── */
+.page{
+  min-height:100vh;
+  padding:24px;
+}
+
+/* ── SECTION HEADER ── */
+.section-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  margin-bottom:20px;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.section-header h2{
+  font-size:18px;
+  font-weight:600;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.section-header h2 i{color:var(--purple);}
+.section-desc{font-size:12px;color:var(--text3);margin-top:2px;}
+.section-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+/* ── BUTTONS ── */
+.tb-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 16px;
+  border-radius:var(--radius);
+  border:1px solid var(--border2);
+  background:var(--surface);
+  color:var(--text);
+  cursor:pointer;
+  font-size:13px;
+  font-family:var(--font);
+  font-weight:500;
+  transition:all .18s;
+  white-space:nowrap;
+}
+.tb-btn:hover{background:var(--surface2);}
+.tb-btn.danger{background:var(--red-dim);border-color:var(--red);color:var(--red);}
+.tb-btn.danger:hover{background:var(--red);color:#fff;}
+.tb-btn.success{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.tb-btn.success:hover{background:var(--teal);color:#fff;}
+.tb-btn i{font-size:15px;}
+.tb-btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+
+/* ── TABLE CARD ── */
+.data-table-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.data-table-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+  gap:10px;
+  flex-wrap:wrap;
+}
+.data-table-title{
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.data-table-title i{color:var(--purple);}
+.data-table-wrap{overflow-x:auto;}
+.data-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  min-width:900px;
+}
+.data-table thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:var(--bg3);
+  text-align:left;
+  font-size:10.5px;
+  font-weight:600;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  padding:11px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+.data-table td{
+  padding:11px 14px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+  vertical-align:middle;
+}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tbody tr{transition:background .12s;}
+.data-table tbody tr:hover td{background:var(--bg3);}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
+.empty-state i{font-size:36px;display:block;margin-bottom:10px;opacity:.4;}
+.empty-state p{font-size:13px;}
+
+/* ── BADGE ── */
+.badge{
+  display:inline-block;
+  padding:2px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  white-space:nowrap;
+}
+.badge.blue{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(88,166,255,.3);}
+.badge.green{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(57,211,83,.3);}
+.badge.amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(227,179,65,.3);}
+.badge.red{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,.3);}
+.badge.purple{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(163,113,247,.3);}
+.badge.gray{background:rgba(110,118,129,.18);color:#8b949e;border:1px solid rgba(110,118,129,.3);}
+
+/* ── ACTION BUTTONS ── */
+.action-pair{display:flex;gap:6px;flex-wrap:wrap;}
+.act-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 11px;
+  border-radius:var(--radius);
+  border:1px solid;
+  cursor:pointer;
+  font-size:11.5px;
+  font-family:var(--font);
+  font-weight:600;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.act-btn.accept{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.act-btn.accept:hover{background:var(--teal);color:#fff;}
+.act-btn.reject{background:var(--red-dim);border-color:var(--red);color:var(--red);}
+.act-btn.reject:hover{background:var(--red);color:#fff;}
+
+/* ── MODAL ── */
+.modal-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(4px);
+  z-index:400;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.modal-backdrop.open{display:flex;}
+.modal{
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-xl);
+  box-shadow:var(--shadow-lg);
+  width:100%;
+  max-width:520px;
+  max-height:90vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.modal-header h2{
+  font-size:15px;
+  font-weight:600;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.modal-header h2 i{color:var(--purple);}
+.modal-body{padding:20px;overflow-y:auto;flex:1;}
+.modal-footer{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  padding:14px 20px;
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.tb-btn.icon-only{padding:8px;}
+
+/* ── EMP STRIP ── */
+.emp-strip{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:8px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:12px 14px;
+  font-size:12.5px;
+  color:var(--text2);
+  margin-bottom:16px;
+}
+.emp-strip strong{color:var(--text);}
+.emp-strip .mono{font-family:var(--mono);}
+
+/* ── FIELD ── */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.field label{font-size:11.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
+.field select{
+  padding:9px 12px;
+  border-radius:var(--radius);
+  border:1px solid var(--border2);
+  background:var(--bg3);
+  color:var(--text);
+  font-family:var(--font);
+  font-size:13px;
+  transition:border-color .15s,box-shadow .15s;
+  outline:none;
+}
+.field select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-dim);}
+.info-box{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  background:var(--accent-dim);
+  border:1px solid rgba(88,166,255,.25);
+  border-radius:var(--radius);
+  padding:10px 14px;
+  font-size:12.5px;
+  color:var(--text2);
+  margin-bottom:14px;
+}
+.info-box i{color:var(--accent);font-size:15px;margin-top:1px;flex-shrink:0;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  padding:12px 18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  font-weight:500;
+  color:var(--text);
+  transform:translateY(80px);
+  opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  z-index:9999;
+  max-width:360px;
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast i{font-size:16px;color:var(--teal);}
+.toast.warn i{color:var(--amber);}
+.toast.error i{color:var(--red);}
+
+/* ── LOADING PULSE ── */
+@keyframes pulse-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.pulse{animation:pulse-spin .7s linear infinite;display:inline-block;}
+
+/* ── NEW ROW ANIM ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.new-row{animation:fadeIn .25s ease-out;}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── SECTION HEADER ── -->
+  <div class="section-header">
+    <div>
+      <h2><i class="ti ti-clock-hour-4"></i>Pending Requests</h2>
+      <div class="section-desc">Requests from Google Sheets (ReqAdvance) with no matching decision in ReqStatus — plus locally submitted requests.</div>
+    </div>
+    <div class="section-actions">
+      <button class="tb-btn" id="btn-sync" onclick="syncSheets()">
+        <i class="ti ti-refresh" id="sync-icon"></i>Sync Sheets
+      </button>
+      <button class="tb-btn success" id="btn-accept-sel" onclick="acceptSelected()" disabled>
+        <i class="ti ti-checks"></i>Accept Selected (<span id="sel-count">0</span>)
+      </button>
+      <button class="tb-btn danger" id="btn-reject-sel" onclick="rejectSelected()" disabled>
+        <i class="ti ti-ban"></i>Reject Selected
+      </button>
+    </div>
+  </div>
+
+  <!-- ── AWAITING DECISION TABLE ── -->
+  <div class="data-table-card">
+    <div class="data-table-header">
+      <div class="data-table-title"><i class="ti ti-clock-hour-4"></i>Awaiting Decision</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <label style="font-size:12px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;">
+          <input type="checkbox" id="chk-all-pending" onchange="toggleAllPending(this.checked)" style="width:14px;height:14px;" />
+          Select All
+        </label>
+        <span class="badge amber" id="pending-badge">0 pending</span>
+      </div>
+    </div>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:36px;"><i class="ti ti-checkbox"></i></th>
+            <th>REF #</th>
+            <th>Emp ID</th>
+            <th>Name</th>
+            <th>EID Number</th>
+            <th>Amount (AED)</th>
+            <th>Installment Split</th>
+            <th>For Month</th>
+            <th>Reason</th>
+            <th>Requested</th>
+            <th>Source</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="pending-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- .page -->
+
+<!-- ══ ACCEPT WITH OPTIONS MODAL ══ -->
+<div class="modal-backdrop" id="modal-accept">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><i class="ti ti-circle-check" style="color:var(--teal);"></i>Accept Advance Request</h2>
+      <button class="tb-btn icon-only" onclick="closeModal('modal-accept')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="emp-strip" id="accept-strip"></div>
+      <div class="info-box"><i class="ti ti-info-circle"></i>You can accept the requested repayment plan as-is, or override it with a different installment option.</div>
+      <div class="field">
+        <label>Accept Mode</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:8px 14px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);flex:1;">
+            <input type="radio" name="accept-mode" value="asis" checked onchange="toggleAcceptMode(this.value)" style="width:14px;height:14px;" />
+            <span>Accept As-Is <span style="font-size:11px;color:var(--text3);">(use employee's plan)</span></span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:8px 14px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);flex:1;">
+            <input type="radio" name="accept-mode" value="override" onchange="toggleAcceptMode(this.value)" style="width:14px;height:14px;" />
+            <span>Override Plan</span>
+          </label>
+        </div>
+      </div>
+      <div id="accept-override-wrap" style="display:none;">
+        <div class="field">
+          <label>Override Repayment Plan</label>
+          <select id="accept-months-override" onchange="updateAcceptPreview()">
+            <option value="0">No Installments (Lump-Sum)</option>
+            <option value="1">1 Month — Next Salary Deduction</option>
+            <option value="2">2 Monthly Installments</option>
+            <option value="3">3 Monthly Installments</option>
+            <option value="4">4 Monthly Installments</option>
+            <option value="5">5 Monthly Installments</option>
+            <option value="6">6 Monthly Installments</option>
+            <option value="9">9 Monthly Installments</option>
+            <option value="12">12 Monthly Installments</option>
+          </select>
+        </div>
+      </div>
+      <div id="accept-preview" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;font-size:12.5px;margin-top:4px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;">Effective Plan Preview</div>
+        <div id="accept-preview-body" style="color:var(--text2);"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn" onclick="closeModal('modal-accept')">Cancel</button>
+      <button class="tb-btn danger" onclick="decideFromModal('rejected')"><i class="ti ti-x"></i>Reject Instead</button>
+      <button class="tb-btn success" onclick="decideFromModal('approved')"><i class="ti ti-circle-check"></i>Confirm Accept</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i id="toast-icon" class="ti ti-circle-check"></i><span id="toast-msg">Done</span></div>
+
+<script>
+// ══════════════════════════════════════
+//  CONFIG — same as advance_v7
+// ══════════════════════════════════════
+const EMPLOYEES = [
+  { empId:1, name:'Ahmed Al Mansoori', eid:'784199995170001', dob:'04/06/1999', mobile:'+971509517001', emergency:'+92304750261', ref:'no', eidExp:'13/05/2027', hrStatus:0 },
+  { empId:2, name:'Mohammed Raza',     eid:'784199995170002', dob:'13/03/1995', mobile:'+971509517002', emergency:'+92304750262', ref:'no', eidExp:'13/05/2026', hrStatus:0 },
+  { empId:3, name:'Saif Al Rashidi',   eid:'784199995170003', dob:'22/09/1990', mobile:'+971509517003', emergency:'+92304750263', ref:'no', eidExp:'13/05/2028', hrStatus:0 },
+  { empId:4, name:'Bilal Hussain',     eid:'784199995170004', dob:'11/07/1993', mobile:'+971509517004', emergency:'+92304750264', ref:'no', eidExp:'01/01/2027', hrStatus:0 },
+  { empId:5, name:'Khaled Ibrahim',    eid:'784199995170005', dob:'05/12/1988', mobile:'+971509517005', emergency:'+92304750265', ref:'no', eidExp:'30/06/2026', hrStatus:1 },
+  { empId:6, name:'Tariq Mehmood',     eid:'784199995170006', dob:'28/02/1996', mobile:'+971509517006', emergency:'+92304750266', ref:'no', eidExp:'13/05/2027', hrStatus:0 },
+];
+
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxP_zK-aqHyleejukkvrP0yPSZFhsQR46Ckim24k8CSu9YgfQCQyT-xFmS4IPA8TS3Zdg/exec';
+
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let requests = [];
+let selectedRefs = new Set();
+let pendingAcceptRef = null;
+
+// ══════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════
+function fmt(n){ return Number(n).toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function esc(v){ if(!v&&v!==0)return''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function nowStr(){
+  const now = new Date();
+  const base = now.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  return base + '.' + String(now.getMilliseconds()).padStart(3,'0');
+}
+function todayVal(){ return new Date().toISOString().slice(0,10); }
+
+// ══════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════
+let toastTimer;
+function showToast(msg, icon='ti-circle-check', type='') {
+  const t = document.getElementById('toast');
+  const ic = document.getElementById('toast-icon');
+  document.getElementById('toast-msg').textContent = msg;
+  ic.className = 'ti ' + icon;
+  t.className = 'toast' + (type ? ' ' + type : '');
+  requestAnimationFrame(() => { t.classList.add('show'); });
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ══════════════════════════════════════
+//  GAS API
+// ══════════════════════════════════════
+async function gasCall(action) {
+  const url = GAS_WEB_APP_URL + '?action=' + action + '&t=' + Date.now();
+  let res, json;
+  try {
+    res  = await fetch(url, { cache: 'no-store' });
+    json = await res.json();
+  } catch (fetchErr) {
+    console.error('[GAS] Network/CORS error for action:', action, fetchErr);
+    throw new Error('Network error for ' + action + ': ' + fetchErr.message);
+  }
+  if (!json.success) {
+    console.error('[GAS] Server error for action:', action, json.error);
+    throw new Error(json.error || 'GAS error: ' + action);
+  }
+  console.log('[GAS]', action, '→', (json.data||[]).length, 'rows');
+  return json.data;
+}
+
+// ══════════════════════════════════════
+//  ROW → REQUEST
+//  [0] Submitted  [1] REF  [2] EmpID  [3] Amount  [4] Installments
+//  [5] ReturnMonths  [6] ForMonth  [7] Reason
+// ══════════════════════════════════════
+function rowToRequest(r) {
+  const ref         = String(r[1] || '').trim();
+  const empId       = parseInt(r[2]) || 0;
+  const amount      = parseFloat(r[3]) || 0;
+  const monthsRaw   = parseInt(r[4]);
+  const isLumpSum   = monthsRaw === 0 || isNaN(monthsRaw);
+  const months      = (isNaN(monthsRaw) || monthsRaw <= 0) ? 1 : monthsRaw;
+  const returnMonths= String(r[5] || '');
+  const forMonth    = String(r[6] || '').trim();
+  const reason      = String(r[7] || '').trim();
+  const submittedAt = String(r[0] || '').trim() || nowStr();
+
+  if (!ref || !empId) return null;
+
+  const repayLabel = isLumpSum
+    ? 'No Installments (Lump-Sum)'
+    : months === 1 ? 'Next Month Deduction'
+    : months + ' Monthly Installments';
+
+  const emp = EMPLOYEES.find(e => e.empId === empId) || {
+    empId, name: 'Emp ' + empId,
+    eid: '—', dob: '—', mobile: '—',
+    emergency: '—', ref: 'no', eidExp: '—', hrStatus: 0
+  };
+
+  return {
+    ref, emp, amount, months, isLumpSum, repayLabel,
+    reason, forMonth, returnMonths,
+    submittedAt,
+    status: 'pending',
+    decidedAt: null,
+    disbursed: false,
+    fromSheet: true
+  };
+}
+
+// ══════════════════════════════════════
+//  LOAD DATA
+// ══════════════════════════════════════
+async function loadData() {
+  setSyncLoading(true);
+  requests = [];
+  selectedRefs.clear();
+
+  try {
+    const pendingRows = await gasCall('getPendingRequests');
+    for (const r of pendingRows) {
+      const req = rowToRequest(r);
+      if (req) requests.push(req);
+    }
+    console.log('[LOAD] Pending requests loaded:', requests.length);
+  } catch (err) {
+    console.error('[LOAD] Fatal GAS fetch error:', err);
+    showToast('Could not load sheet data — check GAS URL & deployment', 'ti-alert-circle', 'error');
+  }
+
+  setSyncLoading(false);
+  renderPending();
+}
+
+// ══════════════════════════════════════
+//  SYNC BUTTON
+// ══════════════════════════════════════
+function setSyncLoading(on) {
+  const btn  = document.getElementById('btn-sync');
+  const icon = document.getElementById('sync-icon');
+  if (on) {
+    btn.disabled = true;
+    icon.className = 'ti ti-loader pulse';
+    btn.childNodes[1].textContent = 'Syncing…';
+  } else {
+    btn.disabled = false;
+    icon.className = 'ti ti-refresh';
+    btn.childNodes[1].textContent = 'Sync Sheets';
+  }
+}
+
+async function syncSheets() {
+  await loadData();
+  showToast('Synced from Google Sheets', 'ti-circle-check');
+}
+
+// ══════════════════════════════════════
+//  RENDER PENDING TABLE
+// ══════════════════════════════════════
+function renderPending() {
+  const tbody   = document.getElementById('pending-tbody');
+  const pending = requests.filter(r => r.status === 'pending');
+
+  document.getElementById('pending-badge').textContent = pending.length + ' pending';
+  selectedRefs.clear();
+  updateSelectionUI();
+  const chkAll = document.getElementById('chk-all-pending');
+  if (chkAll) chkAll.checked = false;
+
+  if (!pending.length) {
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty-state"><i class="ti ti-clock-hour-4"></i><p>No pending requests</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = pending.map(r => {
+    // Installment split pills
+    let splitHtml;
+    if (r.isLumpSum || r.months === 0) {
+      splitHtml = `<span class="badge amber">Lump-Sum (Full)</span>`;
+    } else if (r.months === 1) {
+      splitHtml = `<span class="badge gray">1 × AED ${fmt(r.amount)}</span>`;
+    } else {
+      const monthly = r.amount / r.months;
+      splitHtml = `<div style="display:flex;flex-wrap:wrap;gap:3px;">` +
+        Array.from({length:r.months}, (_,i) => {
+          const last = i === r.months - 1;
+          const installAmt = last ? r.amount - (Math.round(monthly*100)/100)*(r.months-1) : Math.round(monthly*100)/100;
+          return `<span style="background:var(--accent-dim);border:1px solid rgba(88,166,255,.25);border-radius:12px;padding:1px 7px;font-size:10.5px;font-family:var(--mono);color:var(--accent);">#${i+1} ${fmt(installAmt)}</span>`;
+        }).join('') + `</div>`;
+    }
+
+    const sourceBadge = r.fromSheet
+      ? `<span class="badge purple" title="Sourced from ReqAdvance sheet — no entry in ReqStatus"><i class="ti ti-table" style="font-size:10px;vertical-align:middle;"></i> Sheet</span>`
+      : `<span class="badge blue" title="Submitted locally via this portal"><i class="ti ti-device-desktop" style="font-size:10px;vertical-align:middle;"></i> Portal</span>`;
+
+    return `<tr class="new-row" data-ref="${r.ref}">
+      <td><input type="checkbox" class="pending-chk" onchange="togglePendingRow('${r.ref}',this.checked)" style="width:14px;height:14px;cursor:pointer;" /></td>
+      <td style="font-family:var(--mono);font-size:11px;">${r.ref}</td>
+      <td style="font-family:var(--mono);font-size:12px;">${r.emp.empId}</td>
+      <td><strong>${esc(r.emp.name)}</strong></td>
+      <td style="font-family:var(--mono);font-size:11px;">${esc(r.emp.eid)}</td>
+      <td style="font-family:var(--mono);font-weight:700;color:var(--purple);">AED ${fmt(r.amount)}</td>
+      <td style="max-width:200px;">${splitHtml}</td>
+      <td style="font-size:12px;color:var(--purple);font-weight:600;">${r.forMonth ? (() => { const dt = new Date(r.forMonth+'-01'); return dt.toLocaleString('en-GB',{month:'short',year:'numeric'}); })() : '—'}</td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(r.reason)}">${esc(r.reason)}</td>
+      <td style="font-size:12px;color:var(--text3);">${r.submittedAt}</td>
+      <td>${sourceBadge}</td>
+      <td>
+        <div class="action-pair">
+          <button class="act-btn accept" onclick="openAcceptModal('${r.ref}')"><i class="ti ti-circle-check"></i>Accept</button>
+          <button class="act-btn reject" onclick="decide('${r.ref}','rejected')"><i class="ti ti-x"></i>Reject</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+//  SELECTION HELPERS
+// ══════════════════════════════════════
+function updateSelectionUI() {
+  const n = selectedRefs.size;
+  document.getElementById('sel-count').textContent = n;
+  document.getElementById('btn-accept-sel').disabled = n === 0;
+  document.getElementById('btn-reject-sel').disabled = n === 0;
+}
+
+function toggleAllPending(checked) {
+  const pending = requests.filter(r => r.status === 'pending');
+  selectedRefs.clear();
+  if (checked) pending.forEach(r => selectedRefs.add(r.ref));
+  document.querySelectorAll('.pending-chk').forEach(cb => { cb.checked = checked; });
+  updateSelectionUI();
+}
+
+function togglePendingRow(ref, checked) {
+  if (checked) selectedRefs.add(ref);
+  else selectedRefs.delete(ref);
+  updateSelectionUI();
+  const all = requests.filter(r => r.status === 'pending');
+  document.getElementById('chk-all-pending').checked = selectedRefs.size === all.length && all.length > 0;
+}
+
+function acceptSelected() {
+  if (selectedRefs.size === 0) return;
+  const count = selectedRefs.size;
+  selectedRefs.forEach(ref => decide(ref, 'approved', true));
+  selectedRefs.clear();
+  updateSelectionUI();
+  document.getElementById('chk-all-pending').checked = false;
+  showToast(count + ' request(s) accepted', 'ti-circle-check');
+}
+
+function rejectSelected() {
+  if (selectedRefs.size === 0) return;
+  const count = selectedRefs.size;
+  selectedRefs.forEach(ref => decide(ref, 'rejected', true));
+  selectedRefs.clear();
+  updateSelectionUI();
+  document.getElementById('chk-all-pending').checked = false;
+  showToast(count + ' request(s) rejected', 'ti-ban', 'warn');
+}
+
+// ══════════════════════════════════════
+//  DECIDE (ACCEPT / REJECT)
+// ══════════════════════════════════════
+function decide(ref, verdict, skipForm) {
+  const req = requests.find(r => r.ref === ref);
+  if (!req) return;
+  if (req.status === verdict) return;
+  req.status    = verdict;
+  req.decidedAt = nowStr();
+
+  if (!skipForm) {
+    submitDecisionToGoogleForm(req.ref, req.emp.empId, req.emp.name,
+      verdict === 'approved' ? 'Approved' : 'Rejected',
+      verdict === 'approved' ? req.amount : 0,
+      verdict === 'approved' ? req.months : 0,
+      verdict === 'approved' ? buildReturnMonths(req.months) : '0'
+    );
+  }
+
+  const row = document.querySelector(`[data-ref="${ref}"]`);
+  if (row) { row.style.transition = 'opacity .3s'; row.style.opacity = '0'; setTimeout(() => renderPending(), 320); }
+  else renderPending();
+
+  if (verdict === 'approved') showToast('Request accepted — ' + ref, 'ti-circle-check');
+  else showToast('Request rejected — ' + ref, 'ti-ban', 'warn');
+}
+
+function buildReturnMonths(months) {
+  const base = new Date(); base.setDate(1);
+  return Array.from({length: months}, (_, i) => {
+    const d = new Date(base); d.setMonth(d.getMonth() + i + 1);
+    return d.toLocaleString('en-GB', {month: 'short', year: 'numeric'});
+  }).join(', ');
+}
+
+// ══════════════════════════════════════
+//  ACCEPT MODAL
+// ══════════════════════════════════════
+function openAcceptModal(ref) {
+  const req = requests.find(r => r.ref === ref);
+  if (!req) return;
+  pendingAcceptRef = ref;
+
+  document.getElementById('accept-strip').innerHTML = `
+    <div><span>Name: </span><strong>${esc(req.emp.name)}</strong></div>
+    <div><span>Emp ID: </span><strong>${req.emp.empId}</strong></div>
+    <div><span>REF: </span><strong class="mono" style="font-family:var(--mono);">${req.ref}</strong></div>
+    <div><span>Amount: </span><strong style="color:var(--teal);">AED ${fmt(req.amount)}</strong></div>
+    <div style="grid-column:1/-1;"><span>Employee's Plan: </span><strong style="color:var(--purple);">${esc(req.repayLabel)}</strong></div>
+  `;
+
+  document.querySelectorAll('input[name="accept-mode"]').forEach(r => { r.checked = r.value === 'asis'; });
+  document.getElementById('accept-override-wrap').style.display = 'none';
+  document.getElementById('accept-months-override').value = String(req.isLumpSum ? 0 : req.months);
+  updateAcceptPreview();
+  document.getElementById('modal-accept').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.getElementById('modal-accept').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-accept')) closeModal('modal-accept');
+});
+
+function toggleAcceptMode(val) {
+  document.getElementById('accept-override-wrap').style.display = val === 'override' ? 'block' : 'none';
+  updateAcceptPreview();
+}
+
+function updateAcceptPreview() {
+  const req = requests.find(r => r.ref === pendingAcceptRef);
+  if (!req) return;
+  const mode = document.querySelector('input[name="accept-mode"]:checked')?.value || 'asis';
+  let months, isLumpSum;
+
+  if (mode === 'asis') {
+    months = req.months;
+    isLumpSum = req.isLumpSum;
+  } else {
+    const v = parseInt(document.getElementById('accept-months-override').value);
+    months = v === 0 ? 1 : v;
+    isLumpSum = v === 0;
+  }
+
+  const monthly = req.amount / months;
+  const startDate = new Date(); startDate.setDate(1);
+  let html;
+
+  if (isLumpSum || months <= 1) {
+    const due = new Date(startDate); due.setMonth(due.getMonth() + 1);
+    html = `<div style="display:flex;align-items:center;gap:8px;">
+      <span class="badge amber">Lump-Sum / 1 Deduction</span>
+      <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--teal);">AED ${fmt(req.amount)}</span>
+      <span style="font-size:11px;color:var(--text3);">→ ${due.toLocaleString('en-GB',{month:'short',year:'numeric'})}</span>
+    </div>`;
+  } else {
+    const pills = Array.from({length:months}, (_,i) => {
+      const last = i === months - 1;
+      const installAmt = last ? req.amount - (Math.round(monthly*100)/100)*(months-1) : Math.round(monthly*100)/100;
+      const d = new Date(startDate); d.setMonth(d.getMonth() + i + 1);
+      const mLabel = d.toLocaleString('en-GB',{month:'short',year:'numeric'});
+      return `<span style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;font-family:var(--mono);color:var(--accent);display:inline-flex;gap:4px;align-items:center;">
+        <span style="color:var(--text3);font-size:10px;">#${i+1}</span> AED ${fmt(installAmt)}
+        <span style="color:var(--text2);font-size:10px;">→ ${mLabel}</span>
+      </span>`;
+    }).join('');
+    html = `<div style="margin-bottom:8px;display:flex;gap:12px;flex-wrap:wrap;">
+      <span>Monthly: <strong style="font-family:var(--mono);color:var(--teal);">AED ${fmt(monthly)}</strong></span>
+      <span>Months: <strong style="font-family:var(--mono);color:var(--purple);">${months}</strong></span>
+      <span>Total: <strong style="font-family:var(--mono);color:var(--accent);">AED ${fmt(req.amount)}</strong></span>
+    </div><div style="display:flex;flex-wrap:wrap;gap:5px;">${pills}</div>`;
+  }
+  document.getElementById('accept-preview-body').innerHTML = html;
+}
+
+function decideFromModal(verdict) {
+  const req = requests.find(r => r.ref === pendingAcceptRef);
+  if (!req) return;
+
+  if (verdict === 'approved') {
+    const mode = document.querySelector('input[name="accept-mode"]:checked')?.value || 'asis';
+    if (mode === 'override') {
+      const v = parseInt(document.getElementById('accept-months-override').value);
+      req.isLumpSum = v === 0;
+      req.months    = v === 0 ? 1 : v;
+      if (v===0) req.repayLabel = 'No Installments (Lump-Sum)';
+      else if (v===1) req.repayLabel = 'Next Month Deduction';
+      else req.repayLabel = v + ' Monthly Installments';
+    }
+  }
+
+  // Post decision to Google Form
+  const retList = verdict === 'approved' ? buildReturnMonths(req.months) : '0';
+  submitDecisionToGoogleForm(
+    req.ref, req.emp.empId, req.emp.name,
+    verdict === 'approved' ? 'Approved' : 'Rejected',
+    verdict === 'approved' ? req.amount : 0,
+    verdict === 'approved' ? req.months : 0,
+    retList
+  );
+
+  closeModal('modal-accept');
+  decide(pendingAcceptRef, verdict, true); // skipForm=true since we already posted above
+  pendingAcceptRef = null;
+}
+
+// ══════════════════════════════════════
+//  GOOGLE FORM — HR DECISION
+// ══════════════════════════════════════
+function submitDecisionToGoogleForm(ref, empId, empName, verdict, appAmount, appInstallments, retMonthsList) {
+  const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfPkgYXjfSLC9HdQVHVQ1NEWpQ99LqST36ekWqh323kx_BrzQ/formResponse';
+  const body = new FormData();
+  body.append('entry.1832699408', ref);
+  body.append('entry.136041612',  String(empId));
+  body.append('entry.1153392573', verdict);
+  body.append('entry.312937153',  String(appAmount));
+  body.append('entry.229574748',  String(appInstallments));
+  body.append('entry.1835619254', retMonthsList);
+  body.append('entry.338921058',  empName);
+  fetch(FORM_ACTION, { method: 'POST', mode: 'no-cors', body });
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+(async () => {
+  await loadData();
+})();
+</script>
+</body>
+</html>
