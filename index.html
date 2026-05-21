@@ -350,10 +350,10 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
           onclick="loadPage('Reg/addBike.html',null,'Add Bike','ti-motorbike','Register vehicle','teal')">
           <i class="ti ti-motorbike"></i> Add Bike
         </button>
-        <button class="tb-sc adv"
-          onclick="loadPage('Reg/allEmp.html',null,'Advance Salary','ti-cash','Salary advances','amber')">
-          <i class="ti ti-cash"></i> Advance
-        </button>
+		<button class="tb-sc adv"
+		  onclick="createSheet()">
+		  <i class="ti ti-cash"></i> Refresh
+		</button>
       </div>
 
       <div class="tb-gap"></div>
@@ -600,6 +600,21 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   ibOpen('ib-emp', document.getElementById('ib-emp'));
 });
+
+function createSheet() {
+  // optional UI feedback
+  alert("Creating sheet...");
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      alert(res); // show success message
+    })
+    .withFailureHandler(function(err) {
+      alert("Error: " + err.message);
+    })
+    .buildMasterSheet();   // <-- your Apps Script function
+}
+
 </script>
 </body>
 </html>
