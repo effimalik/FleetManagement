@@ -601,29 +601,23 @@ window.addEventListener('DOMContentLoaded', () => {
   ibOpen('ib-emp', document.getElementById('ib-emp'));
 });
 
+
+
 function createSheet() {
 
-  const data = {
-    ref: document.getElementById("ref").value,
-    emp: document.getElementById("emp").value,
-    amount: document.getElementById("amount").value
-  };
-
-  fetch("https://script.google.com/macros/s/AKfycbwoZRtzaWhKGc7vmQkiF89QYthrFxa8bpJeFxwGUt0pNJp3rXETFDDKVggPwdu7JbFYBg/exec", {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-  .then(res => res.json())
-  .then(response => {
-    alert("Success: " + response.status);
-  })
-  .catch(err => {
-    alert("Error: " + err);
-  });
+  fetch("https://script.google.com/macros/s/AKfycbzaWwWKa8gm0wF-gFRQpS4mNBxKbyVFrmL21LqTTg5jKir6zkIu_-K0M20hmTjahE9hjw/exec")
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message + " (" + data.rows + " rows)");
+    })
+    .catch(err => {
+      alert("Error: " + err.message);
+    });
 }
+
+
+
+	
 
 </script>
 </body>
