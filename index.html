@@ -602,17 +602,27 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function createSheet() {
-  // optional UI feedback
-  alert("Creating sheet...");
 
-  google.script.run
-    .withSuccessHandler(function(res) {
-      alert(res); // show success message
-    })
-    .withFailureHandler(function(err) {
-      alert("Error: " + err.message);
-    })
-    .buildMasterSheet();   // <-- your Apps Script function
+  const data = {
+    ref: document.getElementById("ref").value,
+    emp: document.getElementById("emp").value,
+    amount: document.getElementById("amount").value
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbwoZRtzaWhKGc7vmQkiF89QYthrFxa8bpJeFxwGUt0pNJp3rXETFDDKVggPwdu7JbFYBg/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(response => {
+    alert("Success: " + response.status);
+  })
+  .catch(err => {
+    alert("Error: " + err);
+  });
 }
 
 </script>
