@@ -6,7 +6,7 @@
 <title>All Employees</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 <style>
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,51 +46,40 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .page { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
 
 /* ── Page header ── */
-.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-.page-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text); }
-.page-title i { color: var(--accent); font-size: 20px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 12px; }
+.page-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text); }
+.page-title i { color: var(--accent); font-size: 24px; line-height: 1; }
 
-/* ── Theme toggle ── */
-.theme-toggle { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; padding: 0; font-family: var(--font); }
-.theme-toggle-track { position: relative; width: 44px; height: 24px; background: var(--surface2); border: 1.5px solid var(--border2); border-radius: 999px; transition: background .22s, border-color .22s; flex-shrink: 0; }
-.theme-toggle:hover .theme-toggle-track { border-color: var(--accent); }
-.theme-toggle-thumb { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; transition: transform .25s cubic-bezier(.4,0,.2,1), background .22s; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
-.theme-toggle-thumb i { font-size: 10px; color: var(--text2); }
-.theme-toggle .theme-toggle-track { background: #1c2333; }
-.theme-toggle .theme-toggle-thumb { transform: translateX(0); background: #21262d; }
-.theme-toggle .theme-toggle-thumb i { color: #58a6ff; }
-.theme-toggle.light-mode .theme-toggle-track { background: #fde68a; border-color: #f59e0b; }
-.theme-toggle.light-mode .theme-toggle-thumb { transform: translateX(20px); background: #ffffff; border-color: #f59e0b; }
-.theme-toggle.light-mode .theme-toggle-thumb i { color: #d97706; }
-.theme-toggle-label { font-size: 12px; font-weight: 500; color: var(--text2); min-width: 30px; }
+/* ── Page divider & description ── */
+.page-divider { border-top: 1.5px solid var(--border); margin-bottom: 18px; padding-top: 10px; }
+.page-desc { font-size: 12.5px; color: var(--text3); display: flex; align-items: center; gap: 7px; }
+.page-desc i { color: var(--accent); font-size: 16px; flex-shrink: 0; line-height: 1; }
 
-/* ── Cache banner ── */
+/* ── Cache banner refresh button — wider for label ── */
+.cache-banner-icon-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 12px; height: 28px; border-radius: 6px; background: none; border: 1px solid var(--border2); color: var(--text3); cursor: pointer; font-size: 12px; font-family: var(--font); font-weight: 600; transition: all .15s; margin-left: auto; flex-shrink: 0; }
+.cache-banner-icon-btn:hover { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+.cache-banner-icon-btn i { font-size: 15px; line-height: 1; }
 .cache-banner { margin-bottom: 8px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--bg3); font-size: 12px; }
 .cache-banner-main { display: flex; align-items: center; gap: 10px; padding: 7px 12px; }
-.cache-banner-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
+.cache-banner-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
+.cache-banner-status i { font-size: 14px; line-height: 1; }
 .cache-banner-status.synced  { background: var(--teal-dim); color: var(--teal); }
 .cache-banner-status.syncing { background: var(--amber-dim); color: var(--amber); }
-.cache-banner-datetime { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--text3); font-family: var(--mono); }
-.cache-banner-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: none; border: 1px solid var(--border2); color: var(--text3); cursor: pointer; font-size: 13px; transition: all .15s; margin-left: auto; flex-shrink: 0; }
-.cache-banner-icon-btn + .cache-banner-icon-btn { margin-left: 4px; }
-.cache-banner-icon-btn:hover { background: var(--surface2); color: var(--text); }
-.cache-banner-sub { display: none; flex-direction: column; border-top: 1px solid var(--border); padding: 6px 12px 8px; background: var(--bg2); gap: 2px; }
+.cache-banner-datetime { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text3); font-family: var(--mono); }
+.cache-banner-datetime i { font-size: 14px; line-height: 1; }
+.cache-banner-sub { display: none; }
 .cache-banner-sub.open { display: flex; }
-.cache-sub-link { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--accent); text-decoration: none; padding: 5px 6px; border-radius: 5px; transition: background .14s; }
-.cache-sub-link:hover { background: var(--accent-dim); }
-.cache-sub-link i { font-size: 13px; flex-shrink: 0; }
-.cache-sub-note { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text3); padding: 4px 6px; margin-top: 2px; }
 
 /* ── Toolbar ── */
 .emp-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
-.search-wrap { position: relative; flex: 1; min-width: 160px; max-width: 280px; }
-.search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 16px; }
-.search-wrap input { width: 100%; padding: 9px 12px 9px 36px; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface); color: var(--text); font-family: var(--font); font-size: 13px; transition: border .18s, box-shadow .18s; }
-.search-wrap input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-.search-wrap input::placeholder { color: var(--text3); }
+.search-group { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 160px; max-width: 320px; }
+.search-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text3); flex-shrink: 0; cursor: default; font-size: 18px; }
+.search-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface); color: var(--text); font-family: var(--font); font-size: 13px; transition: border .18s, box-shadow .18s; min-width: 0; }
+.search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.search-input::placeholder { color: var(--text3); }
 .hr-filter-pills { display: flex; gap: 5px; flex-shrink: 0; }
-.hr-filter-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text2); font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .18s; white-space: nowrap; }
-.hr-filter-btn i { font-size: 12px; }
+.hr-filter-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text2); font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .18s; white-space: nowrap; }
+.hr-filter-btn i { font-size: 15px; flex-shrink: 0; line-height: 1; display: inline-flex; align-items: center; }
 .hr-filter-btn:hover { background: var(--surface2); color: var(--text); }
 .hr-filter-btn.active   { background: var(--surface2); color: var(--text); border-color: var(--border2); box-shadow: 0 0 0 2px var(--accent); }
 .hr-filter-btn.expired  { border-color: var(--red);   color: var(--red); }
@@ -102,8 +91,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 /* ── Table ── */
 .emp-table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
-.emp-table-wrap { overflow-x: auto; max-height: calc(100vh - 260px); min-height: 200px; }
-.emp-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+.emp-table-wrap { overflow-x: auto; max-height: calc(100vh - 280px); min-height: 200px; -webkit-overflow-scrolling: touch; }
+.emp-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 0; }
 .emp-table thead th { position: sticky; top: 0; z-index: 2; background: var(--bg3); text-align: left; font-size: 10.5px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; padding: 11px 14px; border-bottom: 2px solid var(--border); white-space: nowrap; }
 .emp-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
 .emp-table tr:last-child td { border-bottom: none; }
@@ -120,9 +109,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 [data-theme="light"] .badge.expired,.badge.red   { background: rgba(168,17,27,.11); color: #8b0b14; border-color: rgba(168,17,27,.35); }
 [data-theme="light"] .badge.expiring_soon,.badge.pink { background: rgba(125,78,0,.13); color: #5e3900; border-color: rgba(125,78,0,.35); }
 
+/* ── Global icon baseline — ensures Tabler icons always render ── */
+[class^="ti-"], [class*=" ti-"] { font-style: normal; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+
 /* ── Row action buttons ── */
-.row-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; border: 1.5px solid; font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .16s; white-space: nowrap; line-height: 1; }
-.row-btn i { font-size: 14px; flex-shrink: 0; }
+.row-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; border: 1.5px solid; font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .16s; white-space: nowrap; line-height: 1; }
+.row-btn i { font-size: 15px; flex-shrink: 0; line-height: 1; }
 .row-btn-view { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
 .row-btn-view:hover { background: var(--teal); color: #fff; box-shadow: 0 0 10px var(--teal-dim); }
 .row-btn-adv { background: var(--purple-dim); border-color: var(--purple); color: var(--purple); }
@@ -147,11 +139,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 @keyframes modalIn { from { opacity: 0; transform: scale(.95) translateY(10px); } to { opacity: 1; transform: none; } }
 .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .modal-header h2 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.modal-header h2 i { color: var(--accent); }
+.modal-header h2 i { color: var(--accent); font-size: 18px; line-height: 1; }
 .modal-body { padding: 24px; }
 .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
 
 .tb-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); font-weight: 500; transition: all .18s; white-space: nowrap; }
+.tb-btn i { font-size: 16px; line-height: 1; flex-shrink: 0; }
 .tb-btn:hover { background: var(--surface2); }
 .tb-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
 .tb-btn.primary:hover { background: #79c0ff; }
@@ -198,7 +191,7 @@ select option { background: var(--surface2); color: var(--text); }
 .dp-section { padding: 18px 22px; border-bottom: 1px solid var(--border); }
 .dp-section:last-child { border-bottom: none; }
 .dp-section-title { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--text3); display: flex; align-items: center; gap: 7px; margin-bottom: 14px; }
-.dp-section-title i { color: var(--accent); font-size: 15px; }
+.dp-section-title i { color: var(--accent); font-size: 17px; line-height: 1; }
 .dp-fields { display: flex; flex-direction: column; gap: 0; }
 .dp-field { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .dp-field:last-child { border-bottom: none; }
@@ -210,7 +203,7 @@ select option { background: var(--surface2); color: var(--text); }
 [data-theme="light"] .dp-edit-input { background: var(--bg2); }
 .dp-ex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
 .dp-ex-card { border-radius: 8px; padding: 11px 13px; border: 1.5px solid; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.dp-ex-icon  { font-size: 18px; }
+.dp-ex-icon  { font-size: 22px; line-height: 1; }
 .dp-ex-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; opacity: .8; }
 .dp-ex-status { font-size: 12px; font-weight: 700; }
 .dp-ex-date  { font-size: 10.5px; font-family: var(--mono); opacity: .75; }
@@ -220,7 +213,7 @@ select option { background: var(--surface2); color: var(--text); }
 .dp-ex-na       { background: var(--surface);   color: var(--text3); border-color: var(--border2); }
 .dp-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; justify-content: flex-end; flex-shrink: 0; background: var(--bg2); }
 .dp-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all .18s; white-space: nowrap; }
-.dp-btn i { font-size: 15px; }
+.dp-btn i { font-size: 16px; line-height: 1; flex-shrink: 0; }
 .dp-btn-secondary { background: var(--surface); color: var(--text2); border-color: var(--border2); }
 .dp-btn-secondary:hover { background: var(--surface2); color: var(--text); }
 .dp-btn-edit { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
@@ -237,14 +230,24 @@ select option { background: var(--surface2); color: var(--text); }
   .emp-toolbar { flex-wrap: wrap; gap: 6px; }
   .hr-filter-pills { flex-wrap: wrap; }
   .hr-filter-btn { padding: 5px 10px; font-size: 11px; }
-  .emp-table-wrap { max-height: calc(100vh - 300px); }
+  .emp-table-wrap { max-height: calc(100vh - 320px); }
   .dp-sheet { width: 100%; border-left: none; }
   .dp-fl { width: 100px; }
   .dp-ex-grid { grid-template-columns: repeat(3, 1fr); }
+  .emp-table { font-size: 12px; }
+  .emp-table th, .emp-table td { padding: 9px 10px; }
 }
 @media (max-width: 600px) {
+  /* Hide less critical columns on small phones */
   .emp-table th:nth-child(3), .emp-table td:nth-child(3) { display: none; }
   .emp-table th:nth-child(4), .emp-table td:nth-child(4) { display: none; }
+  .emp-table th, .emp-table td { padding: 8px 8px; }
+  .row-btn span { display: none; }
+  .row-btn { padding: 6px 8px; }
+}
+@media (max-width: 420px) {
+  .emp-table th:nth-child(2), .emp-table td:nth-child(2) { display: none; }
+  .page-desc { font-size: 11.5px; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
@@ -259,22 +262,19 @@ select option { background: var(--surface2); color: var(--text); }
       <i class="ti ti-users"></i>
       All Employees
     </div>
-    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
-      <div class="theme-toggle-track">
-        <div class="theme-toggle-thumb"><i class="ti ti-moon" id="theme-icon"></i></div>
-      </div>
-      <span class="theme-toggle-label" id="theme-label">Dark</span>
-    </button>
+  </div>
+  <div class="page-divider">
+    <p class="page-desc"><i class="ti ti-info-circle"></i> Registered all staff member.</p>
   </div>
 
   <!-- Toolbar -->
   <div class="emp-toolbar">
-    <div class="search-wrap">
-      <i class="ti ti-search"></i>
-      <input type="text" id="emp-search-input" placeholder="Search name, EID, ID, ref..." oninput="filterEmps(this.value)" />
+    <div class="search-group">
+      <span class="search-icon-btn" aria-hidden="true"><i class="ti ti-search"></i></span>
+      <input class="search-input" type="text" id="emp-search-input" placeholder="Search name, EID, ID, ref..." oninput="filterEmps(this.value)" />
     </div>
     <div class="hr-filter-pills">
-      <button class="hr-filter-btn active" data-filter="all"          onclick="filterHR('all')">All</button>
+      <button class="hr-filter-btn active" data-filter="all"          onclick="filterHR('all')"><i class="ti ti-users"></i> All</button>
       <button class="hr-filter-btn expired"  data-filter="expired"    onclick="filterHR('expired')"><i class="ti ti-alert-circle"></i> Expired</button>
       <button class="hr-filter-btn expiring" data-filter="expiring_soon" onclick="filterHR('expiring_soon')"><i class="ti ti-clock"></i> Expiring</button>
       <button class="hr-filter-btn valid"    data-filter="valid"      onclick="filterHR('valid')"><i class="ti ti-circle-check"></i> Valid</button>
@@ -320,8 +320,9 @@ select option { background: var(--surface2); color: var(--text); }
         <div><span>Emp ID: </span><strong id="m-empid">—</strong></div>
         <div style="grid-column:1/-1;"><span>EID: </span><strong style="font-family:var(--mono);font-size:11.5px;" id="m-eid">—</strong></div>
       </div>
+      <input type="hidden" id="m-eid-hidden" />
+      <input type="hidden" id="m-empname-hidden" />
       <div class="field">
-        <label>Advance For Month <span style="color:var(--red);">*</span></label>
         <select id="m-month"><option value="">— Select Month —</option></select>
       </div>
       <div class="field">
@@ -379,7 +380,7 @@ select option { background: var(--surface2); color: var(--text); }
 'use strict';
 
 /* ═══════════ CONSTANTS ═══════════ */
-const EMP_SHEET_URL  = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPLL0uP8GlonjZ29ASKoBuXNDeIhtPg8D9Rw6jYE4RX5Zg6ky_yR24qg/exec?type=employee';
+const EMP_SHEET_URL  = 'https://script.google.com/macros/s/AKfycbwq0DOszTVrVHE7yiwXj_STL1UgZFjnMiUfjnsB4oHTSPzMFjvQXhIc7dLGa0ITmjekPg/exec?type=employee';
 const SHEET_POST_URL = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPLL0uP8GlonjZ29ASKoBuXNDeIhtPg8D9Rw6jYE4RX5Zg6ky_yR24qg/exec';
 const WARN_DAYS = 60;
 
@@ -462,7 +463,7 @@ function parseRows(raw) {
 
 /* ═══════════ CACHE ═══════════ */
 const EMP_CACHE_KEY = 'emp_cache_v1';
-const EMP_CACHE_TTL = 5 * 60 * 1000;
+const EMP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
 function empCacheSave(rows) { try { localStorage.setItem(EMP_CACHE_KEY, JSON.stringify({ ts: Date.now(), rows })); } catch(e) {} }
 function empCacheLoad() { try { const raw = localStorage.getItem(EMP_CACHE_KEY); if (!raw) return null; const { ts, rows } = JSON.parse(raw); if (Date.now() - ts > EMP_CACHE_TTL) return null; return rows; } catch(e) { return null; } }
@@ -478,7 +479,15 @@ function showCacheBanner(show) {
     tbl?.parentElement?.parentElement?.insertBefore(banner, tbl.parentElement);
   }
   if (show) {
-    banner.innerHTML = `<div class="cache-banner-main"><span class="cache-banner-status syncing"><i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i> Refreshing data…</span></div>`;
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const dateStr = now.toLocaleDateString([], { day:'2-digit', month:'short' });
+    banner.innerHTML = `
+      <div class="cache-banner-main">
+        <span class="cache-banner-status syncing"><i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-flex;"></i> Refreshing…</span>
+        <span class="cache-banner-datetime"><i class="ti ti-clock"></i> ${dateStr}, ${timeStr}</span>
+        <button class="cache-banner-icon-btn" disabled style="opacity:.45;cursor:not-allowed;"><i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-flex;"></i> Refresh</button>
+      </div>`;
   } else {
     const now = new Date();
     const timeStr = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
@@ -487,13 +496,7 @@ function showCacheBanner(show) {
       <div class="cache-banner-main">
         <span class="cache-banner-status synced"><i class="ti ti-circle-check"></i> Synced</span>
         <span class="cache-banner-datetime"><i class="ti ti-clock"></i> ${dateStr}, ${timeStr}</span>
-        <button class="cache-banner-icon-btn" onclick="empCacheClear();loadEmployees();" title="Force refresh"><i class="ti ti-refresh"></i></button>
-        <button class="cache-banner-icon-btn" onclick="toggleCacheSub()" title="More options"><i class="ti ti-chevron-down"></i></button>
-      </div>
-      <div class="cache-banner-sub" id="emp-cache-sub">
-        <a href="#" class="cache-sub-link" onclick="empCacheClear();loadEmployees();return false;"><i class="ti ti-refresh"></i> Force refresh from Google Sheet</a>
-        <a href="#" class="cache-sub-link" onclick="empCacheClear();return false;"><i class="ti ti-database-off"></i> Clear local cache only</a>
-        <span class="cache-sub-note"><i class="ti ti-info-circle"></i> Data auto-refreshes every 5 minutes</span>
+        <button class="cache-banner-icon-btn" onclick="forceRefreshEmployees();" title="Force refresh from sheet"><i class="ti ti-refresh"></i> Refresh</button>
       </div>`;
   }
 }
@@ -505,19 +508,24 @@ function toggleCacheSub() {
 
 /* ═══════════ LOAD ═══════════ */
 async function loadEmployees() {
-  const tbody = document.getElementById('emp-tbody');
-
+  // Always show whatever we have from cache immediately — table is never blank during refresh
   const cached = empCacheLoad();
   if (cached && cached.length) {
     employees = cached.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
-    showCacheBanner(true);
-  } else {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;">
-      <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;font-size:22px;color:var(--text3);"></i>
-      <div style="margin-top:8px;color:var(--text3);font-size:13px;">Loading employees…</div>
+    showCacheBanner(false);
+    return; // Cache is fresh (within 6h), no network call needed
+  }
+
+  // No valid cache — show loading row only on first-ever load
+  const tbody = document.getElementById('emp-tbody');
+  if (!employees.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;">
+      <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-flex;font-size:26px;color:var(--text3);"></i>
+      <div style="margin-top:10px;color:var(--text3);font-size:13px;">Loading employees…</div>
     </td></tr>`;
   }
+  showCacheBanner(true);
 
   try {
     const res  = await fetch(EMP_SHEET_URL + '&nocache=' + Date.now());
@@ -529,11 +537,32 @@ async function loadEmployees() {
     showCacheBanner(false);
   } catch (err) {
     console.error('loadEmployees error:', err);
-    if (!cached || !cached.length) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--red);">Error loading data — check console.</td></tr>`;
+    showCacheBanner(false);
+    if (!employees.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--red);"><i class="ti ti-wifi-off" style="font-size:22px;display:block;margin-bottom:8px;"></i>Could not load data — check connection.</td></tr>`;
     } else {
-      showCacheBanner(false);
+      toast('Could not refresh — showing cached data.', 'error');
     }
+  }
+}
+
+// Force-refresh: clears cache, shows spinner in banner but keeps table rows visible
+async function forceRefreshEmployees() {
+  empCacheClear();
+  showCacheBanner(true); // spinner in banner, table stays
+  try {
+    const res  = await fetch(EMP_SHEET_URL + '&nocache=' + Date.now());
+    const raw  = await res.json();
+    const rows = parseRows(raw);
+    empCacheSave(rows);
+    employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+    renderEmpTable(employees);
+    showCacheBanner(false);
+    toast('Data refreshed successfully.');
+  } catch (err) {
+    console.error('forceRefresh error:', err);
+    showCacheBanner(false);
+    toast('Refresh failed — check connection.', 'error');
   }
 }
 
@@ -584,6 +613,26 @@ function buildEmpRow(emp, idx) {
     ? `<a href="tel:${emp.mobile}" style="font-family:var(--mono);font-size:12px;color:var(--text);text-decoration:none;">${emp.mobile}</a>`
     : `<span style="color:var(--text3);">—</span>`;
 
+  // Advance button: disabled if expired, unless HR status or CO exception provides override
+  const hasHROverride = !!(emp.hrStatus && emp.hrStatus.trim());
+  const hasCOOverride = !!(emp.checkoutException && emp.checkoutException.trim());
+  const advDisabled   = overall === 'expired' && !hasHROverride && !hasCOOverride;
+  let advBtn;
+  if (advDisabled) {
+    advBtn = `<button class="row-btn row-btn-adv" disabled title="Advance unavailable — employee documents expired" style="opacity:.38;cursor:not-allowed;filter:grayscale(.6);">
+      <i class="ti ti-cash"></i><span>Advance</span>
+    </button>`;
+  } else if (overall === 'expired' && (hasHROverride || hasCOOverride)) {
+    const overrideLabel = hasHROverride ? `HR: ${emp.hrStatus}` : `CO: ${emp.checkoutException}`;
+    advBtn = `<button class="row-btn row-btn-adv" title="Override active — ${overrideLabel}" onclick="openAdvModal(${JSON.stringify(emp.id)})" style="border-style:dashed;">
+      <i class="ti ti-cash"></i><span>Advance</span>
+    </button>`;
+  } else {
+    advBtn = `<button class="row-btn row-btn-adv" title="Advance request" onclick="openAdvModal(${JSON.stringify(emp.id)})">
+      <i class="ti ti-cash"></i><span>Advance</span>
+    </button>`;
+  }
+
   return `
     <tr ${rowStyle} data-emp-id="${emp.id}">
       <td style="padding:10px 14px;">
@@ -605,7 +654,7 @@ function buildEmpRow(emp, idx) {
       <td style="white-space:nowrap;padding:8px 12px;">
         <div style="display:flex;gap:5px;align-items:center;flex-wrap:nowrap;">
           <button class="row-btn row-btn-view" title="View details" onclick="viewEmployee(${JSON.stringify(emp.id)})"><i class="ti ti-eye"></i><span>View</span></button>
-          <button class="row-btn row-btn-adv"  title="Advance request" onclick="openAdvModal(${JSON.stringify(emp.id)})"><i class="ti ti-cash"></i><span>Advance</span></button>
+          ${advBtn}
         </div>
       </td>
     </tr>`;
@@ -883,10 +932,10 @@ function advGenRef() {
 }
 function advFmt(n) { return Number(n).toLocaleString('en-AE', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
 
-function advSubmitToGoogleForm(ref, empId, amount, installments, returnMonthsList, forMonth, reason) {
+function advSubmitToGoogleForm(ref, empId, amount, installments, returnMonthsList, forMonth, reason, eidNo, empName) {
   const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdk9P7t7zXGmAppTB0BhL5TvisDCHtsmXhv9jq6QOh0Qz6HAQ/formResponse';
   const body = new FormData();
-  const fields = { 'entry.1370945224':ref,'entry.1724987333':String(empId),'entry.1726107212':String(amount),'entry.2138931162':String(installments),'entry.2022826562':returnMonthsList,'entry.877659064':forMonth,'entry.1496219485':reason };
+  const fields = { 'entry.1370945224':ref,'entry.1724987333':String(empId),'entry.1726107212':String(amount),'entry.2138931162':String(installments),'entry.2022826562':returnMonthsList,'entry.877659064':forMonth,'entry.1496219485':reason,'entry.1046987198':String(eidNo),'entry.1315477278':String(empName) };
   Object.entries(fields).forEach(([k,v]) => body.append(k,v));
   fetch(FORM_ACTION, { method:'POST', mode:'no-cors', body });
 }
@@ -894,9 +943,17 @@ function advSubmitToGoogleForm(ref, empId, amount, installments, returnMonthsLis
 function openAdvModal(empId) {
   const emp = employees.find(e => String(e.id) === String(empId));
   if (!emp) return;
+  const overall = calcOverall(emp.expiry || {});
+  const hasHROverride = !!(emp.hrStatus && emp.hrStatus.trim());
+  const hasCOOverride = !!(emp.checkoutException && emp.checkoutException.trim());
+  if (overall === 'expired' && !hasHROverride && !hasCOOverride) {
+    toast('Advance unavailable — employee documents are expired.', 'error'); return;
+  }
   document.getElementById('m-name').textContent  = emp.name  || '—';
   document.getElementById('m-empid').textContent = `#${emp.id}`;
   document.getElementById('m-eid').textContent   = emp.eid   || 'No EID';
+  document.getElementById('m-eid-hidden').value  = emp.eid   || '';
+  document.getElementById('m-empname-hidden').value = emp.name || '';
   document.getElementById('m-amount').value = '';
   document.getElementById('m-repay').selectedIndex = 0;
   document.getElementById('m-reason').value = '';
@@ -950,10 +1007,12 @@ function advSubmitRequest() {
   if (!amount||isNaN(amount)||Number(amount)<=0) { toast('Please enter a valid advance amount.','error'); return; }
   if (!reason) { toast('Please provide a reason for the request.','error'); return; }
   const ref = advGenRef();
+  const eidNo = document.getElementById('m-eid-hidden').value || '';
+  const empName = document.getElementById('m-empname-hidden').value || '';
   const effectiveMonths = months===0?1:months;
   const base = new Date(); base.setDate(1);
   const returnMonthsList = Array.from({ length:effectiveMonths },(_,i) => { const d=new Date(base); d.setMonth(d.getMonth()+i+1); return d.toLocaleString('en-GB',{month:'short',year:'numeric'}); }).join(', ');
-  advSubmitToGoogleForm(ref, empId, Number(amount), months, returnMonthsList, forMonth, reason);
+  advSubmitToGoogleForm(ref, empId, Number(amount), months, returnMonthsList, forMonth, reason, eidNo, empName);
   const repayLabel = months===0?'No Installments (Lump-Sum)':months===1?'Next Month Deduction':months+' Monthly Installments';
   closeModal('modal-request');
   toast(`Advance request ${ref} submitted — ${repayLabel} — AED ${Number(amount).toLocaleString()}`);
