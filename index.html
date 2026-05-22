@@ -602,7 +602,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function createSheet() {
 
-  fetch("https://script.google.com/macros/s/AKfycbxOqqaFcbME5DyMPNMQeBKh-ucNUHGhDr0bKvVOZmGZujz1YHjYJL-Sy5BLCDEUQYdsMA/exec?action=buildMaster")
+  fetch("https://script.google.com/macros/s/AKfycbz076J3jvj_tbr_3iMM_sUT3kWE4WAgWfwbTunpIZz4GHlasscuyDDGpBrneFLIiGfU7Q/exec?action=buildMaster")
     .then(res => res.json())
     .then(data => {
       alert(data.message + " (" + data.rows + " rows)");
