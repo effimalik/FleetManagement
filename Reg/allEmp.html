@@ -264,7 +264,7 @@ select option { background: var(--surface2); color: var(--text); }
     </div>
   </div>
   <div class="page-divider">
-    <p class="page-desc"><i class="ti ti-info-circle"></i> Registered all staff member.</p>
+    <p class="page-desc"><i class="ti ti-info-circle"></i> Browse, search and manage all employee records — view document expiry statuses, request salary advances, and edit employee details in real time.</p>
   </div>
 
   <!-- Toolbar -->
@@ -323,6 +323,7 @@ select option { background: var(--surface2); color: var(--text); }
       <input type="hidden" id="m-eid-hidden" />
       <input type="hidden" id="m-empname-hidden" />
       <div class="field">
+        <label>Advance Month <span style="color:var(--red);">*</span></label>
         <select id="m-month"><option value="">— Select Month —</option></select>
       </div>
       <div class="field">
@@ -380,7 +381,7 @@ select option { background: var(--surface2); color: var(--text); }
 'use strict';
 
 /* ═══════════ CONSTANTS ═══════════ */
-const EMP_SHEET_URL  = 'https://script.google.com/macros/s/AKfycbwq0DOszTVrVHE7yiwXj_STL1UgZFjnMiUfjnsB4oHTSPzMFjvQXhIc7dLGa0ITmjekPg/exec?type=employee';
+const EMP_SHEET_URL  = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPLL0uP8GlonjZ29ASKoBuXNDeIhtPg8D9Rw6jYE4RX5Zg6ky_yR24qg/exec?type=employee';
 const SHEET_POST_URL = 'https://script.google.com/macros/s/AKfycbwzZ5YA9aJ_nwOPLL0uP8GlonjZ29ASKoBuXNDeIhtPg8D9Rw6jYE4RX5Zg6ky_yR24qg/exec';
 const WARN_DAYS = 60;
 
@@ -411,6 +412,8 @@ function normaliseRow(r, i) {
   if (!r) return null;
   if (Array.isArray(r)) {
     const [id, name, eid, dob, mobile, emergency, reference, timestamp, hrStatus, checkoutException, eidDate, licenseDate, labourDate, insuranceDate] = r;
+    // DEBUG — remove after confirming columns: uncomment next line temporarily
+    // if (i < 3) console.log(`Row[${i}] raw:`, JSON.stringify(r));
     if ((id === undefined || id === null || id === '') && (name === undefined || name === null || name === '')) return null;
     return {
       id:   (id !== undefined && id !== null && id !== '') ? id : (i + 1),
@@ -456,8 +459,11 @@ function parseRows(raw) {
     : Array.isArray(raw.data)   ? raw.data
     : Array.isArray(raw.values) ? raw.values
     : Array.isArray(raw.rows)   ? raw.rows : [];
-  const HEADER_RE = /^[a-z_\s]+$/i, DATE_RE = /^\d{4}-\d{2}-\d{2}/;
-  if (rows.length > 0 && Array.isArray(rows[0]) && typeof rows[0][0] === 'string' && HEADER_RE.test(rows[0][0]) && !DATE_RE.test(rows[0][0])) rows = rows.slice(1);
+  // Only skip a row if first cell is an exact known header keyword (case-insensitive)
+  const HEADER_KEYWORDS = /^(id|emp[\s_]?id|employee[\s_]?id|name|employee|sl[\s_]?no|no|#)$/i;
+  if (rows.length > 0 && Array.isArray(rows[0]) && typeof rows[0][0] === 'string' && HEADER_KEYWORDS.test(String(rows[0][0]).trim())) {
+    rows = rows.slice(1);
+  }
   return rows;
 }
 
@@ -531,6 +537,17 @@ async function loadEmployees() {
     const res  = await fetch(EMP_SHEET_URL + '&nocache=' + Date.now());
     const raw  = await res.json();
     const rows = parseRows(raw);
+    // ── Column inspector: logs first 2 data rows so you can verify column mapping ──
+    if (rows.length && Array.isArray(rows[0])) {
+      console.group('📋 Sheet column map (first 2 rows)');
+      const labels = ['[0] id','[1] name','[2] eid','[3] dob','[4] mobile','[5] emergency','[6] reference','[7] timestamp','[8] hrStatus','[9] checkoutException','[10] eidDate','[11] licenseDate','[12] labourDate','[13] insuranceDate'];
+      rows.slice(0, 2).forEach((row, ri) => {
+        console.group(`Row ${ri}`);
+        row.forEach((val, ci) => console.log(`${labels[ci] || '['+ci+']'} =`, JSON.stringify(val)));
+        console.groupEnd();
+      });
+      console.groupEnd();
+    }
     empCacheSave(rows);
     employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
@@ -554,6 +571,17 @@ async function forceRefreshEmployees() {
     const res  = await fetch(EMP_SHEET_URL + '&nocache=' + Date.now());
     const raw  = await res.json();
     const rows = parseRows(raw);
+    // ── Column inspector ──
+    if (rows.length && Array.isArray(rows[0])) {
+      console.group('📋 Sheet column map — force refresh (first 2 rows)');
+      const labels = ['[0] id','[1] name','[2] eid','[3] dob','[4] mobile','[5] emergency','[6] reference','[7] timestamp','[8] hrStatus','[9] checkoutException','[10] eidDate','[11] licenseDate','[12] labourDate','[13] insuranceDate'];
+      rows.slice(0, 2).forEach((row, ri) => {
+        console.group(`Row ${ri}`);
+        row.forEach((val, ci) => console.log(`${labels[ci] || '['+ci+']'} =`, JSON.stringify(val)));
+        console.groupEnd();
+      });
+      console.groupEnd();
+    }
     empCacheSave(rows);
     employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
@@ -923,13 +951,21 @@ async function _dpSave() {
 
 /* ═══════════ ADVANCE MODAL ═══════════ */
 const ADV_REF_KEY = 'advPortalRefSeq';
+
 function advGenRef() {
-  const now = new Date(), yymm = now.getFullYear()+String(now.getMonth()+1).padStart(2,'0');
-  const stored = JSON.parse(localStorage.getItem(ADV_REF_KEY)||'{}');
-  const seq = (stored.prefix===yymm ? stored.seq : 0) + 1;
-  localStorage.setItem(ADV_REF_KEY, JSON.stringify({ prefix:yymm, seq }));
-  return `ADV-${yymm}-${seq.toString(36).toUpperCase().padStart(4,'0')}`;
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+  const ms = String(now.getMilliseconds()).padStart(3, '0');
+  return `ADV-${yyyy}${mm}${dd}-${hh}${min}${ss}${ms}`;
 }
+
+
+
 function advFmt(n) { return Number(n).toLocaleString('en-AE', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
 
 function advSubmitToGoogleForm(ref, empId, amount, installments, returnMonthsList, forMonth, reason, eidNo, empName) {
@@ -940,32 +976,101 @@ function advSubmitToGoogleForm(ref, empId, amount, installments, returnMonthsLis
   fetch(FORM_ACTION, { method:'POST', mode:'no-cors', body });
 }
 
+/* ── Visa validity helpers ── */
+function _visaMonthsRemaining(emp) {
+  // Find the nearest expiry date among all valid/expiring documents
+  const ex = emp.expiry || {};
+  const dates = [ex.eid, ex.license, ex.labour, ex.insurance]
+    .filter(d => d && d.date && d.status !== 'not_available')
+    .map(d => new Date(d.date))
+    .filter(d => !isNaN(d));
+  if (!dates.length) return 0;
+  const earliest = new Date(Math.min(...dates));
+  const now = new Date();
+  // Months from start of next month until expiry month (inclusive)
+  const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  if (earliest < startOfNextMonth) return 0; // already expired or expires this month
+  const diffMs = earliest - startOfNextMonth;
+  const diffMonths = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 30.4375)) + 1;
+  return Math.max(0, diffMonths);
+}
+
 function openAdvModal(empId) {
   const emp = employees.find(e => String(e.id) === String(empId));
   if (!emp) return;
   const overall = calcOverall(emp.expiry || {});
   const hasHROverride = !!(emp.hrStatus && emp.hrStatus.trim());
   const hasCOOverride = !!(emp.checkoutException && emp.checkoutException.trim());
+  const isException   = overall === 'expired' && (hasHROverride || hasCOOverride);
+
   if (overall === 'expired' && !hasHROverride && !hasCOOverride) {
     toast('Advance unavailable — employee documents are expired.', 'error'); return;
   }
+
   document.getElementById('m-name').textContent  = emp.name  || '—';
   document.getElementById('m-empid').textContent = `#${emp.id}`;
   document.getElementById('m-eid').textContent   = emp.eid   || 'No EID';
   document.getElementById('m-eid-hidden').value  = emp.eid   || '';
   document.getElementById('m-empname-hidden').value = emp.name || '';
   document.getElementById('m-amount').value = '';
-  document.getElementById('m-repay').selectedIndex = 0;
   document.getElementById('m-reason').value = '';
   document.getElementById('adv-repay-preview').style.display = 'none';
+
+  // ── Compute how many months the visa is still valid (cap at 5) ──
+  // Exception employees (expired + override): only 1 month allowed
+  let availableMonths;
+  if (isException) {
+    availableMonths = 1;
+  } else {
+    const visaMonths = _visaMonthsRemaining(emp);
+    availableMonths = Math.min(visaMonths, 5);
+    if (availableMonths < 1) availableMonths = 1; // safety fallback
+  }
+
+  // ── Populate advance-month dropdown ──
   const mSel = document.getElementById('m-month');
   mSel.innerHTML = '<option value="">— Select Month —</option>';
   const now = new Date();
-  for (let i = 0; i <= 5; i++) {
+  for (let i = 0; i < availableMonths; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
     mSel.innerHTML += `<option value="${d.toISOString().slice(0,7)}"${i===0?' selected':''}>${d.toLocaleString('en-GB',{month:'long',year:'numeric'})}</option>`;
   }
+
+  // ── Populate repayment plan dropdown ──
+  // Exception: force "1 Month — Next Month Deduction" only
+  const rSel = document.getElementById('m-repay');
+  rSel.innerHTML = '';
+  if (isException) {
+    rSel.innerHTML = '<option value="1">1 Month — Next Month Deduction (Exception)</option>';
+    rSel.disabled = true;
+  } else {
+    rSel.disabled = false;
+    rSel.innerHTML = '<option value="0">No Installments (Full Lump-Sum Deduction)</option>';
+    for (let m = 1; m <= availableMonths; m++) {
+      const lbl = m === 1 ? '1 Month — Next Salary Deduction' : `${m} Monthly Installments`;
+      rSel.innerHTML += `<option value="${m}">${lbl}</option>`;
+    }
+  }
+  rSel.selectedIndex = 0;
+
+  // ── Visa validity info strip ──
+  let visaInfoEl = document.getElementById('m-visa-info');
+  if (!visaInfoEl) {
+    visaInfoEl = document.createElement('div');
+    visaInfoEl.id = 'm-visa-info';
+    mSel.parentElement.insertAdjacentElement('afterend', visaInfoEl);
+  }
+  if (isException) {
+    visaInfoEl.style.cssText = 'margin:-8px 0 14px;padding:7px 12px;border-radius:8px;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:7px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber);';
+    visaInfoEl.innerHTML = `<i class="ti ti-alert-triangle" style="font-size:15px;flex-shrink:0;"></i> Exception override active — 1 month only, next month deduction enforced.`;
+  } else {
+    visaInfoEl.style.cssText = 'margin:-8px 0 14px;padding:7px 12px;border-radius:8px;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:7px;background:var(--teal-dim);color:var(--teal);border:1px solid var(--teal);';
+    visaInfoEl.innerHTML = `<i class="ti ti-shield-check" style="font-size:15px;flex-shrink:0;"></i> Visa valid for ~${availableMonths} month${availableMonths!==1?'s':''} — advance months and repayment limited accordingly.`;
+  }
+
   document.getElementById('modal-request').dataset.empId = emp.id;
+  document.getElementById('modal-request').dataset.isException = isException ? '1' : '0';
+  advUpdateRepayPreview();
   openModal('modal-request');
 }
 
@@ -985,11 +1090,13 @@ function advUpdateRepayPreview() {
       document.getElementById('adv-repay-months').textContent  = months;
       document.getElementById('adv-repay-total').textContent   = 'AED ' + advFmt(amt);
       const pills = document.getElementById('adv-repay-inst-pills');
-      const start = new Date(); start.setDate(1);
+      // Deductions start from NEXT month
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth() + 1, 1);
       pills.innerHTML = Array.from({ length: months }, (_, i) => {
         const last = i===months-1;
         const installAmt = last ? amt-(Math.round(monthly*100)/100)*(months-1) : Math.round(monthly*100)/100;
-        const due = new Date(start); due.setMonth(due.getMonth()+i+1);
+        const due = new Date(start.getFullYear(), start.getMonth()+i, 1);
         return `<span style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;font-family:var(--mono);color:var(--accent);display:inline-flex;gap:5px;align-items:center;"><span style="color:var(--text3);font-size:10px;">#${i+1}</span> AED ${advFmt(installAmt)}<span style="color:var(--text2);font-size:10px;">→ ${due.toLocaleString('en-GB',{month:'short',year:'numeric'})}</span></span>`;
       }).join('');
     }
@@ -1009,7 +1116,9 @@ function advSubmitRequest() {
   const ref = advGenRef();
   const eidNo = document.getElementById('m-eid-hidden').value || '';
   const empName = document.getElementById('m-empname-hidden').value || '';
-  const effectiveMonths = months===0?1:months;
+  const isException = document.getElementById('modal-request').dataset.isException === '1';
+  // For exceptions: always 1-month deduction from next month
+  const effectiveMonths = isException ? 1 : (months===0?1:months);
   const base = new Date(); base.setDate(1);
   const returnMonthsList = Array.from({ length:effectiveMonths },(_,i) => { const d=new Date(base); d.setMonth(d.getMonth()+i+1); return d.toLocaleString('en-GB',{month:'short',year:'numeric'}); }).join(', ');
   advSubmitToGoogleForm(ref, empId, Number(amount), months, returnMonthsList, forMonth, reason, eidNo, empName);
