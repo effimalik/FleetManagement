@@ -105,20 +105,21 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .data-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 /* TABLE — no column dividers, clean alignment */
-.data-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:860px;}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.data-table-wrap{overflow-x:hidden;}
 .data-table thead th{
   position:sticky;top:0;z-index:2;
   background:var(--bg3);
   text-align:left;
   font-size:10px;font-weight:700;color:var(--text3);
   text-transform:uppercase;letter-spacing:.08em;
-  padding:10px 14px;
+  padding:8px 10px;
   border-bottom:2px solid var(--border);
   border-right:none;border-left:none;
   white-space:nowrap;
 }
 .data-table td{
-  padding:11px 14px;
+  padding:9px 10px;
   border-bottom:1px solid var(--border);
   border-right:none;border-left:none;
   color:var(--text);
@@ -146,12 +147,14 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .status-pill.rejected{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,.35);}
 
 /* ACTION BUTTONS */
-.action-pair{display:flex;gap:5px;flex-wrap:nowrap;}
-.act-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--radius);border:1px solid;cursor:pointer;font-size:11px;font-family:var(--font);font-weight:700;transition:all .15s;white-space:nowrap;}
+.action-pair{display:flex;gap:4px;flex-wrap:wrap;}
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--radius);border:1px solid;cursor:pointer;font-size:10.5px;font-family:var(--font);font-weight:700;transition:all .15s;white-space:nowrap;flex-shrink:0;}
 .act-btn.accept{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
 .act-btn.accept:hover{background:var(--teal);color:#fff;}
 .act-btn.reject{background:var(--red-dim);border-color:var(--red);color:var(--red);}
 .act-btn.reject:hover{background:var(--red);color:#fff;}
+@media(max-width:1100px){.act-btn .btn-label{display:none;}.act-btn{padding:5px 7px;gap:0;}}
+@media(min-width:1101px){.act-btn .btn-label{display:inline;}}
 
 /* PAGINATION */
 .pagination-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;background:var(--surface);}
@@ -298,7 +301,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <div class="summary-card-value" id="card-pending">0</div>
           <div class="summary-card-label">
             <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
-            Total Pending Requests
+            Req-Pending
           </div>
         </div>
       </div>
@@ -311,7 +314,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <div class="summary-card-value" id="card-req-amount">AED 0</div>
           <div class="summary-card-label">
             <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
-            Total Requested Amount
+            Req-Amount
           </div>
         </div>
       </div>
@@ -324,7 +327,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <div class="summary-card-value" id="card-installments">0</div>
           <div class="summary-card-label">
             <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
-            Installment Requests
+            Req-Installment
           </div>
         </div>
       </div>
@@ -337,7 +340,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <div class="summary-card-value" id="card-lumpsum">0</div>
           <div class="summary-card-label">
             <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
-            Lump-sum / 1-Month
+             1-Payment
           </div>
         </div>
       </div>
@@ -399,57 +402,15 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
       <table class="data-table">
         <thead>
           <tr>
-            <th style="width:36px;padding-left:14px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Select"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <th style="width:32px;padding-left:10px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             </th>
-            <th>
-              <span style="display:flex;align-items:center;gap:5px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
-                REF ID
-              </span>
-            </th>
-            <th>
-              <span style="display:flex;align-items:center;gap:5px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                Emp ID
-              </span>
-            </th>
-            <th>
-              <span style="display:flex;align-items:center;gap:5px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                Name
-              </span>
-            </th>
-            <th>
-              <span style="display:flex;align-items:center;gap:5px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10"/><path d="M12 8c-2.21 0-4 1.79-4 4"/><path d="M12 16c0 2.21-1.79 4-4 4"/><path d="M12 12a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
-                EID Number
-              </span>
-            </th>
-            <th>
-              <span style="display:flex;align-items:center;gap:5px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                Amount (AED)
-              </span>
-            </th>
-            <th>
-              <span style="display:flex;align-items:center;gap:5px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Reason
-              </span>
-            </th>
-            <th>
-              <span style="display:flex;align-items:center;gap:5px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Ret Req Months
-              </span>
-            </th>
-            <th>
-              <span style="display:flex;align-items:center;gap:5px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-                Action
-              </span>
-            </th>
+            <th style="width:12%;">REF ID</th>
+            <th style="width:7%;">Emp ID</th>
+            <th style="width:24%;">Name &amp; EID</th>
+            <th style="width:22%;">Amount (AED) &amp; Reason</th>
+            <th style="width:20%;">Ret Req Months</th>
+            <th style="width:15%;">Action</th>
           </tr>
         </thead>
         <tbody id="pending-tbody"></tbody>
@@ -768,62 +729,62 @@ function renderTable(){
 
 function fmtRetReqMonths(val){
   if(!val)return'—';
-  // Split by comma or semicolon, format each part if it looks like a date
   return val.split(/[,;]/).map(s=>{
-    s=s.trim();
-    if(!s)return'';
-    // Try parsing as ISO date
+    s=s.trim();if(!s)return'';
     const d=new Date(s);
     if(!isNaN(d)&&s.includes('T')){return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});}
-    // Already formatted or plain text
     return s;
-  }).filter(Boolean).join(', ');
+  }).filter(Boolean).join(' · ');
 }
 
 function renderDesktopTable(page,start,end){
   const tbody=document.getElementById('pending-tbody');
   if(!filteredList.length){
-    tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state">
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state">
       <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;display:block;opacity:.3;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <p>No pending records</p><small>${allRequests.length?'No pending requests at this time.':'No data returned from API.'}</small></div></td></tr>`;
     return;
   }
 
   tbody.innerHTML=page.map(r=>{
-    // Name cell
-    const nameCell=`<span style="font-weight:700;color:var(--text);font-size:12.5px;display:flex;align-items:center;gap:4px;">${SVG.user} ${esc(r.empName)}</span>`;
+    // Compact REF ID — show last segment only, full on hover
+    const refShort=r.ref.replace(/^ADV-\d{8}-/,'#');
+    const refCell=`<span title="${esc(r.ref)}" style="font-family:var(--mono);font-size:10px;color:var(--accent);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;">${esc(refShort)}</span>`;
 
-    // EID cell
-    const eidCell=`<span style="font-family:var(--mono);font-size:11.5px;color:var(--text2);">${esc(r.eidNo)||'—'}</span>`;
+    // Emp ID compact
+    const empCell=`<span style="font-family:var(--mono);font-size:11.5px;color:var(--text2);">${r.empId}</span>`;
 
-    // Amount (AED) — requested amount
-    const reqAmtCell=`<span style="font-family:var(--mono);font-weight:700;color:var(--purple);display:flex;align-items:center;gap:4px;">${SVG.dollar} ${r.reqAmount?fmt(r.reqAmount):'—'}</span>`;
+    // Name + EID stacked
+    const nameEidCell=`<div>
+      <div style="font-weight:700;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.empName)}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:1px;">${esc(r.eidNo)||'—'}</div>
+    </div>`;
 
-    // Reason
-    const reasonCell=r.reqReason
-      ?`<span style="display:flex;align-items:center;gap:4px;color:var(--text2);font-size:12px;">${SVG.msg} ${esc(r.reqReason)}</span>`
-      :`<span style="color:var(--text3);">—</span>`;
+    // Amount + Reason stacked
+    const amtReasonCell=`<div>
+      <div style="font-family:var(--mono);font-weight:700;font-size:12.5px;color:var(--purple);">AED ${r.reqAmount?fmt(r.reqAmount):'—'}</div>
+      ${r.reqReason?`<div style="font-size:10.5px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;" title="${esc(r.reqReason)}">${esc(r.reqReason)}</div>`:''}
+    </div>`;
 
-    // Ret Req Months — format ISO dates
+    // Ret Req Months — month pills
+    const months=fmtRetReqMonths(r.retReqMonths);
     const retCell=r.retReqMonths
-      ?`<span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--text2);">${SVG.cal} ${esc(fmtRetReqMonths(r.retReqMonths))}</span>`
-      :`<span style="color:var(--text3);">—</span>`;
+      ?`<div style="display:flex;flex-wrap:wrap;gap:3px;">${months.split(' · ').map(m=>`<span style="background:var(--accent-dim);color:var(--accent);border:1px solid rgba(88,166,255,.25);border-radius:12px;padding:1px 7px;font-size:10px;font-family:var(--mono);white-space:nowrap;">${esc(m)}</span>`).join('')}</div>`
+      :`<span style="color:var(--text3);font-size:11px;">—</span>`;
 
-    // Action — pending only: Accept + Reject, no View
+    // Action — icon+label, label hides on narrow via CSS
     const actionHtml=`<div class="action-pair">
-        <button class="act-btn accept" onclick="openAcceptModal('${esc(r.ref)}')">${SVG.check} Accept</button>
-        <button class="act-btn reject" onclick="decide('${esc(r.ref)}','rejected')">${SVG.ban} Reject</button>
-      </div>`;
+      <button class="act-btn accept" onclick="openAcceptModal('${esc(r.ref)}')" title="Accept">${SVG.check}<span class="btn-label"> Accept</span></button>
+      <button class="act-btn reject" onclick="decide('${esc(r.ref)}','rejected')" title="Reject">${SVG.ban}<span class="btn-label"> Reject</span></button>
+    </div>`;
 
     return`<tr class="new-row" data-ref="${esc(r.ref)}">
-      <td style="width:40px;"><input type="checkbox" class="pending-chk" onchange="togglePendingRow('${esc(r.ref)}',this.checked)" style="width:14px;height:14px;cursor:pointer;"/></td>
-      <td><span style="font-family:var(--mono);font-size:10.5px;color:var(--accent);display:flex;align-items:center;gap:4px;">${SVG.hash} ${esc(r.ref)}</span></td>
-      <td><span style="font-family:var(--mono);font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;">${SVG.id} ${r.empId}</span></td>
-      <td>${nameCell}</td>
-      <td>${eidCell}</td>
-      <td>${reqAmtCell}</td>
-      <td style="max-width:160px;">${reasonCell}</td>
-      <td style="max-width:200px;">${retCell}</td>
+      <td style="width:32px;padding-left:10px;"><input type="checkbox" class="pending-chk" onchange="togglePendingRow('${esc(r.ref)}',this.checked)" style="width:13px;height:13px;cursor:pointer;"/></td>
+      <td>${refCell}</td>
+      <td>${empCell}</td>
+      <td>${nameEidCell}</td>
+      <td>${amtReasonCell}</td>
+      <td>${retCell}</td>
       <td>${actionHtml}</td>
     </tr>`;
   }).join('');
@@ -1000,10 +961,20 @@ async function syncSheets(){clearCache();await loadData(true);showToast('Synced 
 window.addEventListener('scroll',()=>{document.getElementById('scroll-top').classList.toggle('show',window.scrollY>300);});
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
 
-// THEME SYNC
-function syncTheme(){const p=window.parent?.document?.documentElement;if(p){const t=p.getAttribute('data-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}}
-syncTheme();setInterval(syncTheme,1000);
-try{const s=localStorage.getItem('penReq_theme');if(s)document.documentElement.setAttribute('data-theme',s);}catch(e){}
+// THEME SYNC — instant via MutationObserver on parent, fallback to localStorage
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t||'dark');}
+function syncTheme(){
+  const p=window.parent?.document?.documentElement;
+  if(p){applyTheme(p.getAttribute('data-theme'));}
+}
+syncTheme();
+try{
+  const p=window.parent?.document?.documentElement;
+  if(p){
+    new MutationObserver(()=>applyTheme(p.getAttribute('data-theme'))).observe(p,{attributes:true,attributeFilter:['data-theme']});
+  }
+}catch(e){}
+try{const s=localStorage.getItem('penReq_theme');if(s)applyTheme(s);}catch(e){}
 
 (async()=>{await loadData();})();
 </script>
