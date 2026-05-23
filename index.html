@@ -603,28 +603,28 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function run() {
-  const script = document.createElement("script");
+// function run() {
+//   const script = document.createElement("script");
 
-  script.src =
-    "https://script.google.com/macros/s/AKfycbz2DxOEGAJ5V9r0f9HseYdYiAo7qjFGThFmEgwQ80aKgeAf9n5pjwS00dUm4N1ICcf9BQ/exec?action=run&callback=handleResponse";
+//   script.src =
+//     "https://script.google.com/macros/s/AKfycbz2DxOEGAJ5V9r0f9HseYdYiAo7qjFGThFmEgwQ80aKgeAf9n5pjwS00dUm4N1ICcf9BQ/exec?action=run&callback=handleResponse";
 
-  document.body.appendChild(script);
-}
+//   document.body.appendChild(script);
+// }
 
-function handleResponse(data) {
-  console.log(data);
+// function handleResponse(data) {
+//   console.log(data);
 
-  const status = document.getElementById("statusText");
+//   const status = document.getElementById("statusText");
 
-  if (!status) return;
+//   if (!status) return;
 
-  if (data.success) {
-    status.innerText = `✅ ${data.newCount || 0} records processed`;
-  } else {
-    status.innerText = `❌ ${data.error || data.message}`;
-  }
-}
+//   if (data.success) {
+//     status.innerText = `✅ ${data.newCount || 0} records processed`;
+//   } else {
+//     status.innerText = `❌ ${data.error || data.message}`;
+//   }
+// }
 
 
 
