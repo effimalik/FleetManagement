@@ -353,10 +353,8 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 		
 		  <!-- <button class="tb-sc adv" onclick="run()"> <i class="ti ti-cash"></i> REF </button> -->
 
-		<button id="runBtn" class="tb-sc adv" onclick="run()"><i class="ti ti-cash"></i> Run</button>
-
-		<span id="statusText" style="margin-left:10px;"></span>
-		  
+		  <button class="tb-sc adv" onclick="run()"><i class="ti ti-cash"></i> RUN </button><span id="statusText"></span>
+		  		  
       </div>
 
       <div class="tb-gap"></div>
@@ -605,38 +603,27 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-async function run() {
-  const btn = document.getElementById("runBtn");
-  const out = document.getElementById("output");
+function run() {
+  const script = document.createElement("script");
 
-  btn.disabled = true;
-  btn.innerText = "Running...";
+  script.src =
+    "https://script.google.com/macros/s/AKfycbx7oLbSR7VWtVPJQ0do1dK4uv75YqMrEWkhiWmGMWmWRB7jJhxis5xw-b5SlXZFaeFtYQ/exec?action=run&callback=handleResponse";
 
-  try {
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbx7oLbSR7VWtVPJQ0do1dK4uv75YqMrEWkhiWmGMWmWRB7jJhxis5xw-b5SlXZFaeFtYQ/exec?action=run"
-    );
+  document.body.appendChild(script);
+}
 
-    const data = await res.json();
+function handleResponse(data) {
+  console.log(data);
 
-    out.innerText = JSON.stringify(data, null, 2);
+  const status = document.getElementById("statusText");
 
-    if (data.success) {
-      btn.innerText = "✅ Done";
-    } else {
-      btn.innerText = "❌ Error";
-    }
+  if (!status) return;
 
-  } catch (err) {
-    console.error(err);
-    out.innerText = "Request failed";
-    btn.innerText = "❌ Failed";
+  if (data.success) {
+    status.innerText = `✅ ${data.newCount || 0} records processed`;
+  } else {
+    status.innerText = `❌ ${data.error || data.message}`;
   }
-
-  setTimeout(() => {
-    btn.disabled = false;
-    btn.innerText = "Run Incremental";
-  }, 2000);
 }
 
 
