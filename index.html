@@ -350,7 +350,7 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
           onclick="loadPage('Reg/addBike.html',null,'Add Bike','ti-motorbike','Register vehicle','teal')">
           <i class="ti ti-motorbike"></i> Add Bike
         </button>
-		<button class="tb-sc adv" onclick="createSheet()"> <i class="ti ti-cash"></i> REFRESH </button>
+		<button class="tb-sc adv" onclick="run()"> <i class="ti ti-cash"></i> REFRESH </button>
       </div>
 
       <div class="tb-gap"></div>
@@ -600,16 +600,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-function createSheet() {
-
-  fetch("https://script.google.com/macros/s/AKfycbwfMN8UdNqpUzJ7aTgd7eWlPhBvUr0i28VD5vjlMoRz55HOae5HsrmMj8F3yBMFP5HANw/exec?action=buildMaster")
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message + " (" + data.rows + " rows)");
-    })
-    .catch(err => {
-      alert("Error: " + err.message);
-    });
+function run() {
+  fetch(API + "?action=run");
 }
 
 
