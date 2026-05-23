@@ -599,8 +599,38 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function run() {
-  fetch('https://script.google.com/macros/s/AKfycbx7oLbSR7VWtVPJQ0do1dK4uv75YqMrEWkhiWmGMWmWRB7jJhxis5xw-b5SlXZFaeFtYQ/exec?action=run');
+async function run() {
+  const btn = document.getElementById("runBtn");
+  const out = document.getElementById("output");
+
+  btn.disabled = true;
+  btn.innerText = "Running...";
+
+  try {
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbx7oLbSR7VWtVPJQ0do1dK4uv75YqMrEWkhiWmGMWmWRB7jJhxis5xw-b5SlXZFaeFtYQ/exec?action=run"
+    );
+
+    const data = await res.json();
+
+    out.innerText = JSON.stringify(data, null, 2);
+
+    if (data.success) {
+      btn.innerText = "✅ Done";
+    } else {
+      btn.innerText = "❌ Error";
+    }
+
+  } catch (err) {
+    console.error(err);
+    out.innerText = "Request failed";
+    btn.innerText = "❌ Failed";
+  }
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerText = "Run Incremental";
+  }, 2000);
 }
 
 
