@@ -6,15 +6,6 @@
 <title>Advance Requests — Master Sheet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-
-<!--
-  STATIC JSONP script tag — loaded as plain HTML, not injected by JS.
-  Chrome allows static <script src="https://..."> even from file:// pages.
-  GAS responds with: _gasData([...rows...])
--->
-<script>function _gasData(d){ window.__gasRaw = d; }</script>
-<script src="https://script.google.com/macros/s/AKfycbycra9n3I29ioXmbN9PFfViFYs7cn68VPKqnPIbkGpGYOZJ2gvqL0zFLe4kqnHszQluqQ/exec?type=master&callback=_gasData" onerror="window.__gasErr=true"></script>
-
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -35,7 +26,6 @@
 }
 html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
-/* ANIMATED BACKGROUND */
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:linear-gradient(135deg,#e8ecf8,#f3f5fb 50%,#eef0fb)}
 .blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.5;animation:fl linear infinite}
 .blob:nth-child(1){width:520px;height:520px;background:radial-gradient(circle,rgba(99,102,241,.16),transparent 70%);top:-100px;left:-120px;animation-duration:24s}
@@ -43,7 +33,6 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .blob:nth-child(3){width:320px;height:320px;background:radial-gradient(circle,rgba(16,185,129,.09),transparent 70%);bottom:0;left:25%;animation-duration:20s}
 @keyframes fl{0%{transform:translate(0,0) scale(1)}33%{transform:translate(28px,-18px) scale(1.07)}66%{transform:translate(-18px,28px) scale(.95)}100%{transform:translate(0,0) scale(1)}}
 
-/* TOPBAR */
 .topbar{position:sticky;top:0;z-index:100;height:54px;padding:0 20px;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:var(--sh)}
 .tl{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--text)}
 .tl svg{color:var(--accent);flex-shrink:0}
@@ -54,17 +43,14 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .tr{margin-left:auto;display:flex;align-items:center;gap:8px}
 .synctime{font-size:10px;color:var(--text3);font-family:var(--mono)}
 
-/* PAGE */
 .page{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:0 16px 60px}
 
-/* ERROR BANNER */
 .err-banner{background:#fef2f2;border:1px solid rgba(239,68,68,.25);border-radius:var(--rl);padding:14px 18px;margin:16px 0;display:none;align-items:flex-start;gap:12px;font-size:13px;color:#991b1b}
 .err-banner.show{display:flex}
 .err-banner svg{flex-shrink:0;margin-top:1px;color:#ef4444}
 .err-banner strong{display:block;font-size:13px;margin-bottom:4px}
 .err-banner code{font-size:11px;background:rgba(239,68,68,.08);padding:2px 6px;border-radius:4px;font-family:var(--mono)}
 
-/* SECTION HEADER */
 .hdr{padding:18px 0 14px}
 .hdr-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .hdr-title{font-size:21px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px}
@@ -72,7 +58,6 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .hdr-desc{font-size:12px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:5px}
 .hdr-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
-/* STAT CARDS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 @media(max-width:640px){.stats{grid-template-columns:1fr 1fr;gap:8px}}
 .sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px;transition:box-shadow .18s}
@@ -86,7 +71,6 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .sp{font-size:12px;font-weight:500;color:var(--text3);font-family:var(--ff)}
 .sl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
 
-/* FILTER BAR */
 .fbar{background:rgba(255,255,255,.9);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;box-shadow:var(--sh)}
 .fg{display:flex;flex-direction:column;gap:4px}
 .fl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:4px}
@@ -99,7 +83,6 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .cc{font-size:12px;color:var(--text3);white-space:nowrap}
 .cc strong{color:var(--accent);font-family:var(--mono)}
 
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--r);border:1.5px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;font-size:13px;font-family:var(--ff);font-weight:500;transition:all .15s;white-space:nowrap}
 .btn:hover{background:var(--surface2)}
 .btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
@@ -111,13 +94,11 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .btn-ico{padding:8px;border-radius:var(--r)}
 .btn-sm{padding:5px 10px;font-size:11.5px;border-radius:8px}
 
-/* TABLE CARD */
 .tc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rxl);box-shadow:var(--shm);overflow:hidden}
 .tch{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap}
 .tct{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
 .tct svg{color:var(--accent)}
 
-/* TABLE */
 .tw{overflow-x:auto;max-height:560px;overflow-y:auto}
 .dt{width:100%;border-collapse:collapse;min-width:660px}
 .dt thead th{position:sticky;top:0;z-index:10;background:#f7f9fd;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;border-bottom:2px solid var(--border);text-align:left;white-space:nowrap;cursor:pointer;user-select:none;transition:color .12s}
@@ -129,7 +110,6 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .sa{display:inline-block;margin-left:3px;opacity:.3;font-size:10px}
 .srt-a .sa,.srt-d .sa{opacity:1;color:var(--accent)}
 
-/* CELL TYPES */
 .cs{display:flex;flex-direction:column;gap:2px}
 .cm{font-size:12.5px;font-weight:600;color:var(--text)}
 .cb{font-size:10.5px;color:var(--text3);font-family:var(--mono)}
@@ -138,7 +118,6 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .as{font-size:10.5px;color:var(--blue);font-family:var(--mono)}
 .ap{font-size:10.5px;color:var(--text3)}
 
-/* BADGES */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
 .b-pend{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.22)}
 .b-disb{background:var(--blue-d);color:var(--blue);border:1px solid rgba(59,130,246,.22)}
@@ -146,25 +125,21 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .b-appr{background:var(--green-d);color:var(--green);border:1px solid rgba(16,185,129,.22)}
 .b-gray{background:#f1f4f9;color:var(--text3);border:1px solid var(--border)}
 
-/* INLINE DETAIL ROW */
 .dr td{background:#f7f9fd!important;padding:14px 18px!important;border-bottom:1px solid var(--border)!important}
 .mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px}
 .mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px}
-.ml{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.mlab{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
 .mv{font-size:12px;font-weight:600;color:var(--text);font-family:var(--mono)}
 .mv.g{color:var(--green)}.mv.b{color:var(--blue)}.mv.a{color:var(--amber)}.mv.p{color:var(--purple)}
 
-/* LOAD MORE */
 .lmb{display:flex;align-items:center;justify-content:center;padding:14px;border-top:1px solid var(--border);gap:10px}
 .lmi{font-size:12px;color:var(--text3)}
 .lmi strong{color:var(--accent);font-family:var(--mono)}
 
-/* SKELETONS */
 .skr td{padding:12px 14px;border-bottom:1px solid #f0f3f9}
 .skc{height:13px;border-radius:6px;background:linear-gradient(90deg,#edf0f7 25%,#f5f7fb 50%,#edf0f7 75%);background-size:400% 100%;animation:shim 1.3s ease infinite}
 @keyframes shim{0%{background-position:100% 0}100%{background-position:-100% 0}}
 
-/* MOBILE CARDS */
 .mlist{display:none;flex-direction:column;gap:10px;padding:12px}
 @media(max-width:680px){.tw{display:none}.mlist{display:flex}}
 .rcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px;box-shadow:var(--sh);cursor:pointer;position:relative;overflow:hidden;transition:box-shadow .18s}
@@ -188,17 +163,14 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 .rexp.open{display:block}
 .rexpg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 
-/* EMPTY STATE */
 .empty{text-align:center;padding:48px 20px;color:var(--text3)}
 .empty svg{width:40px;height:40px;margin:0 auto 12px;display:block;opacity:.25}
 .empty p{font-size:13px}
 
-/* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;border-radius:var(--rl);padding:10px 18px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;z-index:9999;opacity:0;transition:all .25s;pointer-events:none;box-shadow:var(--shl);white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.err{background:var(--red)}.toast.wrn{background:var(--amber)}
 
-/* MODAL */
 .mbk{position:fixed;inset:0;background:rgba(15,23,42,.45);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
 .mbk.open{opacity:1;pointer-events:all}
 .mdl{background:var(--surface);border:1px solid var(--border);border-radius:var(--rxl);box-shadow:var(--shl);width:100%;max-width:600px;max-height:90vh;display:flex;flex-direction:column}
@@ -250,12 +222,12 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 <body>
 <div class="bg"><div class="blob"></div><div class="blob"></div><div class="blob"></div></div>
 
-<!-- Error Banner (shown if GAS script failed to load) -->
+<!-- Error Banner -->
 <div class="err-banner" id="err-banner">
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
   <div>
     <strong>Could not load data from Google Sheets</strong>
-    The API script failed to respond. Make sure your <code>doGet()</code> in Google Apps Script supports the <code>?callback=</code> parameter (JSONP). See console for details.
+    The API failed to respond. Check the console for details, then click <em>Sync Sheets</em> to retry.
   </div>
 </div>
 
@@ -311,32 +283,25 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
   <div class="sc"><div class="si b"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div><div class="sv" id="s-1p">0</div><div class="sl">1-Payment</div></div></div>
 </div>
 
-<!-- Filters -->
+<!-- Filters — Search + Date only -->
 <div class="fbar">
   <div class="fg">
-    <div class="fl"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search</div>
-    <input class="fi" id="f-s" placeholder="Search name, ref, EID…" oninput="applyF()" style="min-width:185px"/>
+    <div class="fl">
+      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search
+    </div>
+    <input class="fi" id="f-s" placeholder="Search name, ref, EID…" oninput="applyF()" style="min-width:210px"/>
   </div>
   <div class="fg">
-    <div class="fl"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Status</div>
-    <select class="fs" id="f-st" onchange="applyF()">
-      <option value="">All Statuses</option>
-      <option value="Pending">Pending Disbursement</option>
-      <option value="Disbursed">Disbursed</option>
-      <option value="Rejected">Rejected</option>
-    </select>
-  </div>
-  <div class="fg">
-    <div class="fl"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> FROM DATE</div>
+    <div class="fl">
+      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Date Range
+    </div>
     <div class="dp">
       <input class="fi" type="date" id="f-from" onchange="applyF()"/>
       <span class="ds">→</span>
       <input class="fi" type="date" id="f-to" onchange="applyF()"/>
     </div>
-  </div>
-  <div class="fg">
-    <div class="fl"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> For Month</div>
-    <select class="fs" id="f-mo" onchange="applyF()"><option value="">All Months</option></select>
   </div>
   <div class="fsp"></div>
   <div style="display:flex;align-items:flex-end;gap:8px">
@@ -370,8 +335,8 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
       <thead><tr>
         <th onclick="srt('ref')">REF # / Emp ID <span class="sa" id="sa-ref">↕</span></th>
         <th onclick="srt('name')">Name / EID <span class="sa" id="sa-name">↕</span></th>
-        <th onclick="srt('amt')">Req / App Amt <span class="sa" id="sa-amt">↕</span></th>
-        <th onclick="srt('mo')">Month / Submitted <span class="sa" id="sa-mo">↕</span></th>
+        <th onclick="srt('amt')">Amount <span class="sa" id="sa-amt">↕</span></th>
+        <th onclick="srt('mo')">For Month / Submitted <span class="sa" id="sa-mo">↕</span></th>
         <th onclick="srt('st')">Status <span class="sa" id="sa-st">↕</span></th>
         <th>Detail</th>
       </tr></thead>
@@ -398,8 +363,13 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 <div class="mbk" id="mbk">
   <div class="mdl sd">
     <div class="mhd">
-      <h2><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Loan Detail — <span id="m-ref">—</span></h2>
-      <button class="btn btn-ico" onclick="closeM()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Loan Detail — <span id="m-ref">—</span>
+      </h2>
+      <button class="btn btn-ico" onclick="closeM()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="mbd" id="mbd"></div>
     <div class="mft"><button class="btn" onclick="closeM()">Close</button></div>
@@ -407,140 +377,170 @@ html,body{min-height:100%;font-family:var(--ff);background:var(--bg);color:var(-
 </div>
 
 <!-- Toast -->
-<div class="toast" id="toast"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span id="tmsg">Done</span></div>
+<div class="toast" id="toast">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="tmsg">Done</span>
+</div>
 
 <script>
 /* ── CONFIG ── */
-const GAS_CB  = '_gasData';        // must match callback= in <head> script src
-const PAGE    = 25;
-const TTL     = 5*60*1000;
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbycra9n3I29ioXmbN9PFfViFYs7cn68VPKqnPIbkGpGYOZJ2gvqL0zFLe4kqnHszQluqQ/exec?type=master';
+const PAGE = 25;
+
+/*
+  API returns an array-of-arrays. Column order (0-based):
+  0  REF ID
+  1  EmpID
+  2  EID No
+  3  EmpName
+  4  ReqAmount
+  5  ReqInstallments
+  6  RetReqMonths   (e.g. "Jun 2026, Jul 2026")
+  7  Timestamp      (e.g. "01042026000000")
+  8  ReqReason
+  9  AppAmount
+  10 AppInstallments
+  11 RetAppMonths
+  12 DissDate
+  13 ReqStatus
+  14 DisAmount
+  15 (spare)
+*/
 
 /* ── STATE ── */
 let all=[], filt=[], disp=0, loading=false, sc='', sd=1, xref=null;
-let _cache=null, _cacheT=0;
 
 /* ── HELPERS ── */
 const $=id=>document.getElementById(id);
 function fmt(n){return Number(n||0).toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fmtI(n){return Number(n||0).toLocaleString('en-AE')}
-function esc(v){if(!v&&v!==0)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function esc(v){if(v===null||v===undefined)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function today(){return new Date().toISOString().slice(0,10)}
 function addMo(ds,n){const d=new Date(ds);d.setMonth(d.getMonth()+n);return d.toISOString().slice(0,10)}
 
+/* Parse timestamp "DDMMYYYYHHMMSS" → Date */
 function parseTS(ts){
-  if(!ts) return null; ts=String(ts).trim();
+  if(!ts) return null;
+  ts=String(ts).trim();
   if(/^\d{14}$/.test(ts)){
-    const [dd,mm,yyyy,HH,MM,SS]=[ts.slice(0,2),ts.slice(2,4),ts.slice(4,8),ts.slice(8,10),ts.slice(10,12),ts.slice(12,14)];
+    const dd=ts.slice(0,2),mm=ts.slice(2,4),yyyy=ts.slice(4,8),HH=ts.slice(8,10),MM=ts.slice(10,12),SS=ts.slice(12,14);
     return new Date(`${yyyy}-${mm}-${dd}T${HH}:${MM}:${SS}`);
   }
   const d=new Date(ts); return isNaN(d)?null:d;
 }
 function fmtTS(ts){const d=parseTS(ts);if(!d)return ts||'—';return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
 function tsDate(ts){const d=parseTS(ts);if(!d)return'';return d.toISOString().slice(0,10)}
-function moLbl(v){if(!v)return'—';if(/^\d{4}-\d{2}$/.test(v))return new Date(v+'-01').toLocaleString('en-GB',{month:'short',year:'numeric'});return v}
 
-/* ── MAP ROW ── */
-function mapR(r){
-  const refId=String(r['REF ID']||r['" REF ID"']||r['REFID']||'').trim();
-  const empId=String(r['EmpID']||'').trim();
-  const eid=String(r['EID No']||'').trim();
-  const name=String(r['EmpName']||'').trim();
-  const reqAmt=parseFloat(r['ReqAmount']||0)||0;
-  const reqInst=parseInt(r['ReqInstallments']||0)||0;
-  const retReqMo=String(r['RetReqMonths']||'').trim();
-  const forMonth=String(r['ReqForMonth']||'').trim();
-  const reason=String(r['ReqReason']||'').trim();
-  const ts=String(r['Timestamp']||'').trim();
-  const appAmt=parseFloat(r['AppAmount']||0)||0;
-  const appInst=parseInt(r['AppInstallments']||0)||0;
-  const retAppMo=String(r['RetAppMonths']||'').trim();
-  const status=String(r['ReqStatus']||'').trim();
-  const disAmt=parseFloat(r['Amount']||0)||0;
-  const dissDate=String(r['DissDate']||'').trim();
-  if(!refId&&!empId) return null;
-  const stL=status.toLowerCase();
-  let es=status;
-  if(stL==='approved'&&dissDate) es='Disbursed';
-  else if(stL==='approved'&&!dissDate) es='Pending';
+/* "Jun 2026, Jul 2026" → display as-is; YYYY-MM → short label */
+function moLbl(v){
+  if(!v)return'—';
+  if(/^\d{4}-\d{2}$/.test(v))return new Date(v+'-01').toLocaleString('en-GB',{month:'short',year:'numeric'});
+  return v;
+}
+
+/* ── MAP ROW from array ── */
+function mapRow(r){
+  if(!Array.isArray(r)) return null;
+  const refId  = String(r[0]||'').trim();
+  const empId  = String(r[1]||'').trim();
+  const eid    = String(r[2]||'').trim();
+  const name   = String(r[3]||'').trim();
+  const reqAmt = parseFloat(r[4])||0;
+  const reqInst= parseInt(r[5])||0;
+  const retReqMo = String(r[6]||'').trim();
+  const ts     = String(r[7]||'').trim();
+  const reason = String(r[8]||'').trim();
+  const appAmt = parseFloat(r[9])||0;
+  const appInst= parseInt(r[10])||0;
+  const retAppMo = String(r[11]||'').trim();
+  const dissDate = String(r[12]||'').trim();
+  const status = String(r[13]||'').trim();
+  const disAmt = parseFloat(r[14])||0;
+
+  if(!refId && !empId) return null;
+
+  /* Derive display status */
+  const stL = status.toLowerCase();
+  let es = status;
+  if(stL==='approved' && dissDate) es='Disbursed';
+  else if(stL==='approved' && !dissDate) es='Pending';
   else if(stL==='rejected') es='Rejected';
+  else if(stL==='pending') es='Pending';
+
+  /* Use retReqMo as "for month" display */
+  const forMonth = retReqMo;
+
   return{refId,empId,eid,name,reqAmt,reqInst,retReqMo,forMonth,reason,ts,appAmt,appInst,retAppMo,status,disAmt,dissDate,es,_d:tsDate(ts)};
 }
 
-/* ── INIT: consume data already loaded by static <script> in <head> ── */
-function initData(raw){
-  const rows=Array.isArray(raw)?raw:(raw&&(raw.data||raw.records)||[]);
-  all=rows.map(mapR).filter(Boolean);
-  _cache=all; _cacheT=Date.now();
-  populateMo(all);
+/* ── FETCH DATA via fetch() ── */
+async function fetchData(){
+  const r = await fetch(GAS_URL);
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const data = await r.json();
+  /* GAS may return array directly or wrapped */
+  if(Array.isArray(data)) return data;
+  if(data && Array.isArray(data.data)) return data.data;
+  if(data && Array.isArray(data.records)) return data.records;
+  throw new Error('Unexpected response shape');
+}
+
+/* ── INIT ── */
+function initData(rows){
+  all = rows.map(mapRow).filter(Boolean);
   applyF();
   $('last-sync').textContent='Synced '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 }
 
-/* ── SYNC (re-fetch via new JSONP script tag) ── */
-function syncData(){
+/* ── BOOT ── */
+(async function boot(){
+  showSkel(5);
+  try{
+    const rows = await fetchData();
+    initData(rows);
+    toast('Loaded '+all.length+' records ✓');
+  } catch(e){
+    console.error('Boot fetch error:',e);
+    $('err-banner').classList.add('show');
+    $('tb').innerHTML=`<tr><td colspan="6"><div class="empty"><p>Failed to load data — click Sync Sheets to retry</p></div></td></tr>`;
+    $('ml').innerHTML='<div class="empty"><p>Failed to load — tap Sync Sheets to retry</p></div>';
+  }
+})();
+
+/* ── SYNC ── */
+async function syncData(){
   const btn=$('btn-sync'), ico=$('sync-ico');
   btn.disabled=true; ico.classList.add('spin');
   showSkel(4);
-
-  const cb='_gasSyncCB_'+Date.now();
-  let done=false;
-  const tmr=setTimeout(()=>{
-    if(done)return; done=true; cleanup();
-    ico.classList.remove('spin'); btn.disabled=false;
-    toast('Sync timed out — check network','wrn');
-  },15000);
-
-  function cleanup(){clearTimeout(tmr);delete window[cb];const el=$(cb);if(el)el.remove()}
-
-  window[cb]=function(data){
-    if(done)return; done=true; cleanup();
-    ico.classList.remove('spin'); btn.disabled=false;
-    initData(data);
+  try{
+    const rows = await fetchData();
+    initData(rows);
     toast('Synced — '+all.length+' records ✓');
-  };
-
-  const s=document.createElement('script');
-  s.id=cb;
-  const base='https://script.google.com/macros/s/AKfycbycra9n3I29ioXmbN9PFfViFYs7cn68VPKqnPIbkGpGYOZJ2gvqL0zFLe4kqnHszQluqQ/exec';
-  s.src=`${base}?type=master&callback=${cb}&_t=${Date.now()}`;
-  s.onerror=()=>{
-    if(done)return; done=true; cleanup();
+    $('err-banner').classList.remove('show');
+  } catch(e){
+    console.error('Sync error:',e);
+    toast('Sync failed — check network','err');
+  } finally{
     ico.classList.remove('spin'); btn.disabled=false;
-    toast('Sync failed — API error','err');
-  };
-  document.head.appendChild(s);
-}
-
-/* ── MONTH FILTER ── */
-function populateMo(recs){
-  const months=[...new Set(recs.map(r=>r.forMonth).filter(Boolean))].sort();
-  const sel=$('f-mo'), cur=sel.value;
-  sel.innerHTML='<option value="">All Months</option>';
-  months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=moLbl(m);sel.appendChild(o)});
-  if(cur) sel.value=cur;
+  }
 }
 
 /* ── FILTERS ── */
 function applyF(){
   const s=($('f-s').value||'').toLowerCase().trim();
-  const st=$('f-st').value;
   const fr=$('f-from').value;
   const to=$('f-to').value;
-  const mo=$('f-mo').value;
   filt=all.filter(r=>{
-    if(s){const h=[r.refId,r.empId,r.eid,r.name,r.reason,r.es].join(' ').toLowerCase();if(!h.includes(s))return false}
-    if(st&&r.es!==st)return false;
+    if(s){const h=[r.refId,r.empId,r.eid,r.name,r.reason,r.es,r.forMonth].join(' ').toLowerCase();if(!h.includes(s))return false}
     if(fr&&r._d&&r._d<fr)return false;
     if(to&&r._d&&r._d>to)return false;
-    if(mo&&r.forMonth!==mo)return false;
     return true;
   });
   if(sc) filt=doSort(filt,sc,sd);
   disp=0; $('tb').innerHTML=''; $('ml').innerHTML='';
   updateStats(); renderBatch(PAGE);
 }
-
-function clearF(){['f-s','f-from','f-to'].forEach(id=>$(id).value='');['f-st','f-mo'].forEach(id=>$(id).value='');applyF()}
+function clearF(){['f-s','f-from','f-to'].forEach(id=>$(id).value=''); applyF()}
 
 /* ── SORT ── */
 const SFN={ref:r=>r.refId,name:r=>r.name.toLowerCase(),amt:r=>r.appAmt||r.reqAmt,mo:r=>r.forMonth,st:r=>r.es};
@@ -590,16 +590,15 @@ function updateLM(){
 
 /* ── STATUS BADGE ── */
 function sbadge(r){
-  const ic=(path,cls)=>`<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
   switch(r.es){
-    case'Pending':return`<span class="badge b-pend">${ic('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>')}Pending</span>`;
-    case'Disbursed':return`<span class="badge b-disb">${ic('<polyline points="20 6 9 17 4 12"/>')}Disbursed</span>`;
-    case'Rejected':return`<span class="badge b-rej">${ic('<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>')}Rejected</span>`;
+    case'Pending':return`<span class="badge b-pend"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</span>`;
+    case'Disbursed':return`<span class="badge b-disb"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Disbursed</span>`;
+    case'Rejected':return`<span class="badge b-rej"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Rejected</span>`;
     default:return`<span class="badge b-gray">${esc(r.es||'—')}</span>`;
   }
 }
 
-/* ── BUILD TABLE ROW ── */
+/* ── TABLE ROW ── */
 function buildRow(r){
   return`<tr data-ref="${esc(r.refId)}" onclick="toggleDet('${esc(r.refId)}')">
     <td><div class="cs"><span class="rp"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>${esc(r.refId)}</span><span class="cb" style="margin-top:3px"># ${esc(r.empId)}</span></div></td>
@@ -611,29 +610,29 @@ function buildRow(r){
   </tr>`;
 }
 
-/* ── INLINE DETAIL ── */
+/* ── INLINE DETAIL ROW ── */
 function toggleDet(refId){
-  const ex=$(  'di-'+refId);
+  const ex=$('di-'+refId);
   if(ex){ex.remove();xref=null;return}
   if(xref){const p=$('di-'+xref);if(p)p.remove()}
   xref=refId;
   const r=filt.find(x=>x.refId===refId);if(!r)return;
   const row=document.querySelector(`tr[data-ref="${refId}"]`);if(!row)return;
   row.insertAdjacentHTML('afterend',`<tr id="di-${esc(refId)}" class="dr sd"><td colspan="6"><div class="mg">
-    <div class="mc"><div class="ml">REF ID</div><div class="mv b" style="font-size:10px;word-break:break-all">${esc(r.refId)}</div></div>
-    <div class="mc"><div class="ml">Emp ID</div><div class="mv">${esc(r.empId)}</div></div>
-    <div class="mc"><div class="ml">EID No</div><div class="mv" style="font-size:10px">${esc(r.eid)}</div></div>
-    <div class="mc"><div class="ml">Reason</div><div class="mv" style="font-family:var(--ff);font-size:11.5px;font-weight:500">${esc(r.reason||'—')}</div></div>
-    <div class="mc"><div class="ml">Req Amount</div><div class="mv a">AED ${fmt(r.reqAmt)}</div></div>
-    <div class="mc"><div class="ml">App Amount</div><div class="mv g">AED ${fmt(r.appAmt)}</div></div>
-    <div class="mc"><div class="ml">Req Inst</div><div class="mv">${r.reqInst||'—'}</div></div>
-    <div class="mc"><div class="ml">App Inst</div><div class="mv">${r.appInst||'—'}</div></div>
-    <div class="mc"><div class="ml">Ret Req Months</div><div class="mv" style="font-size:10.5px">${esc(r.retReqMo||'—')}</div></div>
-    <div class="mc"><div class="ml">Ret App Months</div><div class="mv" style="font-size:10.5px">${esc(r.retAppMo||'—')}</div></div>
-    <div class="mc"><div class="ml">For Month</div><div class="mv p">${esc(moLbl(r.forMonth))}</div></div>
-    <div class="mc"><div class="ml">Submitted</div><div class="mv" style="font-size:10.5px">${esc(fmtTS(r.ts))}</div></div>
-    <div class="mc"><div class="ml">Status</div><div class="mv">${esc(r.es)}</div></div>
-    <div class="mc"><div class="ml">Disb Date</div><div class="mv b">${esc(r.dissDate||'—')}</div></div>
+    <div class="mc"><div class="mlab">REF ID</div><div class="mv b" style="font-size:10px;word-break:break-all">${esc(r.refId)}</div></div>
+    <div class="mc"><div class="mlab">Emp ID</div><div class="mv">${esc(r.empId)}</div></div>
+    <div class="mc"><div class="mlab">EID No</div><div class="mv" style="font-size:10px">${esc(r.eid)}</div></div>
+    <div class="mc"><div class="mlab">Reason</div><div class="mv" style="font-family:var(--ff);font-size:11.5px;font-weight:500">${esc(r.reason||'—')}</div></div>
+    <div class="mc"><div class="mlab">Req Amount</div><div class="mv a">AED ${fmt(r.reqAmt)}</div></div>
+    <div class="mc"><div class="mlab">App Amount</div><div class="mv g">AED ${fmt(r.appAmt||r.reqAmt)}</div></div>
+    <div class="mc"><div class="mlab">Req Inst</div><div class="mv">${r.reqInst||'—'}</div></div>
+    <div class="mc"><div class="mlab">App Inst</div><div class="mv">${r.appInst||r.reqInst||'—'}</div></div>
+    <div class="mc"><div class="mlab">Ret Months (Req)</div><div class="mv" style="font-size:10.5px">${esc(r.retReqMo||'—')}</div></div>
+    <div class="mc"><div class="mlab">Ret Months (App)</div><div class="mv" style="font-size:10.5px">${esc(r.retAppMo||'—')}</div></div>
+    <div class="mc"><div class="mlab">For Month</div><div class="mv p">${esc(moLbl(r.forMonth))}</div></div>
+    <div class="mc"><div class="mlab">Submitted</div><div class="mv" style="font-size:10.5px">${esc(fmtTS(r.ts))}</div></div>
+    <div class="mc"><div class="mlab">Status</div><div class="mv">${esc(r.es)}</div></div>
+    <div class="mc"><div class="mlab">Disb Date</div><div class="mv b">${esc(r.dissDate||'—')}</div></div>
   </div></td></tr>`);
 }
 
@@ -662,7 +661,7 @@ function buildCard(r){
     <div class="rexp" id="mx-${esc(r.refId)}">
       <div class="rexpg">
         <div class="rf"><div class="rfl">Req Amount</div><div class="rfv" style="color:var(--amber)">AED ${fmt(r.reqAmt)}</div></div>
-        <div class="rf"><div class="rfl">App Amount</div><div class="rfv" style="color:var(--green)">AED ${fmt(r.appAmt)}</div></div>
+        <div class="rf"><div class="rfl">App Amount</div><div class="rfv" style="color:var(--green)">AED ${fmt(r.appAmt||r.reqAmt)}</div></div>
         <div class="rf"><div class="rfl">Installments</div><div class="rfv">${r.appInst||r.reqInst||'—'}</div></div>
         <div class="rf"><div class="rfl">Disb Date</div><div class="rfv" style="color:var(--blue)">${esc(r.dissDate||'—')}</div></div>
         <div class="rf" style="grid-column:1/-1"><div class="rfl">Submitted</div><div class="rfv" style="font-size:11px">${esc(fmtTS(r.ts))}</div></div>
@@ -681,10 +680,16 @@ function showSkel(n){
 
 /* ── MODAL ── */
 function openM(refId){
-  const r=all.find(x=>x.refId===refId);if(!r){toast('Record not found','err');return}
+  const r=all.find(x=>x.refId===refId);
+  if(!r){toast('Record not found','err');return}
   $('m-ref').textContent=refId;
-  const mo=r.appInst||r.reqInst||1, amt=r.appAmt||r.reqAmt, monthly=amt/mo, db=r.dissDate||today();
-  const inst=Array.from({length:mo},(_,i)=>({no:i+1,due:addMo(db,i+1),amt:i===mo-1?amt-(Math.round(monthly*100)/100)*(mo-1):Math.round(monthly*100)/100}));
+  const mo=r.appInst||r.reqInst||1, amt=r.appAmt||r.reqAmt, monthly=amt/mo;
+  const db=r.dissDate||today();
+  const inst=Array.from({length:mo},(_,i)=>({
+    no:i+1,
+    due:addMo(db,i+1),
+    amt:i===mo-1?Math.round((amt-(Math.round(monthly*100)/100)*(mo-1))*100)/100:Math.round(monthly*100)/100
+  }));
   $('mbd').innerHTML=`
     <div class="egrid">
       <div class="ef"><span>Employee</span><strong>${esc(r.name||'—')}</strong></div>
@@ -711,7 +716,7 @@ function openM(refId){
 function closeM(){$('mbk').classList.remove('open')}
 $('mbk').addEventListener('click',e=>{if(e.target===$('mbk'))closeM()});
 
-/* ── EXPORT ── */
+/* ── EXPORT CSV ── */
 function exportCSV(){
   const rows=all.filter(r=>r.es==='Pending');
   if(!rows.length){toast('No pending records to export','wrn');return}
@@ -732,34 +737,6 @@ function toast(msg,type=''){
   requestAnimationFrame(()=>t.classList.add('show'));
   clearTimeout(tmr); tmr=setTimeout(()=>t.classList.remove('show'),3200);
 }
-
-/* ── BOOT: check if static <script> in <head> already loaded data ── */
-(function boot(){
-  if(window.__gasErr){
-    $('err-banner').classList.add('show');
-    showSkel(0);
-    $('tb').innerHTML=`<tr><td colspan="6"><div class="empty"><p>Failed to load — see error above</p></div></td></tr>`;
-    return;
-  }
-  if(window.__gasRaw){
-    // data came in synchronously (static script tag worked)
-    initData(window.__gasRaw);
-  } else {
-    // static script still loading or no data yet — wait a tick then try again, fallback to sync
-    showSkel(5);
-    let attempts=0;
-    const poll=setInterval(()=>{
-      attempts++;
-      if(window.__gasRaw){ clearInterval(poll); initData(window.__gasRaw); return; }
-      if(window.__gasErr||attempts>40){
-        clearInterval(poll);
-        $('err-banner').classList.add('show');
-        $('tb').innerHTML=`<tr><td colspan="6"><div class="empty"><p>Failed to load data — click Sync Sheets to retry</p></div></td></tr>`;
-        $('ml').innerHTML='<div class="empty"><p>Failed to load — tap Sync Sheets to retry</p></div>';
-      }
-    },250); // poll every 250ms, give up after 10s
-  }
-})();
 </script>
 </body>
 </html>
