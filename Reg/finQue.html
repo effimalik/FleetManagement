@@ -1,1196 +1,1325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Finance Queue — Bulk Disbursement</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Finance Queue — Master Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* ══ THEMES ══ */
 :root,[data-theme="dark"]{
   --bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;
   --surface:#21262d;--surface2:#2d333b;
   --border:#30363d;--border2:#444c56;
   --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
-  --accent:#58a6ff;--accent-dim:rgba(88,166,255,.12);--accent-glow:rgba(88,166,255,.25);
-  --teal:#39d353;--teal-dim:rgba(57,211,83,.12);
-  --amber:#e3b341;--amber-dim:rgba(227,179,65,.12);
-  --red:#f85149;--red-dim:rgba(248,81,73,.12);
-  --purple:#a371f7;--purple-dim:rgba(163,113,247,.12);
-  --orange:#f0883e;--orange-dim:rgba(240,136,62,.12);
-  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+  --accent:#58a6ff;--accent-dim:rgba(88,166,255,.13);--accent-glow:rgba(88,166,255,.25);
+  --teal:#39d353;--teal-dim:rgba(57,211,83,.13);
+  --amber:#e3b341;--amber-dim:rgba(227,179,65,.13);
+  --red:#f85149;--red-dim:rgba(248,81,73,.13);
+  --purple:#a371f7;--purple-dim:rgba(163,113,247,.13);
+  --orange:#f0883e;--orange-dim:rgba(240,136,62,.13);
+  --radius:10px;--radius-lg:14px;--radius-xl:18px;
   --font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow:0 1px 4px rgba(0,0,0,.35);
   --shadow-md:0 4px 16px rgba(0,0,0,.5);--shadow-lg:0 8px 32px rgba(0,0,0,.6);
 }
 [data-theme="light"]{
-  --bg:#f0f2f5;--bg2:#fff;--bg3:#e8ecf0;
-  --surface:#fff;--surface2:#e2e7ed;
-  --border:#c8d0d9;--border2:#9aa5b1;
-  --text:#0d1117;--text2:#3d454f;--text3:#5a6370;
-  --accent:#0550ae;--accent-dim:rgba(5,80,174,.12);--accent-glow:rgba(5,80,174,.22);
-  --teal:#116329;--teal-dim:rgba(17,99,41,.13);
-  --amber:#7d4e00;--amber-dim:rgba(125,78,0,.13);
-  --red:#a8111b;--red-dim:rgba(168,17,27,.11);
-  --purple:#6639c8;--purple-dim:rgba(102,57,200,.13);
-  --orange:#953800;--orange-dim:rgba(149,56,0,.13);
-  --shadow:0 1px 3px rgba(0,0,0,.10);--shadow-md:0 4px 16px rgba(0,0,0,.12);--shadow-lg:0 8px 32px rgba(0,0,0,.15);
+  --bg:#f2f4f7;--bg2:#fff;--bg3:#eaecf0;
+  --surface:#fff;--surface2:#e8ecf0;
+  --border:#d8dde5;--border2:#b0bac5;
+  --text:#111827;--text2:#374151;--text3:#6b7280;
+  --accent:#2563eb;--accent-dim:rgba(37,99,235,.1);--accent-glow:rgba(37,99,235,.2);
+  --teal:#059669;--teal-dim:rgba(5,150,105,.1);
+  --amber:#d97706;--amber-dim:rgba(217,119,6,.1);
+  --red:#dc2626;--red-dim:rgba(220,38,38,.09);
+  --purple:#7c3aed;--purple-dim:rgba(124,58,237,.1);
+  --orange:#ea580c;--orange-dim:rgba(234,88,12,.1);
+  --shadow:0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:0 4px 16px rgba(0,0,0,.1);--shadow-lg:0 8px 32px rgba(0,0,0,.13);
+}
+[data-theme="purple"]{
+  --bg:#120820;--bg2:#1c0d32;--bg3:#27104a;
+  --surface:#2e1460;--surface2:#3d1e78;
+  --border:#4a2a8a;--border2:#6040b0;
+  --text:#f0e8ff;--text2:#c4a8f0;--text3:#8a6cc0;
+  --accent:#c084fc;--accent-dim:rgba(192,132,252,.15);--accent-glow:rgba(192,132,252,.3);
+  --teal:#7ef7a0;--teal-dim:rgba(126,247,160,.12);
+  --amber:#ffd580;--amber-dim:rgba(255,213,128,.12);
+  --red:#ff6b6b;--red-dim:rgba(255,107,107,.12);
+  --purple:#e9d5ff;--purple-dim:rgba(233,213,255,.1);
+  --orange:#ffab76;--orange-dim:rgba(255,171,118,.12);
+  --shadow:0 1px 4px rgba(0,0,0,.5);
+  --shadow-md:0 4px 16px rgba(0,0,0,.6);--shadow-lg:0 8px 32px rgba(0,0,0,.7);
+}
+[data-theme="ocean"]{
+  --bg:#011627;--bg2:#01213d;--bg3:#012f5a;
+  --surface:#013a6e;--surface2:#01468a;
+  --border:#0160a0;--border2:#0080c0;
+  --text:#d6f0ff;--text2:#88c8e8;--text3:#5090b0;
+  --accent:#00d4ff;--accent-dim:rgba(0,212,255,.12);--accent-glow:rgba(0,212,255,.25);
+  --teal:#00ff9d;--teal-dim:rgba(0,255,157,.12);
+  --amber:#ffc947;--amber-dim:rgba(255,201,71,.12);
+  --red:#ff5577;--red-dim:rgba(255,85,119,.12);
+  --purple:#c084fc;--purple-dim:rgba(192,132,252,.12);
+  --orange:#ff8c42;--orange-dim:rgba(255,140,66,.12);
+  --shadow:0 1px 4px rgba(0,0,0,.5);
+  --shadow-md:0 4px 16px rgba(0,0,0,.6);--shadow-lg:0 8px 32px rgba(0,0,0,.7);
 }
 
-html,body{ min-height:100%; font-family:var(--font); background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .22s,color .22s;}
 
-/* ── PAGE ── */
-.page{ min-height:100vh; padding:24px; }
-
-/* ── SECTION HEADER ── */
-.section-header{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; gap:12px; flex-wrap:wrap; }
-.section-header h2{ font-size:18px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:10px; }
-.section-header h2 i{ color:var(--teal); }
-.section-desc{ font-size:12px; color:var(--text3); margin-top:2px; }
-.section-actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-
-/* ── BUTTONS ── */
-.tb-btn{ display:inline-flex; align-items:center; gap:7px; padding:8px 16px; border-radius:var(--radius); border:1px solid var(--border2); background:var(--surface); color:var(--text); cursor:pointer; font-size:13px; font-family:var(--font); font-weight:500; transition:all .18s; white-space:nowrap; }
-.tb-btn:hover{ background:var(--surface2); }
-.tb-btn.success{ background:var(--teal-dim); border-color:var(--teal); color:var(--teal); }
-.tb-btn.success:hover{ background:var(--teal); color:#fff; }
-.tb-btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
-.tb-btn.primary:hover{ filter:brightness(1.1); box-shadow:0 0 0 3px var(--accent-glow); }
-.tb-btn.purple{ background:var(--purple-dim); border-color:var(--purple); color:var(--purple); }
-.tb-btn.purple:hover{ background:var(--purple); color:#fff; }
-.tb-btn.icon-only{ padding:8px; }
-.tb-btn i{ font-size:15px; }
-.tb-btn:disabled{ opacity:.4; cursor:not-allowed; pointer-events:none; }
-
-/* ── TABS ── */
-.tab-bar{ display:flex; gap:4px; margin-bottom:20px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:4px; width:fit-content; }
-.tab-btn{ display:inline-flex; align-items:center; gap:7px; padding:8px 18px; border-radius:var(--radius); border:none; background:transparent; color:var(--text2); cursor:pointer; font-size:13px; font-family:var(--font); font-weight:500; transition:all .18s; white-space:nowrap; }
-.tab-btn:hover{ background:var(--surface2); color:var(--text); }
-.tab-btn.active{ background:var(--accent-dim); color:var(--accent); border:1px solid rgba(88,166,255,.2); }
-.tab-btn.active i{ color:var(--accent); }
-.tab-btn i{ font-size:15px; color:var(--text3); }
-.tab-content{ display:none; }
-.tab-content.active{ display:block; }
-
-/* ── SUMMARY CARD ── */
-.summary-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:20px 24px; margin-bottom:16px; }
-.summary-inner{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
-.summary-stats{ display:flex; gap:32px; flex-wrap:wrap; align-items:center; }
-.stat-lbl{ font-size:10.5px; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; }
-.stat-val{ font-size:22px; font-weight:700; font-family:var(--mono); color:var(--text); }
-.stat-val.green{ color:var(--teal); }
-.stat-val.blue{ color:var(--accent); }
-.stat-val.amber{ color:var(--amber); }
-
-/* ── TABLE CARD ── */
-.data-table-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow); overflow:hidden; }
-.data-table-header{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); gap:10px; flex-wrap:wrap; }
-.data-table-title{ font-size:14px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px; }
-.data-table-title i{ color:var(--teal); }
-.data-table-wrap{ overflow-x:auto; }
-.data-table{ width:100%; border-collapse:collapse; font-size:13px; min-width:900px; }
-.data-table thead th{ position:sticky; top:0; z-index:2; background:var(--bg3); text-align:left; font-size:10.5px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; padding:11px 14px; border-bottom:2px solid var(--border); white-space:nowrap; }
-.data-table td{ padding:11px 14px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:middle; }
-.data-table tr:last-child td{ border-bottom:none; }
-.data-table tbody tr{ transition:background .12s; }
-.data-table tbody tr:hover td{ background:var(--bg3); }
-
-/* skeleton shimmer */
-.skeleton-row td{ padding:11px 14px; border-bottom:1px solid var(--border); }
-.skeleton-cell{ height:16px; border-radius:6px; background:linear-gradient(90deg,var(--surface2) 25%,var(--surface) 50%,var(--surface2) 75%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; }
-@keyframes shimmer{ 0%{background-position:100% 0} 100%{background-position:-100% 0} }
-
-/* ── CELL STACKS ── */
-.cell-stack{ display:flex; flex-direction:column; gap:2px; }
-.cell-main{ font-size:12px; font-weight:600; color:var(--text); }
-.cell-sub{ font-size:11px; color:var(--text3); font-family:var(--mono); }
-.cell-amt-approved{ font-size:12px; font-weight:700; color:var(--teal); font-family:var(--mono); }
-.cell-amt-disbursed{ font-size:11px; color:var(--accent); font-family:var(--mono); }
-.cell-amt-none{ font-size:11px; color:var(--text3); }
-
-/* ── BADGES ── */
-.badge{ display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; }
-.badge.blue{ background:var(--accent-dim); color:var(--accent); border:1px solid rgba(88,166,255,.3); }
-.badge.green{ background:var(--teal-dim); color:var(--teal); border:1px solid rgba(57,211,83,.3); }
-.badge.amber{ background:var(--amber-dim); color:var(--amber); border:1px solid rgba(227,179,65,.3); }
-.badge.red{ background:var(--red-dim); color:var(--red); border:1px solid rgba(248,81,73,.3); }
-.badge.purple{ background:var(--purple-dim); color:var(--purple); border:1px solid rgba(163,113,247,.3); }
-.badge.gray{ background:rgba(110,118,129,.18); color:#8b949e; border:1px solid rgba(110,118,129,.3); }
-
-/* ── ACTION BUTTONS ── */
-.act-btn{ display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:var(--radius); border:1px solid; cursor:pointer; font-size:11.5px; font-family:var(--font); font-weight:600; transition:all .15s; white-space:nowrap; }
-.act-btn.view-btn{ background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
-.act-btn.view-btn:hover{ background:var(--accent); color:#fff; }
-
-/* ── EMPTY STATE ── */
-.empty-state{ text-align:center; padding:40px 20px; color:var(--text3); }
-.empty-state i{ font-size:36px; display:block; margin-bottom:10px; opacity:.4; }
-.empty-state p{ font-size:13px; }
-
-/* ── CARD (bulk steps) ── */
-.card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:20px; margin-bottom:16px; }
-.card-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border); }
-.card-title{ font-size:14px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px; }
-.card-title i{ color:var(--purple); font-size:16px; }
-
-/* ── INFO BOX ── */
-.info-box{ background:var(--accent-dim); border:1px solid rgba(88,166,255,.2); border-radius:var(--radius); padding:12px 14px; font-size:12.5px; color:var(--text2); display:flex; gap:10px; align-items:flex-start; margin-bottom:14px; }
-.info-box i{ color:var(--accent); flex-shrink:0; margin-top:1px; }
-.info-box.success{ background:var(--teal-dim); border-color:rgba(57,211,83,.25); }
-.info-box.success i{ color:var(--teal); }
-
-/* ── UPLOAD ZONE ── */
-.upload-zone{ border:2px dashed var(--border2); border-radius:var(--radius-lg); padding:40px 24px; text-align:center; cursor:pointer; transition:all .2s; background:var(--bg3); position:relative; }
-.upload-zone:hover,.upload-zone.drag{ border-color:var(--purple); background:var(--purple-dim); }
-.upload-zone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-.upload-zone i{ font-size:40px; color:var(--purple); margin-bottom:10px; display:block; }
-.upload-zone p{ font-size:13px; color:var(--text2); margin-bottom:4px; }
-.upload-zone small{ font-size:11px; color:var(--text3); }
-
-/* ── UPLOAD STEPS ── */
-.upload-step{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text3); margin-bottom:6px; }
-.upload-step .step-num{ width:20px; height:20px; border-radius:50%; background:var(--purple-dim); border:1px solid rgba(163,113,247,.3); color:var(--purple); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
-
-/* ── COLUMN MAP ── */
-.col-map-grid{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; margin-bottom:10px; }
-.col-map-grid select{ padding:7px 10px; border-radius:var(--radius); border:1px solid var(--border2); background:var(--bg3); color:var(--text); font-family:var(--font); font-size:12px; outline:none; }
-.col-map-grid select:focus{ border-color:var(--purple); box-shadow:0 0 0 2px var(--purple-dim); }
-.map-arrow{ color:var(--text3); text-align:center; }
-.map-label{ font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
-
-/* ── PREVIEW SUMMARY ── */
-.preview-summary{ display:flex; gap:16px; flex-wrap:wrap; padding:14px 18px; background:var(--bg3); border-bottom:1px solid var(--border); align-items:center; }
-.preview-summary .ps-item{ display:flex; align-items:center; gap:6px; font-size:13px; }
-.preview-summary .ps-val{ font-weight:700; font-family:var(--mono); }
-.ps-val.green{ color:var(--teal); }
-.ps-val.purple{ color:var(--purple); }
-.ps-val.amber{ color:var(--amber); }
-.ps-val.red{ color:var(--red); }
-
-/* ── REF BADGE ── */
-.ref-badge{ display:inline-flex; align-items:center; gap:5px; background:var(--purple-dim); border:1px solid rgba(163,113,247,.3); border-radius:20px; padding:2px 10px; font-size:11px; font-family:var(--mono); color:var(--purple); font-weight:700; }
-
-/* ── ROW STATES ── */
-.row-error td{ background:rgba(248,81,73,.08) !important; }
-.row-warn td{ background:rgba(227,179,65,.08) !important; }
-
-/* ── MODAL ── */
-.modal-backdrop{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); backdrop-filter:blur(4px); z-index:400; align-items:center; justify-content:center; padding:20px; }
-.modal-backdrop.open{ display:flex; }
-.modal{ background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius-xl); box-shadow:var(--shadow-lg); width:100%; max-width:680px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; }
-.modal-header{ display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
-.modal-header h2{ font-size:15px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px; }
-.modal-header h2 i{ color:var(--purple); }
-.modal-body{ padding:20px; overflow-y:auto; flex:1; }
-.modal-footer{ display:flex; align-items:center; justify-content:flex-end; gap:8px; padding:14px 20px; border-top:1px solid var(--border); flex-shrink:0; }
-
-/* ── EMP STRIP ── */
-.emp-strip{ background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px; margin-bottom:16px; display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; font-size:12.5px; }
-.emp-strip span{ color:var(--text3); }
-.emp-strip strong{ color:var(--text); }
-
-/* ── INSTALLMENT ── */
-.inst-progress{ background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; margin-bottom:14px; }
-.inst-progress-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-.inst-progress-label{ font-size:12px; font-weight:600; color:var(--text2); }
-.inst-progress-pct{ font-size:12px; font-family:var(--mono); font-weight:700; }
-.progress-track{ height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
-.progress-fill{ height:100%; border-radius:4px; transition:width .5s ease; }
-.progress-fill.green{ background:linear-gradient(90deg,var(--teal),#56d068); }
-.progress-fill.amber{ background:linear-gradient(90deg,var(--amber),#f0a535); }
-.inst-amounts{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:12px; }
-.inst-amt-box{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:10px; text-align:center; }
-.inst-amt-label{ font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
-.inst-amt-val{ font-size:14px; font-weight:700; font-family:var(--mono); }
-.inst-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
-.inst-table th{ text-align:left; font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; padding:8px 12px; border-bottom:2px solid var(--border); background:var(--bg3); }
-.inst-table td{ padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
-.inst-table tr:last-child td{ border-bottom:none; }
-.inst-table tbody tr:hover td{ background:var(--bg3); }
-
-/* ── DIVIDER ── */
-.divider-label{ display:flex; align-items:center; gap:10px; margin:20px 0 12px; color:var(--text3); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; }
-.divider-label::before,.divider-label::after{ content:''; flex:1; height:1px; background:var(--border); }
-
-/* ── TOAST ── */
-.toast{ position:fixed; bottom:24px; right:24px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:12px 18px; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500; color:var(--text); transform:translateY(80px); opacity:0; transition:all .3s cubic-bezier(.34,1.56,.64,1); z-index:9999; max-width:360px; pointer-events:none; }
-.toast.show{ transform:translateY(0); opacity:1; }
-.toast i{ font-size:16px; color:var(--teal); }
-.toast.warn i{ color:var(--amber); }
-.toast.error i{ color:var(--red); }
-
-/* ── ANIMATIONS ── */
-@keyframes spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-.spinning{ animation:spin .7s linear infinite; display:inline-block; }
-@keyframes rowIn{ from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
-.new-row{ animation:rowIn .25s ease-out; }
-@keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.5} }
-.pulse{ animation:pulse 1s ease-in-out infinite; display:inline-block; }
-
-/* ── LOAD BANNER ── */
-.load-banner{ display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--accent-dim); border:1px solid rgba(88,166,255,.2); border-radius:var(--radius); font-size:12.5px; color:var(--text2); margin-bottom:14px; }
-.load-banner i{ color:var(--accent); font-size:15px; flex-shrink:0; }
-.load-banner.hidden{ display:none; }
-
-@media(max-width:768px){
-  .page{ padding:14px; }
-  .inst-amounts{ grid-template-columns:1fr 1fr; }
-  .summary-stats{ gap:18px; }
-  .tab-bar{ width:100%; }
+/* ══ STICKY TOP NAV ══ */
+.top-nav{
+  position:sticky;top:0;z-index:300;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:0 24px;height:52px;display:flex;align-items:center;gap:12px;
+  box-shadow:var(--shadow);
 }
-[data-theme="light"] .data-table thead th{ background:var(--bg3); }
-[data-theme="light"] .data-table tbody tr:hover td{ background:var(--bg3); }
+.nav-brand{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;}
+.nav-brand i{color:var(--purple);font-size:18px;}
+.nav-sep{width:1px;height:20px;background:var(--border2);margin:0 4px;flex-shrink:0;}
+.nav-sub{font-size:11px;color:var(--text3);font-weight:400;}
+.nav-spacer{flex:1;}
+.nav-actions{display:flex;align-items:center;gap:8px;}
+
+/* Theme swatches */
+.theme-swatches{display:flex;gap:6px;align-items:center;}
+.t-swatch{width:20px;height:20px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.t-swatch:hover,.t-swatch.active{border-color:var(--text2);transform:scale(1.18);}
+.t-swatch[data-t="dark"]{background:linear-gradient(135deg,#0d1117 50%,#58a6ff 50%);}
+.t-swatch[data-t="light"]{background:linear-gradient(135deg,#f2f4f7 50%,#2563eb 50%);}
+.t-swatch[data-t="purple"]{background:linear-gradient(135deg,#120820 50%,#c084fc 50%);}
+.t-swatch[data-t="ocean"]{background:linear-gradient(135deg,#011627 50%,#00d4ff 50%);}
+
+/* ══ BUTTONS ══ */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-size:12px;font-family:var(--font);font-weight:600;transition:all .16s;white-space:nowrap;}
+.btn:hover{background:var(--surface2);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn.primary:hover{filter:brightness(1.1);}
+.btn.success{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.btn.success:hover{background:var(--teal);color:#fff;}
+.btn.danger{background:var(--red-dim);border-color:var(--red);color:var(--red);}
+.btn.danger:hover{background:var(--red);color:#fff;}
+.btn.purple{background:var(--purple-dim);border-color:var(--purple);color:var(--purple);}
+.btn.purple:hover{background:var(--purple);color:#fff;}
+.btn.icon{padding:7px;}
+.btn i{font-size:14px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.btn-group{display:flex;align-items:center;gap:6px;}
+
+/* ══ PAGE ══ */
+.page{padding:20px 24px 48px;max-width:1600px;margin:0 auto;}
+
+/* ══ PAGE HEADER ══ */
+.page-header{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-xl);
+  box-shadow:var(--shadow);margin-bottom:0;overflow:hidden;
+}
+/* gradient top line */
+.page-header::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--teal),var(--accent),var(--purple));}
+
+.ph-title-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px 14px;gap:12px;flex-wrap:wrap;
+}
+.ph-left{display:flex;flex-direction:column;gap:3px;}
+.ph-title{font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.ph-title i{color:var(--purple);font-size:18px;}
+.ph-sub{font-size:11.5px;color:var(--text3);display:flex;align-items:center;gap:6px;}
+.ph-sub i{font-size:11px;}
+.ph-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.ph-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+/* ══ LINE SEPARATOR ══ */
+.line-sep{height:1px;background:var(--border);margin:0;}
+
+/* ══ STAT CARDS ROW ══ */
+.stat-cards-row{
+  display:flex;align-items:stretch;gap:0;
+  padding:16px 22px;flex-wrap:wrap;gap:12px;
+}
+.stat-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:12px 18px;
+  min-width:140px;flex:1;transition:border-color .15s,box-shadow .15s;
+  cursor:default;
+}
+.stat-card:hover{border-color:var(--border2);box-shadow:var(--shadow);}
+.stat-icon{
+  width:38px;height:38px;border-radius:var(--radius);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.stat-icon.amber{background:var(--amber-dim);color:var(--amber);}
+.stat-icon.green{background:var(--teal-dim);color:var(--teal);}
+.stat-icon.blue{background:var(--accent-dim);color:var(--accent);}
+.stat-icon.purple{background:var(--purple-dim);color:var(--purple);}
+.stat-icon.red{background:var(--red-dim);color:var(--red);}
+.stat-body{}
+.stat-val{font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1.1;}
+.stat-val.prefix{font-size:11px;font-weight:600;color:var(--text3);vertical-align:middle;margin-right:2px;font-family:var(--font);}
+.stat-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;}
+.stat-label::before{content:'• ';color:var(--text3);}
+
+/* Date filter section inside stat-cards-row */
+.date-filter-block{
+  display:flex;flex-direction:column;gap:6px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:12px 18px;
+  margin-left:auto;flex-shrink:0;
+}
+.date-filter-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.date-group{display:flex;flex-direction:column;gap:4px;}
+.date-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:4px;}
+.date-label i{font-size:11px;}
+.date-input{
+  padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border2);
+  background:var(--surface);color:var(--text);font-family:var(--font);
+  font-size:12px;outline:none;width:140px;
+  color-scheme:dark;
+  transition:border .15s;
+}
+[data-theme="light"] .date-input,[data-theme="slate"] .date-input{color-scheme:light;}
+.date-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim);}
+.date-filter-foot{display:flex;align-items:center;gap:8px;justify-content:flex-end;}
+.live-dot{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--teal);}
+.live-dot::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--teal);display:inline-block;animation:blink 2s ease-in-out infinite;}
+
+/* ══ TABS ══ */
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:4px;width:fit-content;max-width:100%;overflow-x:auto;}
+.tab-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:var(--radius);border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;transition:all .16s;white-space:nowrap;}
+.tab-btn:hover{background:var(--surface2);color:var(--text);}
+.tab-btn.active{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(88,166,255,.2);}
+.tab-btn.active i,.tab-btn i{font-size:15px;color:var(--text3);}
+.tab-btn.active i{color:var(--accent);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ══ TABLE CARD ══ */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);overflow:hidden;}
+.table-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;
+}
+.tc-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.tc-title i{color:var(--teal);}
+.tc-sep{display:inline-block;width:1px;height:14px;background:var(--border2);margin:0 6px;vertical-align:middle;}
+.tc-desc{font-size:11px;color:var(--text3);font-weight:400;}
+.tc-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+/* scroll table */
+.table-scroll{overflow-x:auto;overflow-y:auto;max-height:560px;}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:720px;}
+.data-table thead th{
+  position:sticky;top:0;z-index:10;
+  background:var(--bg3);text-align:left;
+  font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:10px 14px;border-bottom:2px solid var(--border);
+  white-space:nowrap;cursor:pointer;user-select:none;
+}
+.data-table thead th:hover{color:var(--text);}
+.sort-ic{margin-left:4px;opacity:.35;font-size:10px;}
+th.asc .sort-ic,th.desc .sort-ic{opacity:1;color:var(--accent);}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.data-table tbody tr{transition:background .1s;cursor:pointer;}
+.data-table tbody tr:hover td{background:var(--bg3);}
+.data-table tbody tr:last-child td{border-bottom:none;}
+
+/* cell helpers */
+.cs{display:flex;flex-direction:column;gap:2px;}
+.cm{font-size:12px;font-weight:600;color:var(--text);}
+.cs2{font-size:10.5px;color:var(--text3);font-family:var(--mono);}
+.amt-req{font-size:12px;font-weight:700;color:var(--teal);font-family:var(--mono);}
+.amt-dis{font-size:10.5px;color:var(--accent);font-family:var(--mono);}
+.amt-none{font-size:10.5px;color:var(--text3);}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;}
+.badge.green{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(57,211,83,.25);}
+.badge.amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(227,179,65,.25);}
+.badge.blue{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(88,166,255,.25);}
+.badge.red{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,.25);}
+.badge.purple{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(163,113,247,.25);}
+.badge.gray{background:rgba(110,118,129,.15);color:var(--text2);border:1px solid rgba(110,118,129,.25);}
+
+/* ref pill */
+.ref-pill{display:inline-flex;align-items:center;gap:4px;background:var(--purple-dim);border:1px solid rgba(163,113,247,.25);border-radius:20px;padding:2px 9px;font-size:10px;font-family:var(--mono);color:var(--purple);font-weight:700;max-width:200px;word-break:break-all;}
+
+/* action btns */
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);border:1px solid;cursor:pointer;font-size:11px;font-family:var(--font);font-weight:600;transition:all .14s;white-space:nowrap;}
+.act-btn.view{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.act-btn.view:hover{background:var(--accent);color:#fff;}
+.act-btn.expand{background:var(--purple-dim);border-color:var(--purple);color:var(--purple);}
+.act-btn.expand:hover{background:var(--purple);color:#fff;}
+
+/* inline detail row */
+.det-row td{background:var(--bg3)!important;padding:12px 16px!important;}
+.mini-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;}
+.mini-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;}
+.mini-lbl{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.mini-val{font-size:12px;font-weight:600;color:var(--text);font-family:var(--mono);}
+.mini-val.green{color:var(--teal);}
+.mini-val.blue{color:var(--accent);}
+.mini-val.amber{color:var(--amber);}
+.mini-val.purple{color:var(--purple);}
+.mini-val.plain{font-family:var(--font);}
+
+/* skeleton */
+.skel td{padding:10px 14px;border-bottom:1px solid var(--border);}
+.skel-cell{height:13px;border-radius:6px;background:linear-gradient(90deg,var(--surface2) 25%,var(--surface) 50%,var(--surface2) 75%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* load more */
+.load-more-row{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;border-top:1px solid var(--border);}
+.load-prog{font-size:12px;color:var(--text3);}
+.load-prog strong{color:var(--accent);font-family:var(--mono);}
+
+/* empty state */
+.empty-st{text-align:center;padding:48px 20px;color:var(--text3);}
+.empty-st i{font-size:38px;display:block;margin-bottom:10px;opacity:.35;}
+.empty-st p{font-size:13px;}
+
+/* ══ MODAL ══ */
+.mbackdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.mbackdrop.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.mhead h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.mhead h2 i{color:var(--purple);}
+.mbody{padding:20px;overflow-y:auto;flex:1;}
+.mfoot{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+.emp-strip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;font-size:12px;}
+.emp-strip span{color:var(--text3);}
+.emp-strip strong{color:var(--text);}
+.div-label{display:flex;align-items:center;gap:10px;margin:16px 0 10px;color:var(--text3);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;}
+.div-label::before,.div-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.inst-amounts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.iamt-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center;}
+.iamt-lbl{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
+.iamt-val{font-size:15px;font-weight:700;font-family:var(--mono);}
+.inst-table{width:100%;border-collapse:collapse;font-size:12px;}
+.inst-table th{text-align:left;font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:8px 10px;border-bottom:2px solid var(--border);background:var(--bg3);}
+.inst-table td{padding:8px 10px;border-bottom:1px solid var(--border);}
+.inst-table tr:last-child td{border-bottom:none;}
+.inst-table tbody tr:hover td{background:var(--bg3);}
+
+/* ══ BULK UPLOAD ══ */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow);padding:20px;margin-bottom:16px;}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.card-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.card-title i{color:var(--purple);}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:38px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);position:relative;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--purple);background:var(--purple-dim);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone i{font-size:38px;color:var(--purple);margin-bottom:8px;display:block;}
+.upload-zone p{font-size:13px;color:var(--text2);margin-bottom:3px;}
+.upload-zone small{font-size:11px;color:var(--text3);}
+.up-step{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text3);margin-bottom:6px;}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--purple-dim);border:1px solid rgba(163,113,247,.3);color:var(--purple);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.col-grid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:10px;}
+.col-grid select{padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12px;outline:none;}
+.col-grid select:focus{border-color:var(--purple);box-shadow:0 0 0 2px var(--purple-dim);}
+.map-arrow{color:var(--text3);text-align:center;}
+.map-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.prev-summary{display:flex;gap:16px;flex-wrap:wrap;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);align-items:center;}
+.prev-summary .pi{display:flex;align-items:center;gap:5px;font-size:12px;}
+.pi-v{font-weight:700;font-family:var(--mono);}
+.row-err td{background:rgba(248,81,73,.07)!important;}
+.row-warn td{background:rgba(227,179,65,.07)!important;}
+
+/* info box */
+.info-box{background:var(--accent-dim);border:1px solid rgba(88,166,255,.2);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--text2);display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;}
+.info-box i{color:var(--accent);flex-shrink:0;}
+.info-box.ok{background:var(--teal-dim);border-color:rgba(57,211,83,.2);}
+.info-box.ok i{color:var(--teal);}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--text);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:9999;max-width:340px;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast i{font-size:15px;color:var(--teal);}
+.toast.warn i{color:var(--amber);}
+.toast.error i{color:var(--red);}
+
+/* load banner */
+.load-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--accent-dim);border:1px solid rgba(88,166,255,.2);border-radius:var(--radius);font-size:12px;color:var(--text2);margin-bottom:14px;}
+.load-banner.hidden{display:none;}
+
+/* animations */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.spinning{animation:spin .7s linear infinite;display:inline-block;}
+@keyframes rowIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.row-in{animation:rowIn .18s ease-out;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.slide-down{animation:slideDown .18s ease-out;}
+
+/* responsive */
+@media(max-width:900px){
+  .page{padding:12px;}
+  .stat-cards-row{flex-direction:column;}
+  .date-filter-block{margin-left:0;}
+  .date-filter-top{flex-direction:column;align-items:flex-start;}
+  .top-nav{padding:0 14px;}
+  .inst-amounts{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:600px){
+  .ph-title-row{flex-direction:column;}
+  .tab-bar{width:100%;}
+  .mini-grid{grid-template-columns:1fr 1fr;}
+  .nav-sub{display:none;}
+}
 </style>
 </head>
-<body>
+<body data-theme="dark">
+
+<!-- ══ STICKY NAV ══ -->
+<nav class="top-nav">
+  <div class="nav-brand">
+    <i class="ti ti-building-bank"></i>
+    Finance Queue
+    <div class="nav-sep"></div>
+    <span class="nav-sub">Master Sheet</span>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-actions">
+    <!-- theme swatches -->
+    <div class="theme-swatches">
+      <button class="t-swatch active" data-t="dark"   title="Dark"   onclick="setTheme('dark')"></button>
+      <button class="t-swatch"        data-t="light"  title="Light"  onclick="setTheme('light')"></button>
+      <button class="t-swatch"        data-t="purple" title="Purple" onclick="setTheme('purple')"></button>
+      <button class="t-swatch"        data-t="ocean"  title="Ocean"  onclick="setTheme('ocean')"></button>
+    </div>
+    <div style="width:1px;height:20px;background:var(--border2);"></div>
+    <button class="btn" id="btn-sync" onclick="syncData()">
+      <i class="ti ti-refresh" id="sync-ic"></i>Sync Sheets
+    </button>
+    <button class="btn success" onclick="exportPending()">
+      <i class="ti ti-file-download"></i>Deposit Sheet
+    </button>
+    <button class="btn primary" id="accept-btn" onclick="acceptSelected()" disabled>
+      <i class="ti ti-check"></i>Accept <span id="accept-count">0</span>
+    </button>
+    <button class="btn danger" id="reject-btn" onclick="rejectSelected()" disabled>
+      <i class="ti ti-ban"></i>Reject Selected
+    </button>
+  </div>
+</nav>
 
 <div class="page">
 
-  <!-- ── PAGE HEADER ── -->
-  <div class="section-header">
-    <div>
-      <h2><i class="ti ti-building-bank"></i>Finance Queue</h2>
-      <div class="section-desc">All approved advance requests and bulk disbursement upload.</div>
+<!-- ══ PAGE HEADER CARD ══ -->
+<div class="page-header" id="page-header">
+  <div class="ph-title-row">
+    <div class="ph-left">
+      <div class="ph-title">
+        <i class="ti ti-clock-hour-4"></i>
+        Advance Requests — Master Sheet
+      </div>
+      <div class="ph-sub">
+        <span class="ph-dot"></span>
+        Live data from MASTER API
+        &nbsp;·&nbsp;
+        All statuses
+        &nbsp;·&nbsp;
+        <i class="ti ti-clock"></i>
+        <span id="sync-time">Not synced</span>
+      </div>
     </div>
-    <div class="section-actions">
-      <button class="tb-btn" id="btn-sync" onclick="syncSheets()">
-        <i class="ti ti-refresh" id="sync-icon"></i>Sync Sheets
-      </button>
-      <button class="tb-btn success" onclick="downloadDepositSheet()">
-        <i class="ti ti-file-download"></i>Download Deposit Sheet
-      </button>
+  </div>
+
+  <!-- LINE SEPARATOR -->
+  <div class="line-sep"></div>
+
+  <!-- STAT CARDS + DATE FILTER in same row -->
+  <div class="stat-cards-row">
+    <div class="stat-card">
+      <div class="stat-icon amber"><i class="ti ti-clock-hour-4"></i></div>
+      <div class="stat-body">
+        <div class="stat-val" id="s-pending">0</div>
+        <div class="stat-label">REQ-PENDING</div>
+      </div>
     </div>
-  </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="ti ti-cash"></i></div>
+      <div class="stat-body">
+        <div class="stat-val"><span class="prefix">AED</span><span id="s-amount">0</span></div>
+        <div class="stat-label">REQ-AMOUNT</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="ti ti-calendar-repeat"></i></div>
+      <div class="stat-body">
+        <div class="stat-val" id="s-installment">0</div>
+        <div class="stat-label">REQ-INSTALLMENT</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple"><i class="ti ti-credit-card"></i></div>
+      <div class="stat-body">
+        <div class="stat-val" id="s-payment">0</div>
+        <div class="stat-label">1-PAYMENT</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red"><i class="ti ti-circle-check"></i></div>
+      <div class="stat-body">
+        <div class="stat-val" id="s-disbursed">0</div>
+        <div class="stat-label">DISBURSED</div>
+      </div>
+    </div>
 
-  <!-- ── INLINE LOADING BANNER ── -->
-  <div class="load-banner hidden" id="load-banner">
-    <i class="ti ti-loader spinning"></i>
-    <span id="load-banner-msg">Loading data from Google Sheets…</span>
-  </div>
-
-  <!-- ── TABS ── -->
-  <div class="tab-bar">
-    <button class="tab-btn active" id="tab-queue" onclick="switchTab('queue')">
-      <i class="ti ti-building-bank"></i>Finance Queue
-    </button>
-    <button class="tab-btn" id="tab-bulk" onclick="switchTab('bulk')">
-      <i class="ti ti-upload"></i>Bulk Upload
-    </button>
-  </div>
-
-  <!-- ══════════════════ TAB: FINANCE QUEUE ══════════════════ -->
-  <div class="tab-content active" id="tab-content-queue">
-
-    <!-- SUMMARY CARD -->
-    <div class="summary-card" id="summary-card" style="display:none;">
-      <div class="summary-inner">
-        <div class="summary-stats">
-          <div class="stat-block">
-            <div class="stat-lbl">Total Approved</div>
-            <div class="stat-val green" id="fin-total-amt">AED 0.00</div>
-          </div>
-          <div class="stat-block">
-            <div class="stat-lbl">Records</div>
-            <div class="stat-val" id="fin-count">0</div>
-          </div>
-          <div class="stat-block">
-            <div class="stat-lbl">Deposited</div>
-            <div class="stat-val blue" id="fin-disbursed">0</div>
-          </div>
-          <div class="stat-block">
-            <div class="stat-lbl">Pending</div>
-            <div class="stat-val amber" id="fin-pending">0</div>
-          </div>
+    <!-- DATE FILTER BLOCK -->
+    <div class="date-filter-block">
+      <div class="date-filter-top">
+        <div class="date-group">
+          <div class="date-label"><i class="ti ti-calendar"></i> FROM DATE</div>
+          <input class="date-input" type="date" id="f-from" onchange="applyFilters()"/>
+        </div>
+        <div class="date-group">
+          <div class="date-label"><i class="ti ti-calendar"></i> TO DATE</div>
+          <input class="date-input" type="date" id="f-to" onchange="applyFilters()"/>
+        </div>
+        <div class="date-group" style="justify-content:flex-end;align-self:flex-end;">
+          <button class="btn" onclick="clearDates()" style="gap:5px;font-size:11px;padding:6px 10px;">
+            <i class="ti ti-x" style="font-size:12px;"></i>Clear
+          </button>
         </div>
       </div>
-    </div>
-
-    <!-- ALL APPROVED RECORDS TABLE -->
-    <div class="data-table-card">
-      <div class="data-table-header">
-        <div class="data-table-title"><i class="ti ti-building-bank"></i>All Approved Records</div>
-        <span class="badge green" id="finance-badge">0 records</span>
+      <div class="date-filter-foot">
+        <span class="live-dot">Live data</span>
+        <span style="font-size:11px;color:var(--text3);" id="filter-count-label"></span>
       </div>
-      <div class="data-table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>REF # / Emp ID</th>
-              <th>Name / EID</th>
-              <th>Amt Approved / Amt Disbursed</th>
-              <th>Requested Plan</th>
-              <th>For Month</th>
-              <th>Approved At</th>
-              <th>Date Disbursed</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="finance-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-  </div><!-- /tab-content-queue -->
-
-
-  <!-- ══════════════════ TAB: BULK UPLOAD ══════════════════ -->
-  <div class="tab-content" id="tab-content-bulk">
-
-    <div class="section-header" style="margin-bottom:16px;">
-      <div>
-        <h2 style="font-size:16px;"><i class="ti ti-upload" style="color:var(--purple);"></i>Bulk Disbursement Upload</h2>
-        <div class="section-desc">Upload a CSV/Excel disbursement sheet for multiple employees. Submits each row to Google Sheets via the same GAS backend.</div>
-      </div>
-    </div>
-
-    <!-- STEP 1: Upload Zone -->
-    <div id="bulk-step1" class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="ti ti-file-upload"></i>Step 1 — Upload Disbursement File</div>
-        <button class="tb-btn purple" onclick="downloadBulkTemplate()"><i class="ti ti-download"></i>Download Template</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-        <div class="upload-step"><span class="step-num">1</span>Download the CSV template or use your own file with columns: REF, Emp ID, Amount, DisbDate, tb-uname</div>
-        <div class="upload-step"><span class="step-num">2</span>Fill in data — if first row has a number value it's treated as a data row (no header); otherwise first row is used as the header</div>
-        <div class="upload-step"><span class="step-num">3</span>Upload file, map columns, preview entries, then click "Save All to Google Sheets"</div>
-      </div>
-      <div class="upload-zone" id="bulk-drop-zone" ondragover="bulkDragOver(event)" ondragleave="bulkDragLeave(event)" ondrop="bulkDrop(event)">
-        <input type="file" accept=".csv,.xlsx,.xls,.txt" onchange="handleBulkFile(this.files[0])" id="bulk-file-input" />
-        <i class="ti ti-file-spreadsheet"></i>
-        <p><strong>Click to upload</strong> or drag &amp; drop your disbursement file here</p>
-        <small>Supported: CSV, Excel (.xlsx, .xls) &nbsp;·&nbsp; Columns: REF ID, Emp ID, Amount, DisbDate, tb-uname</small>
-      </div>
-    </div>
-
-    <!-- STEP 2: Column Mapping -->
-    <div id="bulk-step2" class="card" style="display:none;">
-      <div class="card-header">
-        <div class="card-title"><i class="ti ti-columns"></i>Step 2 — Map Columns</div>
-        <span class="badge purple" id="bulk-col-count">0 columns detected</span>
-      </div>
-      <div class="info-box" style="margin-bottom:14px;">
-        <i class="ti ti-info-circle"></i>
-        Map each required field to the corresponding column in your file. Columns are auto-detected from the header row.
-      </div>
-      <div id="bulk-map-area"></div>
-      <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">
-        <button class="tb-btn" onclick="resetBulkUpload()">Cancel</button>
-        <button class="tb-btn primary" onclick="applyBulkMapping()"><i class="ti ti-arrow-right"></i>Apply &amp; Preview</button>
-      </div>
-    </div>
-
-    <!-- STEP 3: Preview Table -->
-    <div id="bulk-step3" class="data-table-card" style="display:none;">
-      <div class="data-table-header">
-        <div class="data-table-title"><i class="ti ti-table"></i>Step 3 — Preview &amp; Confirm</div>
-        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
-          <div style="display:flex;align-items:center;gap:6px;font-size:13px;"><i class="ti ti-users" style="color:var(--accent);"></i><span>Entries:</span><span style="font-weight:700;font-family:var(--mono);color:var(--purple);" id="bulk-count">0</span></div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:13px;"><i class="ti ti-cash" style="color:var(--teal);"></i><span>Total:</span><span style="font-weight:700;font-family:var(--mono);color:var(--teal);" id="bulk-total">AED 0.00</span></div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:13px;"><i class="ti ti-alert-circle" style="color:var(--red);"></i><span>Errors:</span><span style="font-weight:700;font-family:var(--mono);color:var(--red);" id="bulk-errors">0</span></div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:13px;"><i class="ti ti-alert-triangle" style="color:var(--amber);"></i><span>Warns:</span><span style="font-weight:700;font-family:var(--mono);color:var(--amber);" id="bulk-warns">0</span></div>
-        </div>
-      </div>
-      <div class="preview-summary" id="bulk-summary-bar">
-        <div class="ps-item"><span style="font-size:11px;color:var(--text3);">File:</span><span style="font-size:12px;font-weight:600;" id="bulk-filename">—</span></div>
-        <div class="ps-item"><span style="font-size:11px;color:var(--text3);">Disbursement Date:</span><span class="ps-val purple" id="bulk-disp-date">—</span></div>
-        <div class="ps-item"><span style="font-size:11px;color:var(--text3);">tb-uname:</span><span class="ps-val" id="bulk-disp-acc">—</span></div>
-      </div>
-      <div class="data-table-wrap">
-        <table class="data-table" id="bulk-preview-table" style="min-width:700px;">
-          <thead><tr>
-            <th>#</th>
-            <th>Sheet REF ID</th>
-            <th>Emp ID</th>
-            <th>Amount (AED)</th>
-            <th>Disb Date</th>
-            <th>tb-uname</th>
-            <th>Status</th>
-          </tr></thead>
-          <tbody id="bulk-preview-tbody"></tbody>
-        </table>
-      </div>
-      <div style="padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;">
-        <button class="tb-btn" onclick="resetBulkUpload()"><i class="ti ti-refresh"></i>Start Over</button>
-        <button class="tb-btn primary" id="bulk-save-btn2" onclick="saveBulkDisbursement()"><i class="ti ti-device-floppy"></i>Save All to Google Sheets</button>
-      </div>
-    </div>
-
-    <!-- STEP 4: Results -->
-    <div id="bulk-step4" class="card" style="display:none;">
-      <div class="card-header">
-        <div class="card-title"><i class="ti ti-circle-check" style="color:var(--teal);"></i>Submission Complete</div>
-      </div>
-      <div id="bulk-results-body"></div>
-      <div style="margin-top:14px;display:flex;gap:8px;">
-        <button class="tb-btn" onclick="resetBulkUpload()"><i class="ti ti-upload"></i>Upload Another File</button>
-        <button class="tb-btn success" onclick="downloadBulkResultCSV()"><i class="ti ti-download"></i>Download Results CSV</button>
-      </div>
-    </div>
-
-  </div><!-- /tab-content-bulk -->
-
-</div><!-- .page -->
-
-
-<!-- ══ LOAN DETAIL MODAL ══ -->
-<div class="modal-backdrop" id="modal-detail">
-  <div class="modal">
-    <div class="modal-header">
-      <h2><i class="ti ti-list-details"></i>Loan Detail — <span id="detail-ref">—</span></h2>
-      <button class="tb-btn icon-only" onclick="closeModal('modal-detail')"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="modal-body" id="detail-body"></div>
-    <div class="modal-footer">
-      <button class="tb-btn" onclick="closeModal('modal-detail')">Close</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast"><i id="toast-icon" class="ti ti-circle-check"></i><span id="toast-msg">Done</span></div>
+<!-- LOAD BANNER -->
+<div class="load-banner hidden" id="load-banner">
+  <i class="ti ti-loader spinning"></i>
+  <span id="load-msg">Loading data from Google Sheets…</span>
+</div>
 
-<script>
-// ══════════════════════════════════════
-//  CONFIG
-// ══════════════════════════════════════
-const EMPLOYEES = [
-  { empId:1, name:'Ahmed Al Mansoori', eid:'784199995170001', dob:'04/06/1999', mobile:'+971509517001', emergency:'+92304750261', ref:'no', eidExp:'13/05/2027', hrStatus:0 },
-  { empId:2, name:'Mohammed Raza',     eid:'784199995170002', dob:'13/03/1995', mobile:'+971509517002', emergency:'+92304750262', ref:'no', eidExp:'13/05/2026', hrStatus:0 },
-  { empId:3, name:'Saif Al Rashidi',   eid:'784199995170003', dob:'22/09/1990', mobile:'+971509517003', emergency:'+92304750263', ref:'no', eidExp:'13/05/2028', hrStatus:0 },
-  { empId:4, name:'Bilal Hussain',     eid:'784199995170004', dob:'11/07/1993', mobile:'+971509517004', emergency:'+92304750264', ref:'no', eidExp:'01/01/2027', hrStatus:0 },
-  { empId:5, name:'Khaled Ibrahim',    eid:'784199995170005', dob:'05/12/1988', mobile:'+971509517005', emergency:'+92304750265', ref:'no', eidExp:'30/06/2026', hrStatus:1 },
-  { empId:6, name:'Tariq Mehmood',     eid:'784199995170006', dob:'28/02/1996', mobile:'+971509517006', emergency:'+92304750266', ref:'no', eidExp:'13/05/2027', hrStatus:0 },
-];
+<!-- ══ TABS ══ -->
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-queue" onclick="switchTab('queue')">
+    <i class="ti ti-building-bank"></i>Finance Queue
+  </button>
+  <button class="tab-btn" id="tab-bulk" onclick="switchTab('bulk')">
+    <i class="ti ti-upload"></i>Bulk Upload
+  </button>
+</div>
 
-// ── GAS (Finance Queue backend — same as finQue) ───────────────────────────
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxP_zK-aqHyleejukkvrP0yPSZFhsQR46Ckim24k8CSu9YgfQCQyT-xFmS4IPA8TS3Zdg/exec';
-const CACHE_KEY  = 'financeQueue_cache_v1';
-const CACHE_TTL  = 5 * 60 * 1000;
-const PAGE_SIZE  = 20;
-
-// ── Bulk Upload — Google Form endpoint ────────────────────────────────────
-const BULK_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdORhdY950sTH0FavO64cJsEy-4Ouxjovff6Rn0dcey5QU7WQ/formResponse';
-const BULK_FORM_FIELDS = {
-  disRef:   'entry.629206624',
-  sheetRef: 'entry.259978321',
-  empId:    'entry.1291463236',
-  amount:   'entry.2077992815',
-  disbDate: 'entry.1615956699',
-  name:     'entry.1549410189',
-};
-const BULK_FIELDS = [
-  { key:'ref',      label:'REF ID (from sheet)',    required:true  },
-  { key:'empId',    label:'Emp ID',                 required:true  },
-  { key:'amount',   label:'Amount',                 required:true  },
-  { key:'disbDate', label:'Disbursement Date',      required:true  },
-  { key:'tbUname',  label:'tb-uname (portal user)', required:false },
-];
-const BULK_FIELD_HINTS = {
-  ref:      ['ref','ref id','refid','reference','adv-'],
-  empId:    ['emp','empid','employee','emp id','employee id','id'],
-  amount:   ['amount','amt','salary','advance','disbursement','value'],
-  disbDate: ['date','disbdate','disbursedate','disbursement date','diss','dissdate'],
-  tbUname:  ['tb-uname','tbuname','uname','username','user','portal','operator'],
-};
-
-// ── State ─────────────────────────────────────────────────────────────────
-let allRequests  = [];
-let loans        = [];
-let renderOffset = 0;
-let isLoading    = false;
-
-// Bulk state
-let bulkRawRows    = [];
-let bulkHeaders    = [];
-let bulkHasHeader  = false;
-let bulkMapped     = [];
-let bulkFileName   = '';
-let bulkResultsData = [];
-
-
-// ══════════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════════
-function fmt(n){ return Number(n).toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function esc(v){ if(!v&&v!==0)return''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function nowStr(){ const now=new Date(); return now.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+'.'+String(now.getMilliseconds()).padStart(3,'0'); }
-function todayVal(){ return new Date().toISOString().slice(0,10); }
-function addMonths(dateStr,n){ const d=new Date(dateStr); d.setMonth(d.getMonth()+n); return d.toISOString().slice(0,10); }
-function forMonthLabel(forMonth){ if(!forMonth) return '—'; const dt=new Date(forMonth+'-01'); return dt.toLocaleString('en-GB',{month:'short',year:'numeric'}); }
-
-
-// ══════════════════════════════════════
-//  TABS
-// ══════════════════════════════════════
-function switchTab(id){
-  ['queue','bulk'].forEach(t=>{
-    document.getElementById('tab-'+t).classList.toggle('active', t===id);
-    document.getElementById('tab-content-'+t).classList.toggle('active', t===id);
-  });
-}
-
-
-// ══════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════
-let toastTimer;
-function showToast(msg,icon='ti-circle-check',type=''){
-  const t=document.getElementById('toast');
-  document.getElementById('toast-icon').className='ti '+icon;
-  document.getElementById('toast-msg').textContent=msg;
-  t.className='toast'+(type?' '+type:'');
-  requestAnimationFrame(()=>t.classList.add('show'));
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
-}
-
-
-// ══════════════════════════════════════
-//  MODAL
-// ══════════════════════════════════════
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.getElementById('modal-detail').addEventListener('click',e=>{
-  if(e.target===document.getElementById('modal-detail')) closeModal('modal-detail');
-});
-
-
-// ══════════════════════════════════════
-//  CACHE
-// ══════════════════════════════════════
-function readCache(){ try{ const raw=sessionStorage.getItem(CACHE_KEY); if(!raw) return null; const {ts,data}=JSON.parse(raw); if(Date.now()-ts>CACHE_TTL) return null; return data; }catch(e){ return null; } }
-function writeCache(data){ try{ sessionStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data})); }catch(e){} }
-function clearCache(){ try{ sessionStorage.removeItem(CACHE_KEY); }catch(e){} }
-
-
-// ══════════════════════════════════════
-//  GAS API
-// ══════════════════════════════════════
-async function gasCall(action){
-  const url=GAS_WEB_APP_URL+'?action='+action+'&t='+Date.now();
-  let res,json;
-  try{ res=await fetch(url,{cache:'no-store'}); json=await res.json(); }
-  catch(e){ throw new Error('Network error ('+action+'): '+e.message); }
-  if(!json.success) throw new Error(json.error||'GAS error: '+action);
-  return json.data;
-}
-
-
-// ══════════════════════════════════════
-//  ROW → REQUEST  (exact finQue logic)
-// ══════════════════════════════════════
-function rowToRequest(r, status){
-  const ref         = String(r[1]||'').trim();
-  const empId       = parseInt(r[2])||0;
-  const amount      = parseFloat(r[3])||0;
-  const monthsRaw   = parseInt(r[4]);
-  const isLumpSum   = monthsRaw===0||isNaN(monthsRaw);
-  const months      = (isNaN(monthsRaw)||monthsRaw<=0)?1:monthsRaw;
-  const returnMonths= String(r[5]||'');
-  const forMonth    = String(r[6]||'').trim();
-  const reason      = String(r[7]||'').trim();
-  const submittedAt = String(r[0]||'').trim()||nowStr();
-  const decidedAt   = r[8]?String(r[8]).trim():null;
-  const disbursedAt = r[9]?String(r[9]).trim():null;
-  const disbursedAmount = r[10]?(parseFloat(r[10])||null):null;
-
-  if(!ref||!empId) return null;
-
-  const repayLabel = isLumpSum?'No Installments (Lump-Sum)'
-    : months===1?'Next Month Deduction'
-    : months+' Monthly Installments';
-
-  const emp = EMPLOYEES.find(e=>e.empId===empId)||{
-    empId, name:'Emp '+empId, eid:'—', dob:'—', mobile:'—',
-    emergency:'—', ref:'no', eidExp:'—', hrStatus:0
-  };
-
-  const isDisbursed = status==='disbursed';
-
-  return {
-    ref, emp, amount, months, isLumpSum, repayLabel,
-    reason, forMonth, returnMonths, submittedAt,
-    status: isDisbursed?'approved':status,
-    decidedAt,
-    disbursed: isDisbursed,
-    disbursedAt: isDisbursed?(disbursedAt||decidedAt):null,
-    processedAt: isDisbursed?(disbursedAt||decidedAt):null,
-    disbursedAmount: isDisbursed?disbursedAmount:null,
-    fromSheet: true
-  };
-}
-
-
-// ══════════════════════════════════════
-//  BUILD LOAN SCHEDULES
-// ══════════════════════════════════════
-function buildLoans(requests){
-  return requests
-    .filter(r=>r.disbursed&&r.disbursedAt)
-    .map(r=>{
-      const monthly = r.amount/r.months;
-      const installments = Array.from({length:r.months},(_,i)=>({
-        no: i+1,
-        dueDate: addMonths(r.disbursedAt, i+1),
-        amount: (i===r.months-1)?r.amount-(Math.round(monthly*100)/100)*(r.months-1):Math.round(monthly*100)/100,
-        status:'pending', paidDate:null, paidMethod:null, notes:''
-      }));
-      return {
-        id:'LN-'+r.ref, ref:r.ref, emp:r.emp,
-        totalAmount:r.amount, months:r.months, monthly,
-        disbursedAt:r.disbursedAt, processedAt:r.processedAt,
-        forMonth:r.forMonth, installments, completedAt:null
-      };
-    });
-}
-
-
-// ══════════════════════════════════════
-//  LOAD DATA
-// ══════════════════════════════════════
-async function loadData(forceRefresh=false){
-  if(isLoading) return;
-  isLoading=true;
-
-  if(!forceRefresh){
-    const cached=readCache();
-    if(cached&&cached.length){
-      allRequests=cached; loans=buildLoans(allRequests);
-      renderFinance(); showBanner('Updating from Google Sheets…');
-    } else {
-      showSkeletons(5); showBanner('Loading data from Google Sheets…');
-    }
-  } else {
-    showSkeletons(3); showBanner('Syncing from Google Sheets…'); clearCache();
-  }
-
-  try{
-    const [approvedRows, disbursedRows] = await Promise.all([
-      gasCall('getApprovedRequests').catch(e=>{ console.error('[GAS] getApprovedRequests:',e); return []; }),
-      gasCall('getDisbursedRequests').catch(e=>{ console.error('[GAS] getDisbursedRequests:',e); return []; })
-    ]);
-
-    const disbursedRefSet = new Set(disbursedRows.map(r=>String(r[1]||'').trim()).filter(Boolean));
-    const combined = [];
-
-    for(const r of disbursedRows){ const req=rowToRequest(r,'disbursed'); if(req) combined.push(req); }
-    for(const r of approvedRows){
-      const req=rowToRequest(r,'approved');
-      if(!req) continue;
-      if(disbursedRefSet.has(req.ref)) continue;
-      if(!combined.find(x=>x.ref===req.ref)) combined.push(req);
-    }
-
-    allRequests=combined; loans=buildLoans(allRequests); writeCache(combined);
-    await streamRender(combined);
-
-  } catch(err){
-    console.error('[LOAD]',err);
-    showToast('Could not load data — check GAS URL','ti-alert-circle','error');
-    if(!allRequests.length) clearSkeletons();
-  }
-
-  hideBanner(); isLoading=false;
-}
-
-function yieldToBrowser(){ return new Promise(r=>setTimeout(r,0)); }
-
-async function streamRender(records){
-  const tbody=document.getElementById('finance-tbody');
-  tbody.innerHTML=''; renderOffset=0;
-
-  if(!records.length){
-    tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><i class="ti ti-building-bank"></i><p>No approved records found</p></div></td></tr>`;
-    updateSummary([]); return;
-  }
-
-  updateSummary(records);
-  const firstBatch=records.slice(0,PAGE_SIZE);
-  tbody.innerHTML=firstBatch.map(buildRow).join('');
-  renderOffset=firstBatch.length;
-
-  while(renderOffset<records.length){
-    await yieldToBrowser();
-    const batch=records.slice(renderOffset,renderOffset+PAGE_SIZE);
-    batch.forEach(r=>{ tbody.insertAdjacentHTML('beforeend',buildRow(r)); });
-    renderOffset+=batch.length;
-  }
-}
-
-function renderFinance(){ streamRender(allRequests); }
-
-
-// ══════════════════════════════════════
-//  BUILD TABLE ROW
-// ══════════════════════════════════════
-function buildRow(r){
-  const refEmpCell=`<div class="cell-stack">
-    <span class="cell-main" style="font-family:var(--mono);font-size:11px;">${esc(r.ref)}</span>
-    <span class="cell-sub"># ${r.emp.empId}</span>
-  </div>`;
-  const nameEidCell=`<div class="cell-stack">
-    <span class="cell-main">${esc(r.emp.name)}</span>
-    <span class="cell-sub">${esc(r.emp.eid)}</span>
-  </div>`;
-  const disbAmt = r.disbursed&&r.disbursedAmount!=null
-    ? `<span class="cell-amt-disbursed">AED ${fmt(r.disbursedAmount)}</span>`
-    : r.disbursed
-      ? `<span class="cell-amt-disbursed">AED ${fmt(r.amount)}</span>`
-      : `<span class="cell-amt-none">Not yet disbursed</span>`;
-  const amtCell=`<div class="cell-stack"><span class="cell-amt-approved">AED ${fmt(r.amount)}</span>${disbAmt}</div>`;
-  const statusBadge = r.disbursed
-    ? `<span class="badge green"><i class="ti ti-circle-check" style="font-size:10px;vertical-align:middle;"></i> Deposited</span>`
-    : `<span class="badge amber"><i class="ti ti-clock-hour-4" style="font-size:10px;vertical-align:middle;"></i> Pending</span>`;
-  const actionBtn = r.disbursed
-    ? `<button class="act-btn view-btn" onclick="openLoanDetail('${r.ref}')"><i class="ti ti-eye"></i>View</button>`
-    : `<span style="font-size:11px;color:var(--text3);">Upload via<br>Bulk Disburse</span>`;
-
-  return `<tr class="new-row" data-ref="${r.ref}">
-    <td>${refEmpCell}</td><td>${nameEidCell}</td><td>${amtCell}</td>
-    <td><span class="badge blue" style="white-space:normal;max-width:160px;">${esc(r.repayLabel)}</span></td>
-    <td style="font-size:12px;color:var(--purple);font-weight:600;">${forMonthLabel(r.forMonth)}</td>
-    <td style="font-size:11px;color:var(--teal);">${r.decidedAt||'—'}</td>
-    <td style="font-size:11px;">${r.disbursedAt?`<span style="color:var(--accent);">${r.disbursedAt}</span>`:'<span style="color:var(--text3);">—</span>'}</td>
-    <td>${statusBadge}</td><td>${actionBtn}</td>
-  </tr>`;
-}
-
-
-// ══════════════════════════════════════
-//  SUMMARY STATS
-// ══════════════════════════════════════
-function updateSummary(records){
-  const disbursedCount = records.filter(r=>r.disbursed).length;
-  const pendingCount   = records.filter(r=>!r.disbursed).length;
-  const totalAmt       = records.reduce((s,r)=>s+r.amount,0);
-  document.getElementById('fin-total-amt').textContent = 'AED '+fmt(totalAmt);
-  document.getElementById('fin-count').textContent     = records.length;
-  document.getElementById('fin-disbursed').textContent = disbursedCount;
-  document.getElementById('fin-pending').textContent   = pendingCount;
-  document.getElementById('finance-badge').textContent = records.length+' records';
-  const card=document.getElementById('summary-card');
-  card.style.display = records.length?'block':'none';
-}
-
-
-// ══════════════════════════════════════
-//  SKELETONS / BANNER
-// ══════════════════════════════════════
-function showSkeletons(n){
-  const tbody=document.getElementById('finance-tbody');
-  tbody.innerHTML=Array.from({length:n},()=>`<tr class="skeleton-row">
-    <td><div class="skeleton-cell" style="width:120px;"></div></td>
-    <td><div class="skeleton-cell" style="width:140px;"></div></td>
-    <td><div class="skeleton-cell" style="width:100px;"></div></td>
-    <td><div class="skeleton-cell" style="width:110px;"></div></td>
-    <td><div class="skeleton-cell" style="width:70px;"></div></td>
-    <td><div class="skeleton-cell" style="width:130px;"></div></td>
-    <td><div class="skeleton-cell" style="width:90px;"></div></td>
-    <td><div class="skeleton-cell" style="width:80px;"></div></td>
-    <td><div class="skeleton-cell" style="width:60px;"></div></td>
-  </tr>`).join('');
-}
-function clearSkeletons(){
-  document.getElementById('finance-tbody').innerHTML=`<tr><td colspan="9"><div class="empty-state"><i class="ti ti-building-bank"></i><p>No approved records found</p></div></td></tr>`;
-  updateSummary([]);
-}
-function showBanner(msg){ const b=document.getElementById('load-banner'); document.getElementById('load-banner-msg').textContent=msg; b.classList.remove('hidden'); }
-function hideBanner(){ document.getElementById('load-banner').classList.add('hidden'); }
-
-
-// ══════════════════════════════════════
-//  SYNC BUTTON
-// ══════════════════════════════════════
-function setSyncBtn(loading){
-  const btn=document.getElementById('btn-sync');
-  const icon=document.getElementById('sync-icon');
-  btn.disabled=loading;
-  icon.className=loading?'ti ti-loader spinning':'ti ti-refresh';
-}
-async function syncSheets(){
-  setSyncBtn(true);
-  await loadData(true);
-  setSyncBtn(false);
-  showToast('Synced from Google Sheets','ti-circle-check');
-}
-
-
-// ══════════════════════════════════════
-//  DOWNLOAD DEPOSIT SHEET
-// ══════════════════════════════════════
-function downloadDepositSheet(){
-  const pending=allRequests.filter(r=>!r.disbursed);
-  if(!pending.length){ showToast('No pending disbursements to export','ti-alert-circle','warn'); return; }
-  const headers=['REF ID','Emp ID','Amount','DissDate'];
-  const today=todayVal();
-  const rows=pending.map(r=>[r.ref,r.emp.empId,r.amount.toFixed(2),today]);
-  exportCSV('disbursement-sheet',headers,rows);
-  showToast('Disbursement Sheet downloaded — '+pending.length+' records','ti-file-download');
-}
-
-function exportCSV(name,headers,rows){
-  const csv=[headers.map(h=>`"${h}"`), ...rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`))].map(r=>r.join(',')).join('\r\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download=name+'-'+todayVal()+'.csv'; a.click();
-  URL.revokeObjectURL(url);
-}
-
-
-// ══════════════════════════════════════
-//  LOAN DETAIL MODAL
-// ══════════════════════════════════════
-function openLoanDetail(ref){
-  const loan=loans.find(l=>l.ref===ref);
-  const req=allRequests.find(r=>r.ref===ref);
-  if(!loan){ showToast('Installment schedule not available','ti-info-circle','warn'); return; }
-
-  document.getElementById('detail-ref').textContent=ref;
-  const today=todayVal();
-  const paidAmt=loan.installments.filter(i=>i.status==='paid').reduce((s,i)=>s+i.amount,0);
-  const remaining=loan.totalAmount-paidAmt;
-  const paidCount=loan.installments.filter(i=>i.status==='paid').length;
-  const pct=Math.round((paidAmt/loan.totalAmount)*100);
-  const fml=forMonthLabel(loan.forMonth||(req&&req.forMonth));
-
-  document.getElementById('detail-body').innerHTML=`
-    <div class="emp-strip">
-      <div><span>Employee: </span><strong>${esc(loan.emp.name)}</strong></div>
-      <div><span>Emp ID: </span><strong>${loan.emp.empId}</strong></div>
-      <div><span>EID: </span><strong style="font-family:var(--mono);font-size:11px;">${esc(loan.emp.eid)}</strong></div>
-      <div><span>Mobile: </span><strong style="font-family:var(--mono);">${esc(loan.emp.mobile)}</strong></div>
-      <div><span>REF: </span><strong style="font-family:var(--mono);">${loan.ref}</strong></div>
-      <div><span>For Month: </span><strong style="color:var(--purple);">${fml}</strong></div>
-      <div><span>Date Disbursed: </span><strong style="color:var(--accent);">${loan.disbursedAt||'—'}</strong></div>
-      <div><span>Date Processed: </span><strong style="color:var(--orange);">${loan.processedAt||'—'}</strong></div>
-    </div>
-    <div class="inst-progress">
-      <div class="inst-progress-top">
-        <div class="inst-progress-label">Recovery Progress</div>
-        <div class="inst-progress-pct" style="color:${pct===100?'var(--teal)':pct>50?'var(--accent)':'var(--amber)'};">${pct}%</div>
+<!-- ══════ TAB: QUEUE ══════ -->
+<div class="tab-content active" id="tc-queue">
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="tc-title">
+        <i class="ti ti-building-bank"></i>All Records
+        <span class="tc-sep"></span>
+        <span class="tc-desc">Click row to expand · Scroll to load more</span>
       </div>
-      <div class="progress-track"><div class="progress-fill ${pct===100?'green':'amber'}" style="width:${pct}%;"></div></div>
-      <div class="inst-amounts">
-        <div class="inst-amt-box"><div class="inst-amt-label">Total Advance</div><div class="inst-amt-val" style="color:var(--purple);">AED ${fmt(loan.totalAmount)}</div></div>
-        <div class="inst-amt-box"><div class="inst-amt-label">Amount Recovered</div><div class="inst-amt-val" style="color:var(--teal);">AED ${fmt(paidAmt)}</div></div>
-        <div class="inst-amt-box"><div class="inst-amt-label">Balance Remaining</div><div class="inst-amt-val" style="color:${remaining>0?'var(--orange)':'var(--teal)'};">AED ${fmt(remaining)}</div></div>
+      <div class="tc-actions">
+        <span class="badge blue" id="rec-badge">0 records</span>
+        <button class="btn icon" onclick="exportPending()" title="Export CSV"><i class="ti ti-file-download"></i></button>
+        <button class="btn icon" onclick="syncData()" title="Refresh"><i class="ti ti-refresh"></i></button>
       </div>
-      <div style="margin-top:10px;font-size:12px;color:var(--text3);">${paidCount} of ${loan.months} installments paid · Monthly: AED ${fmt(loan.monthly)}</div>
     </div>
-    <div class="divider-label">Installment Schedule</div>
-    <div style="overflow-x:auto;">
-      <table class="inst-table">
-        <thead><tr><th>#</th><th>Due Date</th><th>Due Month</th><th>Amount (AED)</th><th>Status</th><th>Paid On</th><th>Method</th><th>Notes</th></tr></thead>
-        <tbody>
-          ${loan.installments.map(inst=>{
-            const isOverdue=inst.status==='pending'&&inst.dueDate<today;
-            const dueMonthLbl=(()=>{ const dt=new Date(inst.dueDate); return dt.toLocaleString('en-GB',{month:'short',year:'numeric'}); })();
-            return `<tr style="${isOverdue?'background:rgba(248,81,73,.06);':''}">
-              <td style="font-family:var(--mono);font-weight:700;color:var(--orange);">#${inst.no}</td>
-              <td style="font-family:var(--mono);font-size:12px;">${inst.dueDate}</td>
-              <td style="font-size:12px;color:var(--text2);">${dueMonthLbl}</td>
-              <td style="font-family:var(--mono);font-weight:700;color:var(--teal);">AED ${fmt(inst.amount)}</td>
-              <td>${inst.status==='paid'?'<span class="badge green">Paid</span>':isOverdue?'<span class="badge red">Overdue</span>':'<span class="badge amber">Pending</span>'}</td>
-              <td style="font-size:12px;color:var(--text2);">${inst.paidDate||'—'}</td>
-              <td style="font-size:12px;color:var(--text3);">${esc(inst.paidMethod||'—')}</td>
-              <td style="font-size:11px;color:var(--text3);">${esc(inst.notes||'—')}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
+    <div class="table-scroll" id="tscroll" onscroll="onScroll()">
+      <table class="data-table" id="main-table">
+        <thead>
+          <tr>
+            <th style="width:28px;padding:10px 8px 10px 14px;">
+              <input type="checkbox" id="chk-all" onchange="toggleAllCheckboxes()" style="cursor:pointer;accent-color:var(--accent);"/>
+            </th>
+            <th onclick="sortBy('refId')">REF # / Emp ID <i class="ti sort-ic" id="sh-refId"></i></th>
+            <th onclick="sortBy('name')">Name / EID <i class="ti sort-ic" id="sh-name"></i></th>
+            <th onclick="sortBy('reqAmt')">Req Amt / Dis Amt <i class="ti sort-ic" id="sh-reqAmt"></i></th>
+            <th onclick="sortBy('month')">For Month / Submitted <i class="ti sort-ic" id="sh-month"></i></th>
+            <th onclick="sortBy('status')">Status <i class="ti sort-ic" id="sh-status"></i></th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody id="fin-tbody"></tbody>
       </table>
-    </div>`;
-  document.getElementById('modal-detail').classList.add('open');
-}
+    </div>
+    <div class="load-more-row" id="lm-row" style="display:none;">
+      <span class="load-prog">Showing <strong id="lm-shown">0</strong> of <strong id="lm-total">0</strong></span>
+      <button class="btn" id="lm-btn" onclick="loadMore()"><i class="ti ti-chevron-down"></i>Load More</button>
+    </div>
+  </div>
+</div>
 
-
-// ══════════════════════════════════════
-//  BULK UPLOAD — TEMPLATE DOWNLOAD
-// ══════════════════════════════════════
-function downloadBulkTemplate(){
-  const today = todayVal();
-  const headers = ['REF ID','Emp ID','Amount','DissDate','tb-uname'];
-  const sample  = [
-    ['ADV-20260521-120000000','1','2500.00',today,''],
-    ['ADV-20260521-120000001','2','3000.00',today,''],
-    ['ADV-20260521-120000002','3','1500.00',today,''],
-  ];
-  exportCSV('disbursement-template', headers, sample);
-  showToast('Template CSV downloaded — fill in your data then upload','ti-file-download');
-}
-
-
-// ══════════════════════════════════════
-//  BULK UPLOAD — FILE HANDLING
-// ══════════════════════════════════════
-function bulkDragOver(e){ e.preventDefault(); document.getElementById('bulk-drop-zone').classList.add('drag'); }
-function bulkDragLeave(){ document.getElementById('bulk-drop-zone').classList.remove('drag'); }
-function bulkDrop(e){
-  e.preventDefault();
-  document.getElementById('bulk-drop-zone').classList.remove('drag');
-  const file=e.dataTransfer.files[0];
-  if(file) handleBulkFile(file);
-}
-
-function handleBulkFile(file){
-  if(!file) return;
-  bulkFileName=file.name;
-  const ext=file.name.split('.').pop().toLowerCase();
-  if(!['csv','txt','xlsx','xls'].includes(ext)){
-    showToast('Unsupported format. Use CSV or Excel (.xlsx/.xls)','ti-alert-circle','error'); return;
-  }
-  const reader=new FileReader();
-  if(ext==='csv'||ext==='txt'){
-    reader.onload=e=>parseBulkCSV(e.target.result);
-    reader.readAsText(file);
-  } else {
-    reader.onload=e=>parseBulkExcel(e.target.result);
-    reader.readAsArrayBuffer(file);
-  }
-}
-
-function parseBulkCSV(text){
-  const lines=text.trim().split(/\r?\n/).filter(l=>l.trim());
-  if(!lines.length){ showToast('Empty file','ti-alert-circle','error'); return; }
-  const parsed=lines.map(line=>{
-    const result=[]; let cur=''; let inQ=false;
-    for(let i=0;i<line.length;i++){
-      const ch=line[i];
-      if(ch==='"'){ inQ=!inQ; continue; }
-      if(ch===','&&!inQ){ result.push(cur.trim()); cur=''; continue; }
-      cur+=ch;
-    }
-    result.push(cur.trim());
-    return result;
-  });
-  processBulkRows(parsed);
-}
-
-function parseBulkExcel(buffer){
-  if(window.XLSX){ doParseExcel(buffer); }
-  else {
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-    s.onload=()=>doParseExcel(buffer);
-    s.onerror=()=>showToast('Could not load Excel parser. Please convert to CSV.','ti-alert-circle','error');
-    document.head.appendChild(s);
-  }
-}
-
-function doParseExcel(buffer){
-  const wb=XLSX.read(buffer,{type:'arraybuffer',cellDates:true});
-  const ws=wb.Sheets[wb.SheetNames[0]];
-  const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-  processBulkRows(raw.map(r=>r.map(v=>{ if(v instanceof Date) return v.toISOString().slice(0,10); return String(v||'').trim(); })));
-}
-
-function processBulkRows(rows){
-  if(!rows.length){ showToast('No data found in file','ti-alert-circle','error'); return; }
-  const firstCell=String(rows[0][0]||'').trim();
-  bulkHasHeader=!/^\d+(\.\d+)?$/.test(firstCell);
-  if(bulkHasHeader){
-    bulkHeaders=rows[0].map(h=>String(h).trim());
-    bulkRawRows=rows.slice(1).filter(r=>r.some(v=>String(v).trim()!==''));
-  } else {
-    bulkHeaders=rows[0].map((_,i)=>'Column '+(i+1));
-    bulkRawRows=rows.filter(r=>r.some(v=>String(v).trim()!==''));
-  }
-  if(!bulkRawRows.length){ showToast('No data rows found','ti-alert-circle','error'); return; }
-  document.getElementById('bulk-step1').style.display='none';
-  document.getElementById('bulk-step2').style.display='block';
-  document.getElementById('bulk-col-count').textContent=bulkHeaders.length+' columns detected'+(bulkHasHeader?' (header row used)':' (no header detected)');
-  renderBulkMapArea();
-}
-
-function autoDetectCol(fieldKey){
-  const hints=BULK_FIELD_HINTS[fieldKey]||[];
-  for(let i=0;i<bulkHeaders.length;i++){
-    const h=bulkHeaders[i].toLowerCase().replace(/[^a-z0-9 ]/g,'');
-    if(hints.some(hint=>h.includes(hint.replace(/[^a-z0-9 ]/g,'')))) return String(i);
-  }
-  return '';
-}
-
-function renderBulkMapArea(){
-  const area=document.getElementById('bulk-map-area');
-  area.innerHTML=`<div class="map-label">Map your file columns to required fields</div>`+
-    BULK_FIELDS.map(f=>{
-      const auto=autoDetectCol(f.key);
-      const opts=bulkHeaders.map((h,i)=>`<option value="${i}" ${String(i)===auto?'selected':''}>${h||'Column '+(i+1)}</option>`).join('');
-      return `<div class="col-map-grid">
-        <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text);">${f.label}${f.required?'<span style="color:var(--red);margin-left:3px;">*</span>':' <span style="font-size:10px;color:var(--text3);">(optional)</span>'}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Maps to Google Form field</div>
-        </div>
-        <div class="map-arrow"><i class="ti ti-arrows-exchange" style="font-size:16px;"></i></div>
-        <select id="map-${f.key}" style="width:100%;">
-          <option value="">— Skip / Not in file —</option>
-          ${opts}
-        </select>
-      </div>`;
-    }).join('');
-}
-
-function applyBulkMapping(){
-  for(const f of BULK_FIELDS){
-    if(f.required&&!document.getElementById('map-'+f.key).value){
-      showToast(`Please map the "${f.label}" column (required)`,'ti-alert-circle','warn'); return;
-    }
-  }
-  const colIdx={};
-  BULK_FIELDS.forEach(f=>{ const v=document.getElementById('map-'+f.key).value; colIdx[f.key]=v!==''?parseInt(v):null; });
-
-  bulkMapped=bulkRawRows.map((row,i)=>{
-    const get=key=>colIdx[key]!==null&&colIdx[key]!==undefined?String(row[colIdx[key]]||'').trim():'';
-    const sheetRef=get('ref');
-    const empId=get('empId');
-    const amtStr=get('amount').replace(/[^0-9.]/g,'');
-    const disbDate=get('disbDate');
-    const tbUname=get('tbUname')||'';
-    const amount=parseFloat(amtStr);
-    const errors=[], warns=[];
-    if(!sheetRef)                errors.push('Missing REF ID');
-    if(!empId)                   errors.push('Missing Emp ID');
-    if(isNaN(amount)||amount<=0) errors.push('Invalid amount');
-    if(!disbDate)                errors.push('Missing date');
-    else if(!/^\d{4}-\d{2}-\d{2}$/.test(disbDate)&&!/^\d{2}[-/]\d{2}[-/]\d{4}$/.test(disbDate))
-      warns.push('Date format unclear — expected YYYY-MM-DD');
-    let normDate=disbDate;
-    if(/^\d{2}[-/]\d{2}[-/]\d{4}$/.test(disbDate)){ const p=disbDate.split(/[-/]/); normDate=`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; }
-    return { sheetRef, empId, amount, disbDate:normDate||disbDate, tbUname, rowIdx:i+1, errors, warns };
-  });
-
-  renderBulkPreview();
-}
-
-function renderBulkPreview(){
-  const totalAmt=bulkMapped.reduce((s,r)=>s+(isNaN(r.amount)?0:r.amount),0);
-  const errCount=bulkMapped.filter(r=>r.errors.length).length;
-  const warnCount=bulkMapped.filter(r=>r.warns.length).length;
-
-  document.getElementById('bulk-count').textContent  = bulkMapped.length;
-  document.getElementById('bulk-total').textContent  = 'AED '+fmt(totalAmt);
-  document.getElementById('bulk-errors').textContent = errCount;
-  document.getElementById('bulk-warns').textContent  = warnCount;
-  document.getElementById('bulk-filename').textContent = bulkFileName;
-
-  const dates=[...new Set(bulkMapped.map(r=>r.disbDate).filter(Boolean))];
-  const users=[...new Set(bulkMapped.map(r=>r.tbUname).filter(Boolean))];
-  document.getElementById('bulk-disp-date').textContent=dates.join(', ')||'—';
-  document.getElementById('bulk-disp-acc').textContent=users.join(', ')||'—';
-
-  const tbody=document.getElementById('bulk-preview-tbody');
-  tbody.innerHTML=bulkMapped.map((r,i)=>{
-    const hasErr=r.errors.length>0;
-    const hasWarn=!hasErr&&r.warns.length>0;
-    const cls=hasErr?'row-error':hasWarn?'row-warn':'';
-    const statusHtml=hasErr
-      ? r.errors.map(e=>`<span class="badge red" style="margin-bottom:2px;">${esc(e)}</span>`).join(' ')
-      : hasWarn
-        ? r.warns.map(w=>`<span class="badge amber" style="margin-bottom:2px;">${esc(w)}</span>`).join(' ')
-        : `<span class="badge green">Ready</span>`;
-    return `<tr class="${cls}">
-      <td style="font-size:11px;color:var(--text3);">${r.rowIdx}</td>
-      <td><span class="ref-badge"><i class="ti ti-hash" style="font-size:10px;"></i>${esc(r.sheetRef)}</span></td>
-      <td style="font-family:var(--mono);font-size:12px;">${esc(r.empId)}</td>
-      <td style="font-family:var(--mono);font-weight:700;color:var(--teal);">${isNaN(r.amount)?'—':'AED '+fmt(r.amount)}</td>
-      <td style="font-family:var(--mono);font-size:12px;">${esc(r.disbDate)}</td>
-      <td style="font-size:12px;">${esc(r.tbUname||'—')}</td>
-      <td>${statusHtml}</td>
-    </tr>`;
-  }).join('');
-
-  document.getElementById('bulk-step2').style.display='none';
-  document.getElementById('bulk-step3').style.display='block';
-  document.getElementById('bulk-save-btn2').disabled = errCount===bulkMapped.length;
-}
-
-async function saveBulkDisbursement(){
-  const validRows=bulkMapped.filter(r=>r.errors.length===0);
-  if(!validRows.length){ showToast('No valid rows to submit','ti-alert-circle','error'); return; }
-  const btn=document.getElementById('bulk-save-btn2');
-  btn.disabled=true;
-  btn.innerHTML='<i class="ti ti-loader pulse"></i> Submitting…';
-  bulkResultsData=[];
-  let successCount=0;
-
-  for(const row of validRows){
-    try{
-      const now=new Date();
-      const date=now.getFullYear().toString()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
-      const time=String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0')+String(now.getSeconds()).padStart(2,'0')+String(now.getMilliseconds()).padStart(3,'0');
-      const disRef=`ADV-${date}-${time}`;
-      const body=new FormData();
-      body.append(BULK_FORM_FIELDS.disRef,   disRef);
-      body.append(BULK_FORM_FIELDS.sheetRef, row.sheetRef);
-      body.append(BULK_FORM_FIELDS.empId,    row.empId);
-      body.append(BULK_FORM_FIELDS.amount,   row.amount.toFixed(2));
-      body.append(BULK_FORM_FIELDS.disbDate, row.disbDate);
-      body.append(BULK_FORM_FIELDS.name,     row.tbUname||'');
-      await fetch(BULK_FORM_ACTION,{method:'POST',mode:'no-cors',body});
-      bulkResultsData.push({...row,disRef,submitted:true});
-      successCount++;
-    } catch(e){
-      bulkResultsData.push({...row,disRef:'',submitted:false,submitError:String(e)});
-    }
-    await new Promise(r=>setTimeout(r,120));
-  }
-
-  renderBulkResults(successCount, validRows.length);
-}
-
-function renderBulkResults(success, total){
-  document.getElementById('bulk-step3').style.display='none';
-  document.getElementById('bulk-step4').style.display='block';
-  const totalAmt=bulkResultsData.filter(r=>r.submitted).reduce((s,r)=>s+r.amount,0);
-  const body=document.getElementById('bulk-results-body');
-  body.innerHTML=`
-    <div class="info-box success" style="margin-bottom:14px;">
-      <i class="ti ti-circle-check"></i>
-      <div><strong>${success} of ${total}</strong> entries submitted to Google Sheets. Total: <strong>AED ${fmt(totalAmt)}</strong></div>
+<!-- ══════ TAB: BULK ══════ -->
+<div class="tab-content" id="tc-bulk">
+  <!-- Step 1 -->
+  <div id="bs1" class="card">
+    <div class="card-head">
+      <div class="card-title"><i class="ti ti-file-upload"></i>Step 1 — Upload Disbursement File</div>
+      <button class="btn purple" onclick="dlTemplate()"><i class="ti ti-download"></i>Download Template</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;">
+      <div class="up-step"><span class="step-num">1</span>Download template or use your own CSV with columns: REF ID, Emp ID, Amount, DisbDate, tb-uname</div>
+      <div class="up-step"><span class="step-num">2</span>First row is header unless all first-row values are numeric</div>
+      <div class="up-step"><span class="step-num">3</span>Upload → map columns → preview → Save to Google Sheets</div>
+    </div>
+    <div class="upload-zone" id="bzone" ondragover="bdrag(event)" ondragleave="bndrag(event)" ondrop="bdrop(event)">
+      <input type="file" accept=".csv,.txt" onchange="bfile(this.files[0])" id="bfile-inp"/>
+      <i class="ti ti-file-spreadsheet"></i>
+      <p><strong>Click to upload</strong> or drag &amp; drop</p>
+      <small>CSV · Columns: REF ID, Emp ID, Amount, DisbDate, tb-uname</small>
+    </div>
+  </div>
+  <!-- Step 2 -->
+  <div id="bs2" class="card" style="display:none;">
+    <div class="card-head">
+      <div class="card-title"><i class="ti ti-columns"></i>Step 2 — Map Columns</div>
+      <span class="badge purple" id="bcol-cnt">0 cols</span>
+    </div>
+    <div class="info-box"><i class="ti ti-info-circle"></i>Map each required field to your file's column.</div>
+    <div id="bmap-area"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn" onclick="breset()">Cancel</button>
+      <button class="btn primary" onclick="bapply()"><i class="ti ti-arrow-right"></i>Apply &amp; Preview</button>
+    </div>
+  </div>
+  <!-- Step 3 -->
+  <div id="bs3" class="table-card" style="display:none;">
+    <div class="table-card-header">
+      <div class="tc-title"><i class="ti ti-table"></i>Step 3 — Preview &amp; Confirm</div>
+      <div class="btn-group" style="flex-wrap:wrap;gap:10px;">
+        <span style="font-size:12px;color:var(--text3);">Entries: <strong style="color:var(--purple);font-family:var(--mono);" id="b-cnt">0</strong></span>
+        <span style="font-size:12px;color:var(--text3);">Total: <strong style="color:var(--teal);font-family:var(--mono);" id="b-tot">AED 0</strong></span>
+        <span style="font-size:12px;color:var(--text3);">Errors: <strong style="color:var(--red);font-family:var(--mono);" id="b-err">0</strong></span>
+      </div>
+    </div>
+    <div class="prev-summary" id="b-sumbar">
+      <div class="pi"><span style="font-size:11px;color:var(--text3);">File:</span><span style="font-size:12px;font-weight:600;" id="b-fname">—</span></div>
+      <div class="pi"><span style="font-size:11px;color:var(--text3);">Disb Date:</span><span class="pi-v" style="color:var(--purple);" id="b-dates">—</span></div>
     </div>
     <div style="overflow-x:auto;">
       <table class="data-table" style="min-width:600px;">
-        <thead><tr><th>Sheet REF ID</th><th>Dis REF (auto)</th><th>Emp ID</th><th>Amount (AED)</th><th>Date</th><th>tb-uname</th><th>Status</th></tr></thead>
-        <tbody>
-          ${bulkResultsData.map(r=>`<tr>
-            <td><span class="ref-badge"><i class="ti ti-hash" style="font-size:10px;"></i>${esc(r.sheetRef)}</span></td>
-            <td style="font-family:var(--mono);font-size:11px;color:var(--accent);">${esc(r.disRef||'—')}</td>
-            <td style="font-family:var(--mono);font-size:12px;">${esc(r.empId)}</td>
-            <td style="font-family:var(--mono);font-weight:700;color:var(--teal);">AED ${fmt(r.amount)}</td>
-            <td style="font-family:var(--mono);font-size:12px;">${esc(r.disbDate)}</td>
-            <td style="font-size:12px;">${esc(r.tbUname||'—')}</td>
-            <td>${r.submitted?'<span class="badge green">Submitted</span>':'<span class="badge red">Failed</span>'}</td>
-          </tr>`).join('')}
-        </tbody>
+        <thead><tr><th>#</th><th>REF ID</th><th>Emp ID</th><th>Amount</th><th>Disb Date</th><th>tb-uname</th><th>Status</th></tr></thead>
+        <tbody id="bprev-body"></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn" onclick="breset()"><i class="ti ti-refresh"></i>Start Over</button>
+      <button class="btn primary" id="bsave-btn" onclick="bsave()"><i class="ti ti-device-floppy"></i>Save All to Google Sheets</button>
+    </div>
+  </div>
+  <!-- Step 4 -->
+  <div id="bs4" class="card" style="display:none;">
+    <div class="card-head">
+      <div class="card-title"><i class="ti ti-circle-check" style="color:var(--teal);"></i>Submission Complete</div>
+    </div>
+    <div id="b-results"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn" onclick="breset()"><i class="ti ti-upload"></i>Upload Another</button>
+      <button class="btn success" onclick="bdownloadCSV()"><i class="ti ti-download"></i>Download Results CSV</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- .page -->
+
+<!-- ══ MODAL ══ -->
+<div class="mbackdrop" id="modal">
+  <div class="modal">
+    <div class="mhead">
+      <h2><i class="ti ti-list-details"></i>Record Detail — <span id="m-ref">—</span></h2>
+      <button class="btn icon" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbody" id="m-body"></div>
+    <div class="mfoot"><button class="btn" onclick="closeModal()">Close</button></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i id="t-icon" class="ti ti-circle-check"></i><span id="t-msg">Done</span></div>
+
+<script>
+// ════════════════════════════════
+//  CONFIG
+// ════════════════════════════════
+const API_URL  = 'https://script.google.com/macros/s/AKfycbycra9n3I29ioXmbN9PFfViFYs7cn68VPKqnPIbkGpGYOZJ2gvqL0zFLe4kqnHszQluqQ/exec?type=master';
+const CACHE_K  = 'fq_master_v3';
+const CACHE_T  = 5 * 60 * 1000;
+const PAGE_SZ  = 30;
+
+const BULK_FA  = 'https://docs.google.com/forms/d/e/1FAIpQLSdORhdY950sTH0FavO64cJsEy-4Ouxjovff6Rn0dcey5QU7WQ/formResponse';
+const BULK_FF  = {disRef:'entry.629206624',sheetRef:'entry.259978321',empId:'entry.1291463236',amount:'entry.2077992815',disbDate:'entry.1615956699',name:'entry.1549410189'};
+const BFIELDS  = [{key:'ref',label:'REF ID',req:true},{key:'empId',label:'Emp ID',req:true},{key:'amount',label:'Amount',req:true},{key:'disbDate',label:'Disb Date',req:true},{key:'tbUname',label:'tb-uname',req:false}];
+const BHINTS   = {ref:['ref','refid','reference'],empId:['emp','empid','employee','id'],amount:['amount','amt','salary','advance'],disbDate:['date','disbdate','diss'],tbUname:['tb-uname','tbuname','uname','user']};
+
+// ════ State ════
+let ALL = [];          // raw from API
+let FILT = [];         // after date filter
+let DISP_N = 0;        // rows rendered
+let isLoading = false;
+let sortCol = '', sortDir = 1;
+let expandedRef = null;
+let selectedRefs = new Set();
+let bulkRaw=[], bulkHdr=[], bulkMapped=[], bulkFile='', bulkResults=[];
+
+// ════════════════════════════════
+//  HELPERS
+// ════════════════════════════════
+function fmt(n){return Number(n).toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function esc(v){if(!v&&v!==0)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function todayVal(){return new Date().toISOString().slice(0,10);}
+function addMonths(d,n){const dt=new Date(d);dt.setMonth(dt.getMonth()+n);return dt.toISOString().slice(0,10);}
+
+/**
+ * Parse Timestamp "DDMMYYYYHHmmss" (14 digits) → Date
+ * e.g. 25052026015754 → 2026-05-25 01:57:54
+ */
+function parseTS(ts){
+  if(!ts) return null;
+  ts=String(ts).trim().replace(/[^0-9]/g,'');
+  if(ts.length>=14){
+    const dd=ts.slice(0,2),mm=ts.slice(2,4),yyyy=ts.slice(4,8);
+    const HH=ts.slice(8,10),MI=ts.slice(10,12),SS=ts.slice(12,14);
+    const d=new Date(`${yyyy}-${mm}-${dd}T${HH}:${MI}:${SS}`);
+    if(!isNaN(d)) return d;
+  }
+  const d=new Date(ts);
+  return isNaN(d)?null:d;
+}
+function tsToDateVal(ts){
+  const d=parseTS(ts);
+  if(!d) return '';
+  return d.toISOString().slice(0,10);
+}
+function fmtTS(ts){
+  const d=parseTS(ts);
+  if(!d) return ts||'—';
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+    +' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+function fmtMonth(v){
+  if(!v) return '—';
+  if(/^\d{4}-\d{2}$/.test(v)){const d=new Date(v+'-01');return d.toLocaleString('en-GB',{month:'short',year:'numeric'});}
+  return v;
+}
+function nowStr(){
+  const n=new Date();
+  const p=x=>String(x).padStart(2,'0');
+  return p(n.getDate())+p(n.getMonth()+1)+n.getFullYear()+p(n.getHours())+p(n.getMinutes())+p(n.getSeconds())+String(n.getMilliseconds()).padStart(3,'0');
+}
+
+// ════════════════════════════════
+//  THEME
+// ════════════════════════════════
+function setTheme(t){
+  document.body.dataset.theme=t;
+  document.querySelectorAll('.t-swatch').forEach(s=>s.classList.toggle('active',s.dataset.t===t));
+  try{localStorage.setItem('fq_t',t);}catch(e){}
+}
+(()=>{try{const t=localStorage.getItem('fq_t');if(t)setTheme(t);}catch(e){}})();
+
+// ════════════════════════════════
+//  TABS
+// ════════════════════════════════
+function switchTab(id){
+  ['queue','bulk'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===id);
+    document.getElementById('tc-'+t).classList.toggle('active',t===id);
+  });
+}
+
+// ════════════════════════════════
+//  TOAST
+// ════════════════════════════════
+let toastT;
+function toast(msg,ic='ti-circle-check',type=''){
+  const el=document.getElementById('toast');
+  document.getElementById('t-icon').className='ti '+ic;
+  document.getElementById('t-msg').textContent=msg;
+  el.className='toast'+(type?' '+type:'');
+  requestAnimationFrame(()=>el.classList.add('show'));
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>el.classList.remove('show'),3400);
+}
+
+// modal
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+
+// ════════════════════════════════
+//  BANNER
+// ════════════════════════════════
+function showBanner(msg){document.getElementById('load-msg').textContent=msg;document.getElementById('load-banner').classList.remove('hidden');}
+function hideBanner(){document.getElementById('load-banner').classList.add('hidden');}
+
+// ════════════════════════════════
+//  CACHE
+// ════════════════════════════════
+function readCache(){
+  try{const r=sessionStorage.getItem(CACHE_K);if(!r)return null;const{ts,data}=JSON.parse(r);if(Date.now()-ts>CACHE_T)return null;return data;}catch(e){return null;}
+}
+function writeCache(d){try{sessionStorage.setItem(CACHE_K,JSON.stringify({ts:Date.now(),data:d}));}catch(e){}}
+function clearCache(){try{sessionStorage.removeItem(CACHE_K);}catch(e){}}
+
+// ════════════════════════════════
+//  MAP ROW → RECORD
+//  API columns (0-indexed):
+//  0:" REF ID"  1:EmpID  2:EID No  3:EmpName
+//  4:ReqAmount  5:ReqInstallments  6:RetReqMonths
+//  7:ReqForMonth  8:ReqReason  9:Timestamp
+//  10:AppAmount  11:AppInstallments  12:RetAppMonths
+//  13:ReqStatus  14:Amount  15:DissDate
+// ════════════════════════════════
+function mapRow(r){
+  // r is an object from JSON
+  const get=(k)=>r[k]!=null?String(r[k]).trim():'';
+  const getN=(k)=>parseFloat(get(k))||0;
+
+  // Try both with/without quote-space prefix
+  const refId   = get('REF ID')||get('" REF ID"')||get('REFID')||get('ref_id')||'';
+  const empId   = get('EmpID')||get('empId')||get('emp_id')||'';
+  const eidNo   = get('EID No')||get('EIDNo')||get('eid_no')||'';
+  const empName = get('EmpName')||get('empName')||get('emp_name')||'';
+  const reqAmt  = getN('ReqAmount')||getN('reqAmount')||0;
+  const reqInst = parseInt(get('ReqInstallments')||0)||0;
+  const retReqM = get('RetReqMonths')||'';
+  const forMonth= get('ReqForMonth')||'';
+  const reason  = get('ReqReason')||'';
+  const timestamp=get('Timestamp')||'';
+  const appAmt  = getN('AppAmount')||0;
+  const appInst = parseInt(get('AppInstallments')||0)||0;
+  const retAppM = get('RetAppMonths')||'';
+  const status  = get('ReqStatus')||'';
+  // col O = Amount (disbursed), col P = DissDate
+  const disAmt  = getN('Amount')||0;
+  const dissDate= get('DissDate')||'';
+
+  if(!refId && !empId) return null;
+
+  // Pending disburse: Approved status AND (Amount col is 0/empty OR DissDate col is empty)
+  const isApproved = /^approved$/i.test(status);
+  const isDisbursed = isApproved && dissDate !== '' && (disAmt > 0 || dissDate !== '');
+  const isPendingDisb = isApproved && (!dissDate || dissDate === '' || disAmt === 0);
+
+  return {
+    refId, empId, eidNo, empName,
+    reqAmt, reqInst, retReqM,
+    forMonth, reason, timestamp,
+    appAmt, appInst, retAppM,
+    status, disAmt, dissDate,
+    isApproved, isDisbursed, isPendingDisb,
+    _tsDate: tsToDateVal(timestamp),
+  };
+}
+
+// ════════════════════════════════
+//  LOAD DATA
+// ════════════════════════════════
+async function loadData(force=false){
+  if(isLoading) return;
+  isLoading=true;
+
+  if(!force){
+    const c=readCache();
+    if(c&&c.length){ALL=c;applyFilters();showBanner('Updating from Google Sheets…');}
+    else{showSkel(6);showBanner('Loading from Google Sheets…');}
+  } else {
+    clearCache();showSkel(4);showBanner('Syncing…');
+  }
+
+  try{
+    const res=await fetch(API_URL,{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json=await res.json();
+
+    let rows=Array.isArray(json)?json:(json.data||json.records||[]);
+    // Handle array-of-arrays with first row as header
+    if(rows.length && Array.isArray(rows[0])){
+      const hdr=rows[0];
+      rows=rows.slice(1).map(r=>{
+        const obj={};
+        hdr.forEach((h,i)=>obj[String(h).trim()]=r[i]!=null?r[i]:'');
+        return obj;
+      });
+    }
+
+    ALL=rows.map(mapRow).filter(Boolean);
+    writeCache(ALL);
+    applyFilters();
+    document.getElementById('sync-time').textContent='Synced '+new Date().toLocaleTimeString('en-GB');
+  } catch(err){
+    console.error(err);
+    toast('Could not load data: '+err.message,'ti-alert-circle','error');
+    if(!ALL.length) clearSkel();
+  }
+
+  hideBanner();
+  isLoading=false;
+}
+
+async function syncData(){
+  setSyncLoading(true);
+  await loadData(true);
+  setSyncLoading(false);
+  toast('Synced from Google Sheets','ti-circle-check');
+}
+function setSyncLoading(v){
+  document.getElementById('btn-sync').disabled=v;
+  document.getElementById('sync-ic').className=v?'ti ti-loader spinning':'ti ti-refresh';
+}
+
+// ════════════════════════════════
+//  DATE FILTER
+// ════════════════════════════════
+function applyFilters(){
+  const from=document.getElementById('f-from').value;
+  const to  =document.getElementById('f-to').value;
+
+  FILT=ALL.filter(r=>{
+    if(from && r._tsDate && r._tsDate < from) return false;
+    if(to   && r._tsDate && r._tsDate > to)   return false;
+    return true;
+  });
+
+  if(sortCol) FILT=doSort(FILT,sortCol,sortDir);
+
+  DISP_N=0;
+  document.getElementById('fin-tbody').innerHTML='';
+  updateStats();
+  renderBatch(PAGE_SZ);
+
+  // filter count label
+  const lbl=document.getElementById('filter-count-label');
+  if(from||to) lbl.textContent=FILT.length+' of '+ALL.length+' records';
+  else lbl.textContent='';
+}
+
+function clearDates(){
+  document.getElementById('f-from').value='';
+  document.getElementById('f-to').value='';
+  applyFilters();
+}
+
+// ════════════════════════════════
+//  SORT
+// ════════════════════════════════
+const SORT_FN={
+  refId:r=>r.refId,
+  name:r=>r.empName.toLowerCase(),
+  reqAmt:r=>r.reqAmt,
+  month:r=>r.forMonth,
+  status:r=>r.status.toLowerCase(),
+};
+function sortBy(col){
+  if(sortCol===col) sortDir*=-1; else{sortCol=col;sortDir=1;}
+  ['refId','name','reqAmt','month','status'].forEach(c=>{
+    const el=document.getElementById('sh-'+c);
+    if(!el) return;
+    el.className='ti sort-ic';
+    if(c===sortCol) el.className='ti sort-ic '+(sortDir===1?'ti-chevron-up':'ti-chevron-down');
+  });
+  applyFilters();
+}
+function doSort(arr,col,dir){
+  const fn=SORT_FN[col];if(!fn) return arr;
+  return [...arr].sort((a,b)=>{const va=fn(a),vb=fn(b);return va<vb?-1*dir:va>vb?1*dir:0;});
+}
+
+// ════════════════════════════════
+//  RENDER BATCH
+// ════════════════════════════════
+function renderBatch(n){
+  const tbody=document.getElementById('fin-tbody');
+  const batch=FILT.slice(DISP_N,DISP_N+n);
+
+  if(DISP_N===0&&batch.length===0){
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty-st"><i class="ti ti-building-bank"></i><p>No records found</p></div></td></tr>`;
+    updateLMBar(); return;
+  }
+
+  batch.forEach(r=>tbody.insertAdjacentHTML('beforeend',buildRow(r)));
+  DISP_N+=batch.length;
+  updateLMBar();
+}
+
+function loadMore(){renderBatch(PAGE_SZ);}
+
+function updateLMBar(){
+  const bar=document.getElementById('lm-row');
+  document.getElementById('lm-shown').textContent=DISP_N;
+  document.getElementById('lm-total').textContent=FILT.length;
+  document.getElementById('rec-badge').textContent=FILT.length+' records';
+  if(DISP_N<FILT.length){
+    bar.style.display='flex';
+    document.getElementById('lm-btn').innerHTML='<i class="ti ti-chevron-down"></i>Load More ('+(FILT.length-DISP_N)+' remaining)';
+    document.getElementById('lm-btn').disabled=false;
+  } else {
+    bar.style.display=FILT.length>PAGE_SZ?'flex':'none';
+    if(FILT.length>PAGE_SZ){
+      document.getElementById('lm-btn').innerHTML='<i class="ti ti-check"></i>All loaded';
+      document.getElementById('lm-btn').disabled=true;
+    }
+  }
+}
+
+// Infinite scroll
+function onScroll(){
+  const w=document.getElementById('tscroll');
+  if(w&&w.scrollTop+w.clientHeight>=w.scrollHeight-80&&DISP_N<FILT.length&&!isLoading)renderBatch(PAGE_SZ);
+}
+
+// ════════════════════════════════
+//  BUILD ROW
+// ════════════════════════════════
+function buildRow(r){
+  const chkHtml=`<input type="checkbox" class="row-chk" data-ref="${esc(r.refId)}" onchange="onChkChange(this)" onclick="event.stopPropagation()" style="cursor:pointer;accent-color:var(--accent);"/>`;
+
+  const refCell=`<div class="cs">
+    <span class="ref-pill"><i class="ti ti-hash" style="font-size:9px;"></i>${esc(r.refId||'—')}</span>
+    <span class="cs2" style="margin-top:3px;"># ${esc(r.empId)}</span>
+  </div>`;
+
+  const nameCell=`<div class="cs">
+    <span class="cm">${esc(r.empName||'—')}</span>
+    <span class="cs2">${esc(r.eidNo||'—')}</span>
+  </div>`;
+
+  const amtCell=`<div class="cs">
+    <span class="amt-req">AED ${fmt(r.appAmt||r.reqAmt)}</span>
+    ${r.isDisbursed
+      ?`<span class="amt-dis"><i class="ti ti-circle-check" style="font-size:9px;"></i> AED ${fmt(r.disAmt||r.appAmt)}</span>`
+      :`<span class="amt-none">Not disbursed</span>`}
+  </div>`;
+
+  const monthCell=`<div class="cs">
+    <span class="cm" style="color:var(--purple);">${esc(fmtMonth(r.forMonth))}</span>
+    <span class="cs2">${r.timestamp?fmtTS(r.timestamp):'—'}</span>
+  </div>`;
+
+  const statusBadge=r.isDisbursed
+    ?`<span class="badge green"><i class="ti ti-circle-check" style="font-size:9px;"></i> Deposited</span>`
+    :r.isPendingDisb
+      ?`<span class="badge amber"><i class="ti ti-clock-hour-4" style="font-size:9px;"></i> Pending Disb.</span>`
+      :`<span class="badge gray">${esc(r.status||'—')}</span>`;
+
+  return `<tr class="row-in" data-ref="${esc(r.refId)}" onclick="toggleDetail('${esc(r.refId)}',event)" style="cursor:pointer;">
+    <td onclick="event.stopPropagation()" style="padding:10px 8px 10px 14px;">${chkHtml}</td>
+    <td>${refCell}</td>
+    <td>${nameCell}</td>
+    <td>${amtCell}</td>
+    <td>${monthCell}</td>
+    <td>${statusBadge}</td>
+    <td>
+      <div class="btn-group" onclick="event.stopPropagation()">
+        <button class="act-btn expand" onclick="toggleDetail('${esc(r.refId)}',event)" title="Expand">
+          <i class="ti ti-chevron-down" id="xi-${esc(r.refId)}"></i>
+        </button>
+        ${r.isDisbursed?`<button class="act-btn view" onclick="openModal('${esc(r.refId)}')" title="Installments"><i class="ti ti-list-details"></i></button>`:''}
+      </div>
+    </td>
+  </tr>`;
+}
+
+// ════════════════════════════════
+//  INLINE DETAIL
+// ════════════════════════════════
+function toggleDetail(refId,evt){
+  const existing=document.getElementById('det-'+refId);
+  if(existing){
+    existing.remove();
+    const ic=document.getElementById('xi-'+refId);
+    if(ic) ic.className='ti ti-chevron-down';
+    expandedRef=null;return;
+  }
+  if(expandedRef){
+    const p=document.getElementById('det-'+expandedRef);if(p)p.remove();
+    const pi=document.getElementById('xi-'+expandedRef);if(pi)pi.className='ti ti-chevron-down';
+  }
+  expandedRef=refId;
+  const ic=document.getElementById('xi-'+refId);
+  if(ic) ic.className='ti ti-chevron-up';
+
+  const r=FILT.find(x=>x.refId===refId)||ALL.find(x=>x.refId===refId);
+  if(!r) return;
+  const row=document.querySelector(`tr[data-ref="${refId}"]`);
+  if(!row) return;
+
+  const html=`<tr id="det-${refId}" class="det-row slide-down">
+    <td colspan="7">
+      <div class="mini-grid">
+        <div class="mini-card"><div class="mini-lbl">REF ID</div><div class="mini-val blue" style="font-size:10.5px;word-break:break-all;">${esc(r.refId||'—')}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Emp ID</div><div class="mini-val">${esc(r.empId||'—')}</div></div>
+        <div class="mini-card"><div class="mini-lbl">EID Number</div><div class="mini-val" style="font-size:10px;">${esc(r.eidNo||'—')}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Employee Name</div><div class="mini-val plain">${esc(r.empName||'—')}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Req Amount</div><div class="mini-val amber">AED ${fmt(r.reqAmt)}</div></div>
+        <div class="mini-card"><div class="mini-lbl">App Amount</div><div class="mini-val green">AED ${fmt(r.appAmt)}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Dis Amount</div><div class="mini-val ${r.isDisbursed?'blue':''}">
+          ${r.isDisbursed?'AED '+fmt(r.disAmt||r.appAmt):'—'}
+        </div></div>
+        <div class="mini-card"><div class="mini-lbl">Req Installments</div><div class="mini-val">${r.reqInst||'—'}</div></div>
+        <div class="mini-card"><div class="mini-lbl">App Installments</div><div class="mini-val">${r.appInst||'—'}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Ret Req Months</div><div class="mini-val" style="font-size:10px;word-break:break-word;">${esc(r.retReqM||'—')}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Ret App Months</div><div class="mini-val" style="font-size:10px;word-break:break-word;">${esc(r.retAppM||'—')}</div></div>
+        <div class="mini-card"><div class="mini-lbl">For Month</div><div class="mini-val purple">${esc(fmtMonth(r.forMonth))}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Reason</div><div class="mini-val plain" style="font-size:11px;font-weight:500;">${esc(r.reason||'—')}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Submitted</div><div class="mini-val" style="font-size:10.5px;">${esc(fmtTS(r.timestamp))}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Status</div><div class="mini-val plain">${esc(r.status||'—')}</div></div>
+        <div class="mini-card"><div class="mini-lbl">Disb Date</div><div class="mini-val ${r.isDisbursed?'blue':''}">${esc(r.dissDate||'—')}</div></div>
+      </div>
+    </td>
+  </tr>`;
+  row.insertAdjacentHTML('afterend',html);
+}
+
+// ════════════════════════════════
+//  STATS
+// ════════════════════════════════
+function updateStats(){
+  const src=FILT.length?FILT:ALL;
+  const pending=src.filter(r=>r.isPendingDisb).length;
+  const totalAmt=src.reduce((s,r)=>s+(r.appAmt||r.reqAmt),0);
+  const inst=src.filter(r=>(r.appInst||r.reqInst)>1).length;
+  const oneP=src.filter(r=>(r.appInst||r.reqInst)<=1).length;
+  const disbN=src.filter(r=>r.isDisbursed).length;
+  document.getElementById('s-pending').textContent=pending;
+  document.getElementById('s-amount').textContent=fmt(totalAmt);
+  document.getElementById('s-installment').textContent=inst;
+  document.getElementById('s-payment').textContent=oneP;
+  document.getElementById('s-disbursed').textContent=disbN;
+}
+
+// ════════════════════════════════
+//  SKELETON
+// ════════════════════════════════
+function showSkel(n){
+  const w=[28,130,140,110,120,90,80];
+  document.getElementById('fin-tbody').innerHTML=
+    Array.from({length:n},()=>`<tr class="skel">${w.map(wd=>`<td><div class="skel-cell" style="width:${wd}px;"></div></td>`).join('')}</tr>`).join('');
+}
+function clearSkel(){
+  document.getElementById('fin-tbody').innerHTML=`<tr><td colspan="7"><div class="empty-st"><i class="ti ti-building-bank"></i><p>No records found</p></div></td></tr>`;
+  updateStats();
+}
+
+// ════════════════════════════════
+//  SELECT / ACCEPT / REJECT
+// ════════════════════════════════
+function onChkChange(chk){
+  const ref=chk.dataset.ref;
+  if(chk.checked) selectedRefs.add(ref); else selectedRefs.delete(ref);
+  updateSelectionBtns();
+}
+function toggleAllCheckboxes(){
+  const all=document.getElementById('chk-all');
+  document.querySelectorAll('.row-chk').forEach(c=>{
+    c.checked=all.checked;
+    if(all.checked) selectedRefs.add(c.dataset.ref); else selectedRefs.delete(c.dataset.ref);
+  });
+  updateSelectionBtns();
+}
+function updateSelectionBtns(){
+  const n=selectedRefs.size;
+  document.getElementById('accept-btn').disabled=n===0;
+  document.getElementById('reject-btn').disabled=n===0;
+  document.getElementById('accept-count').textContent=n||'0';
+}
+function acceptSelected(){ if(!selectedRefs.size) return; toast('Accept action for '+selectedRefs.size+' records (hook your API here)','ti-check'); }
+function rejectSelected(){ if(!selectedRefs.size) return; toast('Reject action for '+selectedRefs.size+' records (hook your API here)','ti-ban','warn'); }
+
+// ════════════════════════════════
+//  EXPORT CSV
+// ════════════════════════════════
+function exportPending(){
+  const rows=ALL.filter(r=>r.isPendingDisb);
+  if(!rows.length){toast('No pending disbursements','ti-alert-circle','warn');return;}
+  const hdr=['REF ID','Emp ID','EID No','Emp Name','App Amount','For Month','Reason','Submitted'];
+  const data=rows.map(r=>[r.refId,r.empId,r.eidNo,r.empName,(r.appAmt||r.reqAmt).toFixed(2),r.forMonth,r.reason,fmtTS(r.timestamp)]);
+  doCSV('pending-disbursement',hdr,data);
+  toast('Exported '+rows.length+' pending records','ti-file-download');
+}
+function doCSV(name,hdr,rows){
+  const csv=[hdr,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  const a=document.createElement('a');a.href=url;a.download=name+'-'+todayVal()+'.csv';a.click();URL.revokeObjectURL(url);
+}
+
+// ════════════════════════════════
+//  LOAN DETAIL MODAL
+// ════════════════════════════════
+function openModal(refId){
+  const r=ALL.find(x=>x.refId===refId);
+  if(!r){toast('Record not found','ti-alert-circle','warn');return;}
+  document.getElementById('m-ref').textContent=refId;
+  const months=r.appInst||r.reqInst||1;
+  const amount=r.appAmt||r.reqAmt;
+  const monthly=amount/months;
+  const disbDate=r.dissDate||todayVal();
+  const today=todayVal();
+  const retMs=(r.retAppM||r.retReqM||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const inst=Array.from({length:months},(_,i)=>({
+    no:i+1,
+    due:addMonths(disbDate,i+1),
+    amt:i===months-1?amount-(Math.round(monthly*100)/100)*(months-1):Math.round(monthly*100)/100,
+  }));
+
+  document.getElementById('m-body').innerHTML=`
+    <div class="emp-strip">
+      <div><span>Employee: </span><strong>${esc(r.empName||'—')}</strong></div>
+      <div><span>Emp ID: </span><strong>${esc(r.empId)}</strong></div>
+      <div><span>EID: </span><strong style="font-family:var(--mono);font-size:10.5px;">${esc(r.eidNo||'—')}</strong></div>
+      <div><span>For Month: </span><strong style="color:var(--purple);">${esc(fmtMonth(r.forMonth))}</strong></div>
+      <div><span>Submitted: </span><strong style="font-size:11px;">${esc(fmtTS(r.timestamp))}</strong></div>
+      <div><span>Reason: </span><strong>${esc(r.reason||'—')}</strong></div>
+      <div><span>Status: </span><strong>${esc(r.status)}</strong></div>
+      <div><span>Disb Date: </span><strong style="color:var(--accent);">${esc(r.dissDate||'—')}</strong></div>
+    </div>
+    <div class="inst-amounts">
+      <div class="iamt-box"><div class="iamt-lbl">Requested</div><div class="iamt-val" style="color:var(--amber);">AED ${fmt(r.reqAmt)}</div></div>
+      <div class="iamt-box"><div class="iamt-lbl">Approved</div><div class="iamt-val" style="color:var(--teal);">AED ${fmt(r.appAmt||r.reqAmt)}</div></div>
+      <div class="iamt-box"><div class="iamt-lbl">Disbursed</div><div class="iamt-val" style="color:var(--accent);">${r.isDisbursed?'AED '+fmt(r.disAmt||r.appAmt):'—'}</div></div>
+    </div>
+    <div class="div-label">Installment Schedule</div>
+    <div style="overflow-x:auto;">
+      <table class="inst-table">
+        <thead><tr><th>#</th><th>Return Month</th><th>Due Date</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>${inst.map((it,i)=>{
+          const rm=retMs[i]||'';
+          const over=it.due<today;
+          return `<tr>
+            <td style="font-family:var(--mono);font-weight:700;color:var(--orange);">#${it.no}</td>
+            <td style="color:var(--purple);">${rm||new Date(it.due).toLocaleString('en-GB',{month:'short',year:'numeric'})}</td>
+            <td style="font-family:var(--mono);font-size:11px;">${it.due}</td>
+            <td style="font-family:var(--mono);font-weight:700;color:var(--teal);">AED ${fmt(it.amt)}</td>
+            <td>${over?'<span class="badge red">Overdue</span>':'<span class="badge amber">Pending</span>'}</td>
+          </tr>`;
+        }).join('')}</tbody>
       </table>
     </div>`;
-  showToast(`${success} records submitted to Google Sheets!`,'ti-circle-check');
+  document.getElementById('modal').classList.add('open');
 }
 
-function downloadBulkResultCSV(){
-  if(!bulkResultsData.length) return;
-  const headers=['Sheet REF ID','Dis REF (auto)','Emp ID','Amount (AED)','Disbursement Date','tb-uname','Submitted'];
-  const rows=bulkResultsData.map(r=>[r.sheetRef,r.disRef||'',r.empId,r.amount.toFixed(2),r.disbDate,r.tbUname||'',r.submitted?'Yes':'No']);
-  exportCSV('bulk-disbursement-results',headers,rows);
+// ════════════════════════════════
+//  BULK UPLOAD
+// ════════════════════════════════
+function bdrag(e){e.preventDefault();document.getElementById('bzone').classList.add('drag');}
+function bndrag(){document.getElementById('bzone').classList.remove('drag');}
+function bdrop(e){e.preventDefault();bndrag();if(e.dataTransfer.files[0])bfile(e.dataTransfer.files[0]);}
+function bfile(f){if(!f)return;bulkFile=f.name;const r=new FileReader();r.onload=e=>bparse(e.target.result);r.readAsText(f);}
+function bparse(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());if(!lines.length){toast('Empty file','ti-alert-circle','error');return;}
+  const prow=l=>{const res=[];let cur='',iq=false;for(const c of l){if(c==='"'){iq=!iq;}else if(c===','&&!iq){res.push(cur.trim());cur='';}else cur+=c;}res.push(cur.trim());return res;};
+  const first=prow(lines[0]);
+  const isHdr=first.some(v=>isNaN(parseFloat(v))&&v.length>0);
+  bulkHdr=isHdr?first:first.map((_,i)=>'Col '+(i+1));
+  bulkRaw=lines.slice(isHdr?1:0).map(prow).filter(r=>r.some(v=>v));
+  document.getElementById('bcol-cnt').textContent=bulkHdr.length+' cols detected';
+  const ma=document.getElementById('bmap-area');
+  ma.innerHTML=BFIELDS.map(f=>{
+    const best=autoCol(f.key,bulkHdr);
+    return `<div style="margin-bottom:10px;">
+      <div class="map-lbl">${f.label}${f.req?' <span style="color:var(--red)">*</span>':''}</div>
+      <div class="col-grid">
+        <div style="font-size:12px;color:var(--text3);">→ maps to:</div>
+        <div class="map-arrow"><i class="ti ti-arrow-right"></i></div>
+        <select id="cm-${f.key}">${!f.req?'<option value="">— Not mapped —</option>':''}${bulkHdr.map((h,i)=>`<option value="${i}" ${best===i?'selected':''}>${h}</option>`).join('')}</select>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('bs1').style.display='none';
+  document.getElementById('bs2').style.display='block';
+}
+function autoCol(key,hdrs){
+  const hints=BHINTS[key]||[];
+  for(let i=0;i<hdrs.length;i++){const h=hdrs[i].toLowerCase();if(hints.some(t=>h.includes(t)))return i;}
+  return 0;
+}
+function bapply(){
+  const cm={};BFIELDS.forEach(f=>{const s=document.getElementById('cm-'+f.key);cm[f.key]=s&&s.value!==''?parseInt(s.value):null;});
+  bulkMapped=bulkRaw.map((row,i)=>{
+    const g=k=>cm[k]!=null?row[cm[k]]||'':'';
+    const ref=g('ref').trim(),empId=g('empId').trim(),amt=parseFloat(g('amount').replace(/[^0-9.]/g,''))||0,disbDate=g('disbDate').trim(),tbU=g('tbUname').trim();
+    const err=[],warn=[];
+    if(!ref)err.push('Missing REF');if(!empId)err.push('Missing Emp ID');if(!amt)err.push('Invalid amount');if(!disbDate)warn.push('No disb date');
+    return{ref,empId,amt,disbDate,tbU,rowIdx:i+1,err,warn};
+  });
+  const tot=bulkMapped.reduce((s,r)=>s+(isNaN(r.amt)?0:r.amt),0);
+  const errN=bulkMapped.filter(r=>r.err.length).length;
+  document.getElementById('b-cnt').textContent=bulkMapped.length;
+  document.getElementById('b-tot').textContent='AED '+fmt(tot);
+  document.getElementById('b-err').textContent=errN;
+  document.getElementById('b-fname').textContent=bulkFile;
+  document.getElementById('b-dates').textContent=[...new Set(bulkMapped.map(r=>r.disbDate).filter(Boolean))].join(', ')||'—';
+  document.getElementById('bprev-body').innerHTML=bulkMapped.map(r=>{
+    const hasE=r.err.length>0,hasW=!hasE&&r.warn.length>0;
+    const st=hasE?r.err.map(e=>`<span class="badge red">${esc(e)}</span>`).join(' '):hasW?r.warn.map(w=>`<span class="badge amber">${esc(w)}</span>`).join(' '):'<span class="badge green">Ready</span>';
+    return `<tr class="${hasE?'row-err':hasW?'row-warn':''}">
+      <td style="font-size:11px;color:var(--text3);">${r.rowIdx}</td>
+      <td><span class="ref-pill"><i class="ti ti-hash" style="font-size:9px;"></i>${esc(r.ref)}</span></td>
+      <td style="font-family:var(--mono);">${esc(r.empId)}</td>
+      <td style="font-family:var(--mono);color:var(--teal);font-weight:700;">${isNaN(r.amt)?'—':'AED '+fmt(r.amt)}</td>
+      <td style="font-family:var(--mono);font-size:11px;">${esc(r.disbDate)}</td>
+      <td style="font-size:12px;">${esc(r.tbU||'—')}</td>
+      <td>${st}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('bs2').style.display='none';
+  document.getElementById('bs3').style.display='block';
+  document.getElementById('bsave-btn').disabled=errN===bulkMapped.length;
+}
+async function bsave(){
+  const valid=bulkMapped.filter(r=>r.err.length===0);
+  if(!valid.length){toast('No valid rows','ti-alert-circle','error');return;}
+  const btn=document.getElementById('bsave-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader spinning"></i> Submitting…';
+  bulkResults=[];let ok=0;
+  for(const row of valid){
+    try{
+      const ts=nowStr();const disRef=`ADV-${ts.slice(0,8)}-${ts.slice(8)}`;
+      const body=new FormData();
+      body.append(BULK_FF.disRef,disRef);body.append(BULK_FF.sheetRef,row.ref);body.append(BULK_FF.empId,row.empId);
+      body.append(BULK_FF.amount,row.amt.toFixed(2));body.append(BULK_FF.disbDate,row.disbDate);body.append(BULK_FF.name,row.tbU||'');
+      await fetch(BULK_FA,{method:'POST',mode:'no-cors',body});
+      bulkResults.push({...row,disRef,ok:true});ok++;
+    }catch(e){bulkResults.push({...row,disRef:'',ok:false});}
+    await new Promise(r=>setTimeout(r,120));
+  }
+  const tot=bulkResults.filter(r=>r.ok).reduce((s,r)=>s+r.amt,0);
+  document.getElementById('b-results').innerHTML=`
+    <div class="info-box ok" style="margin-bottom:12px;"><i class="ti ti-circle-check"></i><div><strong>${ok} of ${valid.length}</strong> submitted. Total: <strong>AED ${fmt(tot)}</strong></div></div>
+    <div style="overflow-x:auto;"><table class="data-table" style="min-width:560px;"><thead><tr><th>Sheet REF</th><th>Dis REF</th><th>Emp ID</th><th>Amount</th><th>Date</th><th>tb-uname</th><th>Status</th></tr></thead>
+    <tbody>${bulkResults.map(r=>`<tr>
+      <td><span class="ref-pill"><i class="ti ti-hash" style="font-size:9px;"></i>${esc(r.ref)}</span></td>
+      <td style="font-family:var(--mono);font-size:10.5px;color:var(--accent);">${esc(r.disRef||'—')}</td>
+      <td style="font-family:var(--mono);">${esc(r.empId)}</td>
+      <td style="font-family:var(--mono);color:var(--teal);font-weight:700;">AED ${fmt(r.amt)}</td>
+      <td style="font-family:var(--mono);font-size:11px;">${esc(r.disbDate)}</td>
+      <td style="font-size:12px;">${esc(r.tbU||'—')}</td>
+      <td>${r.ok?'<span class="badge green">Submitted</span>':'<span class="badge red">Failed</span>'}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+  document.getElementById('bs3').style.display='none';
+  document.getElementById('bs4').style.display='block';
+  toast(ok+' records submitted!','ti-circle-check');
+}
+function bdownloadCSV(){
+  if(!bulkResults.length) return;
+  doCSV('bulk-results',['Sheet REF','Dis REF','Emp ID','Amount','Disb Date','tb-uname','Submitted'],
+    bulkResults.map(r=>[r.ref,r.disRef||'',r.empId,r.amt.toFixed(2),r.disbDate,r.tbU||'',r.ok?'Yes':'No']));
+}
+function dlTemplate(){doCSV('bulk-template',['REF ID','Emp ID','Amount','DisbDate','tb-uname'],[]);toast('Template downloaded','ti-file-download');}
+function breset(){
+  bulkRaw=[];bulkHdr=[];bulkMapped=[];bulkFile='';bulkResults=[];
+  ['bs1','bs2','bs3','bs4'].forEach((id,i)=>document.getElementById(id).style.display=i===0?'block':'none');
+  document.getElementById('bfile-inp').value='';
 }
 
-function resetBulkUpload(){
-  bulkRawRows=[]; bulkHeaders=[]; bulkHasHeader=false;
-  bulkMapped=[]; bulkFileName=''; bulkResultsData=[];
-  document.getElementById('bulk-step1').style.display='block';
-  document.getElementById('bulk-step2').style.display='none';
-  document.getElementById('bulk-step3').style.display='none';
-  document.getElementById('bulk-step4').style.display='none';
-  document.getElementById('bulk-file-input').value='';
-}
-
-
-// ══════════════════════════════════════
+// ════════════════════════════════
 //  INIT
-// ══════════════════════════════════════
+// ════════════════════════════════
 (async()=>{ await loadData(); })();
 </script>
 </body>
