@@ -864,16 +864,57 @@ function closeThemeDropdown() {
 /* ══ SESSION GUARD ══
    Redirect to login.html if no valid session exists.
    Session is set by login.html after Apps Script verification. */
-(function sessionGuard(){
-  try{
-    const raw = sessionStorage.getItem('ap_user');
-    if(!raw){ window.location.href = 'login.html'; return; }
-    const u = JSON.parse(raw);
-    if(!u || !u.email){ window.location.href = 'login.html'; return; }
-  } catch(e){
-    window.location.href = 'login.html';
+/* ══ AUTH GUARD — must be first ══ */
+(function() {
+  'use strict';
+
+  const SESSION_KEY  = 'adminpro_session';
+  const LOGIN_PAGE   = 'login.html';          // ← path to your login page
+  const SESSION_TTL  = 8 * 60 * 60 * 1000;   // 8 hours in ms
+
+  function getSession() {
+    try {
+      const raw = sessionStorage.getItem(SESSION_KEY)
+                  || localStorage.getItem(SESSION_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function isValid(session) {
+    if (!session || !session.token || !session.loggedInAt) return false;
+    if (Date.now() - session.loggedInAt > SESSION_TTL) return false;  // expired
+    return true;
+  }
+
+  // Block rendering immediately — before DOMContentLoaded fires
+  const session = getSession();
+  if (!isValid(session)) {
+    // Wipe any stale data
+    sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(SESSION_KEY);
+
+    // Prevent flash of protected content
+    document.documentElement.style.visibility = 'hidden';
+
+    // Redirect — preserve intended URL so login can send them back
+    const intended = encodeURIComponent(window.location.href);
+    window.location.replace(LOGIN_PAGE + '?next=' + intended);
   }
 })();
+
+	
+	
+///////////////////////////////////////////////////////////////////////	
+// (function sessionGuard(){
+//   try{
+//     const raw = sessionStorage.getItem('ap_user');
+//     if(!raw){ window.location.href = 'login.html'; return; }
+//     const u = JSON.parse(raw);
+//     if(!u || !u.email){ window.location.href = 'login.html'; return; }
+//   } catch(e){
+//     window.location.href = 'login.html';
+//   }
+// })();
 
 /* ── Sign out ── */
 function signOut(){
