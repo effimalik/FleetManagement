@@ -370,7 +370,7 @@ body::after{
    ════════════════════════════════════════════════════ */
 const CONFIG = {
   // Your Google Apps Script Web App URL (deployed as "Execute as Me / Anyone")
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxc3LeIT1u5wgCcRv0E2r3Q7oPzunIVzqSiPA6uaweWSMZm5cXhju2x7SoxrMcEdQve_g/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzMCqGb6LvzeDQ561_0YsFLWD2WfngpxoJ4rlErjbr9GVMWMuplk76k5Me_ggSZRmvF/exec',
 
   // Your Google OAuth Client ID (from console.cloud.google.com)
   GOOGLE_CLIENT_ID: '743775120253-lr54jgst59jqr5s61vc3i4o3rnfn596a.apps.googleusercontent.com',
@@ -558,67 +558,43 @@ async function startGoogleLogin(){
   window.location.href = CONFIG.REDIRECT_URL;
 }
 
-/* ── Get Google ID token via GSI TokenClient ── */
+/* ── Get Google ID token via GSI — FedCM compatible ── */
 function getGoogleIdToken(){
   return new Promise((resolve, reject) => {
-    // Use Google Identity Services One Tap
     google.accounts.id.initialize({
       client_id: CONFIG.GOOGLE_CLIENT_ID,
       callback: (response) => {
         if(response.credential){
-          resolve(response.credential); // JWT id_token
+          resolve(response.credential);
         } else {
           reject({type:'auth_error', message:'Google did not return credentials.'});
         }
       },
-      cancel_on_tap_outside: false,
-      context: 'signin',
+      ux_mode: 'popup',
+      use_fedcm_for_prompt: true,
+      use_fedcm_for_button: true,
     });
 
-    // Try One Tap first; if the user dismisses it, fall back to the popup button flow
     google.accounts.id.prompt((notification) => {
-      if(notification.isNotDisplayed() || notification.isSkippedMoment()){
-        // One Tap not shown — open the popup instead
-        google.accounts.id.renderButton(
-          document.createElement('div'), // hidden render target
-          {theme:'filled_black', size:'large'}
-        );
-        // Open an explicit popup sign-in using OAuth2 token flow
-        const tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CONFIG.GOOGLE_CLIENT_ID,
-          scope: 'openid email profile',
-          callback: () => {},
-        });
-
-        // Use openid connect id_token from accounts.id
-        google.accounts.id.initialize({
-          client_id: CONFIG.GOOGLE_CLIENT_ID,
-          callback: (r) => {
-            if(r.credential) resolve(r.credential);
-            else reject({type:'auth_error', message:'Sign-in was cancelled.'});
-          },
-          ux_mode: 'popup',
-        });
-        google.accounts.id.prompt();
+      // Only isDismissedMoment() is safe to use under FedCM
+      // isNotDisplayed(), isSkippedMoment(), getSkippedReason() are removed
+      if(notification.isDismissedMoment()){
+        reject({type:'user_cancel', message:'Sign-in was dismissed.'});
       }
     });
   });
 }
 
-/* ── Verify with Apps Script ── */
+/* ── Verify with Apps Script via POST ── */
 async function verifyWithAppsScript(idToken){
-  const url = CONFIG.APPS_SCRIPT_URL + '?token=' + encodeURIComponent(idToken);
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {'Accept': 'application/json'},
+  const res = await fetch(CONFIG.APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ token: idToken }),
   });
   if(!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
   return data;
-  /* Expected Apps Script response shape:
-     Allowed:  { allowed: true,  email, name, role }
-     Blocked:  { allowed: false, email, reason, title, status }
-  */
 }
 
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
