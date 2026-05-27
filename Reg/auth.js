@@ -68,3 +68,11 @@
   activityTimer = setTimeout(redirectToLogin, INACTIVITY_TTL);
 
 })();
+
+function logout() {
+  sessionStorage.removeItem('adminpro_session');
+  if (window.google?.accounts?.id) {
+    google.accounts.id.disableAutoSelect();
+  }
+  window.location.replace('login.html');
+}
