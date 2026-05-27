@@ -574,6 +574,21 @@ function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
     }
   } catch(e){}
 })();
+
+function createSession(username, role) {
+  const session = {
+    token:      crypto.randomUUID(),
+    username:   username,
+    role:       role,
+    lastActive: Date.now()
+  };
+  sessionStorage.setItem('adminpro_session', JSON.stringify(session));
+
+  const params = new URLSearchParams(window.location.search);
+  const next   = params.get('next');
+  window.location.replace(next ? decodeURIComponent(next) : 'index.html');
+}
+  
 </script>
 </body>
 </html>
