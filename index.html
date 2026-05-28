@@ -8,6 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
 
+<!-- Line 9 — after tabler icons link, add this: -->
+<script src="auth.js"></script>
+
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
@@ -559,7 +563,8 @@ html,body{
       <div class="tb-vsep"></div>
 
       <!-- User -->
-      <div class="tb-user" title="Signed in as Admin">
+<div class="tb-user" title="Click to sign out" onclick="if(confirm('Sign out of AdminPro UAE?')) logout()">
+
         <div class="tb-avatar">AD</div>
         <div>
           <div class="tb-uname">Admin</div>
@@ -861,54 +866,6 @@ function closeThemeDropdown() {
   setTimeout(tick, 1000);
 })();
 
-/* ══ SESSION GUARD ══
-   Redirect to login.html if no valid session exists.
-   Session is set by login.html after Apps Script verification. */
-/* ══ AUTH GUARD — must be first ══ */
-(function() {
-  'use strict';
-
-  const SESSION_KEY  = 'adminpro_session';
-  const LOGIN_PAGE   = 'login.html';          // ← path to your login page
-  const SESSION_TTL  = 8 * 60 * 60 * 1000;   // 8 hours in ms
-
-  function getSession() {
-    try {
-      const raw = sessionStorage.getItem(SESSION_KEY)
-                  || localStorage.getItem(SESSION_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) { return null; }
-  }
-
-  function isValid(session) {
-    if (!session || !session.token || !session.loggedInAt) return false;
-    if (Date.now() - session.loggedInAt > SESSION_TTL) return false;  // expired
-    return true;
-  }
-
-  // Block rendering immediately — before DOMContentLoaded fires
-  const session = getSession();
-  if (!isValid(session)) {
-    // Wipe any stale data
-    sessionStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(SESSION_KEY);
-
-    // Prevent flash of protected content
-    document.documentElement.style.visibility = 'hidden';
-
-    // Redirect — preserve intended URL so login can send them back
-    const intended = encodeURIComponent(window.location.href);
-    window.location.replace(LOGIN_PAGE + '?next=' + intended);
-  }
-})();
-
-/* ── Init ── */
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('theme') || 'dark';
-  setTheme(saved);
-  ibOpen('ib-emp', document.getElementById('ib-emp'));
-  populateUserChip();
-});
 </script>
 </body>
 </html>
