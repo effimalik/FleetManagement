@@ -7,7 +7,7 @@
   'use strict';
 
   const SESSION_KEY    = 'adminpro_session';
-  const LOGIN_PAGE     = 'login.html';
+  const LOGIN_PAGE     = '../login.html';
   const INACTIVITY_TTL = 30 * 60 * 1000; // 30 minutes
 
   /* ── Resolve login.html path regardless of subfolder depth ── */
