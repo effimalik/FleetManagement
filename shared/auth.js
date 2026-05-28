@@ -74,5 +74,5 @@ function logout() {
   if (window.google?.accounts?.id) {
     google.accounts.id.disableAutoSelect();
   }
-  window.location.replace('login.html');
+  window.location.replace('../login.html');
 }
