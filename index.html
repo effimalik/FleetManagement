@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
 
 <!-- Line 9 — after tabler icons link, add this: -->
-<script src="../auth.js"></script>
+<script src="Reg/auth.js"></script>
 
 
 <style>
@@ -866,6 +866,15 @@ function closeThemeDropdown() {
   setTimeout(tick, 1000);
 })();
 
+
+/* ── Init ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('theme') || 'dark';
+  setTheme(saved);
+  ibOpen('ib-emp', document.getElementById('ib-emp'));
+});
+
+	
 </script>
 </body>
 </html>
