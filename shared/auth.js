@@ -1,50 +1,88 @@
-/* ══ AUTH GUARD — AdminPro UAE ══
-   Place this as the FIRST script in <head> of every protected page:
-   Root pages  → <script src="auth.js"></script>
-   Reg/ pages  → <script src="../auth.js"></script>
-================================================== */
+/* ═══════════════════════════════════════════════════════════════
+   auth.js — AdminPro UAE
+   Single unified auth guard for ALL protected pages.
+
+   HOW TO USE — add ONE line inside <head> of every protected page:
+     <script src="auth.js"></script>           ← root folder
+     <script src="../auth.js"></script>         ← one folder deep
+     <script src="../../auth.js"></script>      ← two folders deep
+
+   What this script does automatically:
+     1. Blocks access if no valid session → redirects to login.html
+     2. Auto-logs out after 30 min of inactivity
+     3. Populates the user chip (name, role, initials) on DOMContentLoaded
+     4. Exposes signOut() and getUser() globally
+═══════════════════════════════════════════════════════════════ */
+
 (function () {
   'use strict';
 
-  const SESSION_KEY    = 'adminpro_session';
-  const LOGIN_PAGE     = '../login.html';
-  const INACTIVITY_TTL = 30 * 60 * 1000; // 30 minutes
+  /* ─────────────────────────────────────────────
+     CONFIG
+  ───────────────────────────────────────────── */
+  const SESSION_KEY    = 'ap_user';          // sessionStorage key
+  const INACTIVITY_TTL = 30 * 60 * 1000;    // 30 minutes in ms
 
-  /* ── Resolve login.html path regardless of subfolder depth ── */
+
+  /* ─────────────────────────────────────────────
+     1. RESOLVE login.html PATH
+        Works at any subfolder depth by reading the
+        src attribute of this very <script> tag.
+  ───────────────────────────────────────────── */
   function getLoginUrl() {
-    const depth = window.location.pathname.split('/').length - 2;
-    const prefix = depth > 0 ? '../'.repeat(depth) : '';
-    return prefix + LOGIN_PAGE;
+    const scripts = document.querySelectorAll('script[src]');
+    for (const s of scripts) {
+      if (s.src && s.src.includes('auth.js')) {
+        return s.src.replace('auth.js', 'login.html');
+      }
+    }
+    return '/login.html'; // fallback
   }
 
+
+  /* ─────────────────────────────────────────────
+     2. SESSION HELPERS
+  ───────────────────────────────────────────── */
   function getSession() {
     try {
       const raw = sessionStorage.getItem(SESSION_KEY);
       return raw ? JSON.parse(raw) : null;
-    } catch (e) { return null; }
+    } catch (e) {
+      return null;
+    }
   }
 
   function isValid(session) {
-    if (!session || !session.token || !session.lastActive) return false;
-    if (Date.now() - session.lastActive > INACTIVITY_TTL) return false;
+    if (!session || !session.email) return false;
+    if (session.lastActive && Date.now() - session.lastActive > INACTIVITY_TTL) return false;
     return true;
   }
 
   function redirectToLogin() {
     sessionStorage.removeItem(SESSION_KEY);
     document.documentElement.style.visibility = 'hidden';
-    const intended = encodeURIComponent(window.location.href);
-    window.location.replace(getLoginUrl() + '?next=' + intended);
+    const next = encodeURIComponent(window.location.href);
+    window.location.replace(getLoginUrl() + '?next=' + next);
   }
 
-  /* ── Block immediately on page load ── */
+
+  /* ─────────────────────────────────────────────
+     3. IMMEDIATE SESSION GUARD
+        Runs before the page renders — blocks access
+        if there is no valid session.
+  ───────────────────────────────────────────── */
   const session = getSession();
   if (!isValid(session)) {
     redirectToLogin();
-    return;
+    return; // stop the rest of the script
   }
 
-  /* ── Inactivity timer ── */
+
+  /* ─────────────────────────────────────────────
+     4. INACTIVITY TIMER
+        Resets on every user interaction.
+        Redirects to login after 30 min of silence.
+  ───────────────────────────────────────────── */
   let activityTimer;
 
   function resetActivity() {
@@ -54,25 +92,98 @@
       const s = JSON.parse(raw);
       s.lastActive = Date.now();
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
-    } catch (e) { redirectToLogin(); }
-
+    } catch (e) {
+      redirectToLogin();
+      return;
+    }
     clearTimeout(activityTimer);
     activityTimer = setTimeout(redirectToLogin, INACTIVITY_TTL);
   }
 
-  /* ── Listen to all user activity ── */
   ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click']
     .forEach(evt => document.addEventListener(evt, resetActivity, { passive: true }));
 
-  /* ── Start first countdown ── */
   activityTimer = setTimeout(redirectToLogin, INACTIVITY_TTL);
 
-})();
 
-function logout() {
-  sessionStorage.removeItem('adminpro_session');
-  if (window.google?.accounts?.id) {
-    google.accounts.id.disableAutoSelect();
+  /* ─────────────────────────────────────────────
+     5. SIGN OUT  (global: signOut())
+  ───────────────────────────────────────────── */
+  window.signOut = function () {
+    clearTimeout(activityTimer);
+    sessionStorage.removeItem(SESSION_KEY);
+    try {
+      if (window.google?.accounts?.id) {
+        google.accounts.id.disableAutoSelect();
+      }
+    } catch (e) {}
+    window.location.replace(getLoginUrl());
+  };
+
+  // Legacy alias
+  window.logout = window.signOut;
+
+
+  /* ─────────────────────────────────────────────
+     6. GET USER  (global: getUser())
+        Returns the parsed session object or {}.
+        Usage: const user = getUser();
+               console.log(user.name, user.role, user.email);
+  ───────────────────────────────────────────── */
+  window.getUser = function () {
+    try {
+      return JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}');
+    } catch (e) {
+      return {};
+    }
+  };
+
+
+  /* ─────────────────────────────────────────────
+     7. POPULATE USER CHIP
+        Fills in #tb-avatar, #tb-uname, #tb-urole,
+        and #tb-user-chip on every protected page
+        that includes those elements.
+  ───────────────────────────────────────────── */
+  function populateUserChip() {
+    try {
+      const u = getUser();
+      if (!u || !u.email) return;
+
+      // Build initials: "Afan Haidar" → "AH"
+      const nameParts = (u.name || u.email).trim().split(/\s+/);
+      const initials  = nameParts.length >= 2
+        ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+        : (u.name || u.email).substring(0, 2).toUpperCase();
+
+      const fullName = u.name || u.email;
+      const role     = u.role || 'User';
+
+      const avatarEl = document.getElementById('tb-avatar');
+      const nameEl   = document.getElementById('tb-uname');
+      const roleEl   = document.getElementById('tb-urole');
+      const chipEl   = document.getElementById('tb-user-chip');
+
+      if (avatarEl) avatarEl.textContent = initials;
+      if (nameEl)   nameEl.textContent   = fullName;
+      if (roleEl)   roleEl.textContent   = role;
+
+      if (chipEl) {
+        chipEl.title   = 'Signed in as ' + u.email + '\nClick to sign out';
+        chipEl.onclick = function () {
+          if (confirm('Sign out ' + fullName + '?')) signOut();
+        };
+        chipEl.style.cursor = 'pointer';
+      }
+    } catch (e) {
+      console.warn('auth.js populateUserChip:', e);
+    }
   }
-  window.location.replace('../login.html');
-}
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', populateUserChip);
+  } else {
+    populateUserChip();
+  }
+
+})();
