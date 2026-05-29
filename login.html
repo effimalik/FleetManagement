@@ -340,7 +340,6 @@ body::after{
 const CONFIG = {
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwHdmallgjar-vav6rklU6VO0TR9bfMJ7S2Nyp6OL1Q_fwW2uYqboG2LgZ-T03Ga3a-zQ/exec',
   GOOGLE_CLIENT_ID: '743775120253-lr54jgst59jqr5s61vc3i4o3rnfn596a.apps.googleusercontent.com',
-  REDIRECT_URL: '/index.html',
 };
 
 /* ── Clock ── */
@@ -577,8 +576,8 @@ function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 })();
 
 /* ── Post-login redirect ── */
-const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement';
-const DEFAULT_PAGE   = ALLOWED_ORIGIN + '/index.html';
+const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement/';
+const DEFAULT_PAGE   = ALLOWED_ORIGIN + 'index.html';
 
 function handleLoginRedirect() {
   try {
