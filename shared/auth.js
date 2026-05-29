@@ -147,38 +147,9 @@
 
 
   /* ─────────────────────────────────────────────
-     7. HANDLE LOGIN REDIRECT  (global: handleLoginRedirect())
-        Call this on login.html after a successful login.
-        Reads ?next= from the URL, validates it is within
-        ALLOWED_ORIGIN, then navigates there.
-        Falls back to DEFAULT_PAGE if ?next= is missing or unsafe.
-
-        Usage in login.html:
-          function onLoginSuccess(user) {
-            sessionStorage.setItem('ap_user', JSON.stringify({
-              email: user.email,
-              name:  user.name,
-              role:  user.role,
-              lastActive: Date.now()
-            }));
-            handleLoginRedirect();
-          }
+     7. HANDLE LOGIN REDIRECT  → defined below the IIFE
+        so login.html can call it even without a session.
   ───────────────────────────────────────────── */
-  window.handleLoginRedirect = function () {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const next   = decodeURIComponent(params.get('next') || '');
-
-      // Only redirect to pages within our own app (prevents open-redirect attacks)
-      if (next && next.startsWith(ALLOWED_ORIGIN)) {
-        window.location.replace(next);
-      } else {
-        window.location.replace(DEFAULT_PAGE);
-      }
-    } catch (e) {
-      window.location.replace(DEFAULT_PAGE);
-    }
-  };
 
 
   /* ─────────────────────────────────────────────
@@ -229,3 +200,30 @@
   }
 
 })();
+
+
+/* ═══════════════════════════════════════════════════════════════
+   handleLoginRedirect()
+   Defined OUTSIDE the IIFE so login.html can call it even when
+   there is no active session (the IIFE returns early in that case).
+
+   Call this immediately after saving the session on login success:
+     sessionStorage.setItem('ap_user', JSON.stringify({ ... }));
+     handleLoginRedirect();
+═══════════════════════════════════════════════════════════════ */
+window.handleLoginRedirect = function () {
+  const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement';
+  const DEFAULT_PAGE   = ALLOWED_ORIGIN + '/index.html';
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const next   = decodeURIComponent(params.get('next') || '');
+    // Only redirect within our own app — prevents open-redirect attacks
+    if (next && next.startsWith(ALLOWED_ORIGIN)) {
+      window.location.replace(next);
+    } else {
+      window.location.replace(DEFAULT_PAGE);
+    }
+  } catch (e) {
+    window.location.replace(DEFAULT_PAGE);
+  }
+};
