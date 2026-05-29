@@ -508,10 +508,11 @@ async function startGoogleLogin(){
     name:     result.name  || result.email,
     role:     result.role  || 'User',
     initials: (result.name||result.email).split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(),
+    lastActive: Date.now(),
   }));
 
   await sleep(400);
-  window.location.href = CONFIG.REDIRECT_URL;
+  handleLoginRedirect();
 }
 
 /* ── FIX: getGoogleIdToken with settled flag to prevent race condition ── */
@@ -570,33 +571,28 @@ function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
     const s = sessionStorage.getItem('ap_user');
     if(s){
       const u = JSON.parse(s);
-      if(u && u.email) window.location.href = CONFIG.REDIRECT_URL;
+      if(u && u.email) handleLoginRedirect();
     }
   } catch(e){}
 })();
 
-function createSession(username, role) {
-  const session = {
-    token:      crypto.randomUUID(),
-    username:   username,
-    role:       role,
-    lastActive: Date.now()
-  };
-  sessionStorage.setItem('adminpro_session', JSON.stringify(session));
+/* ── Post-login redirect ── */
+const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement';
+const DEFAULT_PAGE   = ALLOWED_ORIGIN + '/index.html';
 
-  const params = new URLSearchParams(window.location.search);
-  const next   = params.get('next');
-  window.location.replace(next ? decodeURIComponent(next) : 'index.html');
-}
-function onLoginSuccess(user) {
-  sessionStorage.setItem('ap_user', JSON.stringify({
-    email: user.email,
-    name:  user.name,
-    role:  user.role,
-    lastActive: Date.now()
-  }));
-
-  handleLoginRedirect(); // ← reads ?next= and redirects safely
+function handleLoginRedirect() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const next   = decodeURIComponent(params.get('next') || '');
+    // Only redirect within our own app — prevents open-redirect attacks
+    if (next && next.startsWith(ALLOWED_ORIGIN)) {
+      window.location.replace(next);
+    } else {
+      window.location.replace(DEFAULT_PAGE);
+    }
+  } catch (e) {
+    window.location.replace(DEFAULT_PAGE);
+  }
 }
   
 </script>
