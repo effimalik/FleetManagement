@@ -867,11 +867,11 @@ function closeThemeDropdown() {
 (function sessionGuard(){
   try{
     const raw = sessionStorage.getItem('ap_user');
-    if(!raw){ window.location.href = '../login.html'; return; }
+    if(!raw){ window.location.href = 'login.html'; return; }
     const u = JSON.parse(raw);
-    if(!u || !u.email){ window.location.href = '../login.html'; return; }
+    if(!u || !u.email){ window.location.href = 'login.html'; return; }
   } catch(e){
-    window.location.href = '../login.html';
+    window.location.href = 'login.html';
   }
 })();
 
@@ -882,7 +882,7 @@ function signOut(){
   if(window.google && window.google.accounts && window.google.accounts.id){
     google.accounts.id.disableAutoSelect();
   }
-  window.location.href = '../login.html';
+  window.location.href = 'login.html';
 }
 
 /* ── Populate user chip from session ── */
