@@ -43,7 +43,7 @@
         return s.src.replace(ALLOWED_ORIGIN + 'shared/auth.js', ALLOWED_ORIGIN + 'login.html');
       }
     }
-    return ALLOWED_ORIGIN + '/login.html'; // fallback
+    return ALLOWED_ORIGIN + 'login.html'; // fallback
   }
 
 
