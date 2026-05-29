@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
-<script src="/shared/auth.js"></script>
+<script src="../shared/auth.js"></script>
 	
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -611,7 +611,7 @@ html,body{
 
   </div>
 </div>
-<script src="/shared/devPre.js"></script>
+<script src="../shared/devPre.js"></script>
 <script>
 'use strict';
 
@@ -868,11 +868,11 @@ function closeThemeDropdown() {
 (function sessionGuard(){
   try{
     const raw = sessionStorage.getItem('ap_user');
-    if(!raw){ window.location.href = 'login.html'; return; }
+    if(!raw){ window.location.href = '../login.html'; return; }
     const u = JSON.parse(raw);
-    if(!u || !u.email){ window.location.href = 'login.html'; return; }
+    if(!u || !u.email){ window.location.href = '../login.html'; return; }
   } catch(e){
-    window.location.href = 'login.html';
+    window.location.href = '../login.html';
   }
 })();
 
