@@ -33,10 +33,10 @@
     const scripts = document.querySelectorAll('script[src]');
     for (const s of scripts) {
       if (s.src && s.src.includes('auth.js')) {
-        return s.src.replace('auth.js', 'login.html');
+        return s.src.replace('auth.js', '../login.html');
       }
     }
-    return '/login.html'; // fallback
+    return '../login.html'; // fallback
   }
 
 
