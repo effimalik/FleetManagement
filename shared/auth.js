@@ -27,8 +27,8 @@
   ───────────────────────────────────────────── */
   const SESSION_KEY    = 'ap_user';                                        // sessionStorage key
   const INACTIVITY_TTL = 30 * 60 * 1000;                                  // 30 minutes in ms
-  const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement';   // your GitHub Pages base URL
-  const DEFAULT_PAGE   = ALLOWED_ORIGIN + '/index.html';                  // fallback after login
+  const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement/';   // your GitHub Pages base URL
+  const DEFAULT_PAGE   = ALLOWED_ORIGIN + 'index.html';                  // fallback after login
 
 
   /* ─────────────────────────────────────────────
@@ -39,11 +39,11 @@
   function getLoginUrl() {
     const scripts = document.querySelectorAll('script[src]');
     for (const s of scripts) {
-      if (s.src && s.src.includes('../shered/auth.js')) {
-        return s.src.replace('../shared/auth.js', '../login.html');
+      if (s.src && s.src.includes(ALLOWED_ORIGIN + 'shered/auth.js')) {
+        return s.src.replace(ALLOWED_ORIGIN + 'shared/auth.js', ALLOWED_ORIGIN + 'login.html');
       }
     }
-    return '/login.html'; // fallback
+    return ALLOWED_ORIGIN + '/login.html'; // fallback
   }
 
 
