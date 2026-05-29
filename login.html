@@ -503,22 +503,12 @@ async function startGoogleLogin(){
   await sleep(700);
   setStep(5,'done');
 
-  // sessionStorage.setItem('ap_user', JSON.stringify({
-  //   email:    result.email,
-  //   name:     result.name  || result.email,
-  //   role:     result.role  || 'User',
-  //   initials: (result.name||result.email).split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(),
-  // }));
-
-  sessionStorage.setItem('adminpro_session', JSON.stringify({
-  token:      crypto.randomUUID(),
-  email:      result.email,
-  name:       result.name  || result.email,
-  role:       result.role  || 'User',
-  initials:   (result.name||result.email).split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(),
-  lastActive: Date.now(),
-}));
-  
+  sessionStorage.setItem('ap_user', JSON.stringify({
+    email:    result.email,
+    name:     result.name  || result.email,
+    role:     result.role  || 'User',
+    initials: (result.name||result.email).split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(),
+  }));
 
   await sleep(400);
   window.location.href = CONFIG.REDIRECT_URL;
@@ -577,7 +567,7 @@ function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 /* ── Skip login if valid session exists ── */
 (function checkExistingSession(){
   try{
-    const s = sessionStorage.getItem('adminpro_session');
+    const s = sessionStorage.getItem('ap_user');
     if(s){
       const u = JSON.parse(s);
       if(u && u.email) window.location.href = CONFIG.REDIRECT_URL;
