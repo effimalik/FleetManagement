@@ -39,8 +39,8 @@
   function getLoginUrl() {
     const scripts = document.querySelectorAll('script[src]');
     for (const s of scripts) {
-      if (s.src && s.src.includes('/shered/auth.js')) {
-        return s.src.replace('auth.js', '/shared/login.html');
+      if (s.src && s.src.includes('../shered/auth.js')) {
+        return s.src.replace('../shared/auth.js', '../login.html');
       }
     }
     return '/login.html'; // fallback
@@ -189,7 +189,7 @@
         chipEl.style.cursor = 'pointer';
       }
     } catch (e) {
-      console.warn('auth.js populateUserChip:', e);
+      console.warn('/shared/auth.js populateUserChip:', e);
     }
   }
 
