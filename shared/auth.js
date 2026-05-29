@@ -11,7 +11,12 @@
      1. Blocks access if no valid session → redirects to login.html
      2. Auto-logs out after 30 min of inactivity
      3. Populates the user chip (name, role, initials) on DOMContentLoaded
-     4. Exposes signOut() and getUser() globally
+     4. Exposes signOut(), getUser(), and handleLoginRedirect() globally
+
+   ON YOUR LOGIN PAGE — call this after a successful login:
+     handleLoginRedirect();
+     → Reads ?next= from the URL and sends the user back to where
+       they came from, or falls back to DEFAULT_PAGE.
 ═══════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -20,8 +25,10 @@
   /* ─────────────────────────────────────────────
      CONFIG
   ───────────────────────────────────────────── */
-  const SESSION_KEY    = 'ap_user';          // sessionStorage key
-  const INACTIVITY_TTL = 30 * 60 * 1000;    // 30 minutes in ms
+  const SESSION_KEY    = 'ap_user';                                        // sessionStorage key
+  const INACTIVITY_TTL = 30 * 60 * 1000;                                  // 30 minutes in ms
+  const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement';   // your GitHub Pages base URL
+  const DEFAULT_PAGE   = ALLOWED_ORIGIN + '/index.html';                  // fallback after login
 
 
   /* ─────────────────────────────────────────────
@@ -33,10 +40,10 @@
     const scripts = document.querySelectorAll('script[src]');
     for (const s of scripts) {
       if (s.src && s.src.includes('auth.js')) {
-        return s.src.replace('auth.js', '../login.html');
+        return s.src.replace('auth.js', 'login.html');
       }
     }
-    return '../login.html'; // fallback
+    return '/login.html'; // fallback
   }
 
 
@@ -140,7 +147,42 @@
 
 
   /* ─────────────────────────────────────────────
-     7. POPULATE USER CHIP
+     7. HANDLE LOGIN REDIRECT  (global: handleLoginRedirect())
+        Call this on login.html after a successful login.
+        Reads ?next= from the URL, validates it is within
+        ALLOWED_ORIGIN, then navigates there.
+        Falls back to DEFAULT_PAGE if ?next= is missing or unsafe.
+
+        Usage in login.html:
+          function onLoginSuccess(user) {
+            sessionStorage.setItem('ap_user', JSON.stringify({
+              email: user.email,
+              name:  user.name,
+              role:  user.role,
+              lastActive: Date.now()
+            }));
+            handleLoginRedirect();
+          }
+  ───────────────────────────────────────────── */
+  window.handleLoginRedirect = function () {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const next   = decodeURIComponent(params.get('next') || '');
+
+      // Only redirect to pages within our own app (prevents open-redirect attacks)
+      if (next && next.startsWith(ALLOWED_ORIGIN)) {
+        window.location.replace(next);
+      } else {
+        window.location.replace(DEFAULT_PAGE);
+      }
+    } catch (e) {
+      window.location.replace(DEFAULT_PAGE);
+    }
+  };
+
+
+  /* ─────────────────────────────────────────────
+     9. POPULATE USER CHIP
         Fills in #tb-avatar, #tb-uname, #tb-urole,
         and #tb-user-chip on every protected page
         that includes those elements.
