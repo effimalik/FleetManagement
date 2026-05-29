@@ -588,6 +588,16 @@ function createSession(username, role) {
   const next   = params.get('next');
   window.location.replace(next ? decodeURIComponent(next) : 'index.html');
 }
+function onLoginSuccess(user) {
+  sessionStorage.setItem('ap_user', JSON.stringify({
+    email: user.email,
+    name:  user.name,
+    role:  user.role,
+    lastActive: Date.now()
+  }));
+
+  handleLoginRedirect(); // ← reads ?next= and redirects safely
+}
   
 </script>
 </body>
