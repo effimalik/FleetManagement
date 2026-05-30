@@ -236,35 +236,36 @@ window.handleLoginRedirect = function () {
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
   });
+// 2. Disable F12 and standard DevTool keyboard combinations
+document.addEventListener('keydown', function(e) {
 
-  // 2. Disable F12 and standard DevTool keyboard combinations
-  document.addEventListener('keydown', function(e) {
-    // Disable F12
-    if (e.key === 'F12') {
-      e.preventDefault();
-      return false;
-    }
+  // Disable F12
+  if (e.key === 'F12') {
+    e.preventDefault();
+    return false;
+  }
 
-    // Disable Ctrl+Shift+I (Inspect Element)
-    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-      e.preventDefault();
-      return false;
-    }
+  // Disable Ctrl+Shift+I
+  if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+    e.preventDefault();
+    return false;
+  }
 
-    // Disable Ctrl+Shift+J (Open Console)
-    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
-      e.preventDefault();
-      return false;
-    }
+  // Disable Ctrl+Shift+J
+  if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+    e.preventDefault();
+    return false;
+  }
 
-    // Disable Ctrl+U (View Page Source)
-    if (e.ctrlKey && e.key === 'U') {
-      e.preventDefault();
-      return false;
-    
-/* ══ SESSION GUARD ══
-   Redirect to login.html if no valid session exists.
-   Session is set by login.html after Apps Script verification. */
+  // Disable Ctrl+U
+  if (e.ctrlKey && e.key === 'U') {
+    e.preventDefault();
+    return false;
+  }
+
+});
+
+// ══ SESSION GUARD (ONLY ONCE — REMOVE DUPLICATE) ══
 (function sessionGuard(){
   try{
     const raw = sessionStorage.getItem('ap_user');
