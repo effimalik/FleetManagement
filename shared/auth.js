@@ -262,3 +262,16 @@ window.handleLoginRedirect = function () {
       e.preventDefault();
       return false;
     
+/* ══ SESSION GUARD ══
+   Redirect to login.html if no valid session exists.
+   Session is set by login.html after Apps Script verification. */
+(function sessionGuard(){
+  try{
+    const raw = sessionStorage.getItem('ap_user');
+    if(!raw){ window.location.href = 'https://effimalik.github.io/FleetManagement/login.html'; return; }
+    const u = JSON.parse(raw);
+    if(!u || !u.email){ window.location.href = 'https://effimalik.github.io/FleetManagement/login.html'; return; }
+  } catch(e){
+    window.location.href = 'https://effimalik.github.io/FleetManagement/login.html';
+  }
+})();
