@@ -6,9 +6,6 @@
 <title>Advance Requests — Approved</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script src="shared/auth.js"></script>
-
-  
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root,[data-theme="dark"]{
@@ -43,6 +40,33 @@
 }
 html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;max-width:100%;}
 .page{min-height:100vh;padding:20px 20px 40px;}
+/* ── Fluid font overrides for key elements ── */
+.section-title-group h2{font-size:clamp(14px,1.8vw,18px)!important;}
+.summary-card-value{font-size:clamp(13px,1.6vw,16px)!important;}
+.summary-card-label{font-size:clamp(9px,0.9vw,10px)!important;}
+.data-table{font-size:clamp(10px,1.1vw,12.5px);}
+.data-table thead th{font-size:clamp(9px,0.9vw,10px);padding:clamp(5px,0.8vw,8px) clamp(6px,0.9vw,10px);}
+.data-table td{padding:clamp(6px,0.8vw,9px) clamp(6px,0.9vw,10px);}
+.tb-btn{font-size:clamp(10px,1.1vw,12.5px);padding:clamp(5px,0.7vw,8px) clamp(8px,1.2vw,15px);}
+.act-btn{font-size:clamp(9px,1vw,10.5px);padding:clamp(4px,0.6vw,5px) clamp(6px,0.9vw,10px);}
+.filter-input{font-size:clamp(10px,1.1vw,12.5px);width:clamp(100px,12vw,148px);}
+.search-input{font-size:clamp(10px,1.1vw,12.5px);width:clamp(130px,15vw,200px);}
+.badge{font-size:clamp(9px,0.9vw,10.5px);}
+.status-pill{font-size:clamp(9px,0.95vw,11px);}
+.pagination-info,.rpp-label{font-size:clamp(10px,1vw,12px);}
+.page-btn{font-size:clamp(10px,1.1vw,12.5px);min-width:clamp(24px,3vw,32px);height:clamp(24px,3vw,32px);}
+
+/* ── Overflow prevention ── */
+*{max-width:100%;word-break:break-word;}
+img,svg{max-width:100%;height:auto;}
+.data-table-wrap{overflow-x:auto;}
+.section-header-top{gap:clamp(6px,1vw,12px);}
+.section-actions{gap:clamp(4px,0.6vw,8px);}
+.summary-card{flex:1 1 clamp(100px,20%,160px);min-width:0;}
+.summary-card-body{min-width:0;overflow:hidden;}
+.top-bar{gap:clamp(6px,1vw,10px);}
+.filter-panel{gap:clamp(6px,1vw,10px);padding:clamp(8px,1vw,10px) clamp(10px,1.2vw,14px);}
+
 
 /* SECTION HEADER */
 .section-header{margin-bottom:8px;}
@@ -55,6 +79,8 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 /* SVG ICON */
 .ico{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .ico svg{display:block;}
+
+
 
 /* TOP BAR */
 .top-bar{display:flex;align-items:stretch;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
@@ -77,9 +103,8 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .filter-field{display:flex;flex-direction:column;gap:4px;}
 .filter-label{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:5px;}
 .filter-input{padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;transition:border-color .15s,box-shadow .15s;width:148px;}
-.filter-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim);}
+.filter-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-dim);}
 .filter-input.err{border-color:var(--red)!important;box-shadow:0 0 0 3px var(--red-dim)!important;}
-.filter-input::-webkit-calendar-picker-indicator{filter:invert(.55);cursor:pointer;}
 .filter-err-msg{font-size:10px;color:var(--red);margin-top:2px;display:none;white-space:nowrap;}
 .filter-err-msg.show{display:block;}
 .filter-divider{width:1px;background:var(--border);align-self:stretch;margin:0 2px;}
@@ -90,6 +115,8 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 /* BUTTONS */
 .tb-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-size:12.5px;font-family:var(--font);font-weight:600;transition:all .18s;white-space:nowrap;}
 .tb-btn:hover{background:var(--surface2);}
+.tb-btn.danger{background:var(--red-dim);border-color:var(--red);color:var(--red);}
+.tb-btn.danger:hover{background:var(--red);color:#fff;}
 .tb-btn.success{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
 .tb-btn.success:hover{background:var(--teal);color:#fff;}
 .tb-btn.primary{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
@@ -153,10 +180,22 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .badge.blue{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(88,166,255,.3);}
 .badge.gray{background:rgba(110,118,129,.18);color:#8b949e;border:1px solid rgba(110,118,129,.3);}
 
+/* ACTION BUTTONS */
+.action-pair{display:flex;gap:4px;flex-wrap:wrap;}
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--radius);border:1px solid;cursor:pointer;font-size:10.5px;font-family:var(--font);font-weight:700;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.act-btn.accept{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.act-btn.accept:hover{background:var(--teal);color:#fff;}
+.act-btn.reject{background:var(--red-dim);border-color:var(--red);color:var(--red);}
+.act-btn.reject:hover{background:var(--red);color:#fff;}
+@media(max-width:1100px){.act-btn .btn-label{display:none;}.act-btn{padding:5px 7px;gap:0;}}
+@media(min-width:1101px){.act-btn .btn-label{display:inline;}}
+
+
 /* STATUS PILL */
 .status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.status-pill.pending{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(227,179,65,.35);}
 .status-pill.approved{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(57,211,83,.35);}
-.status-pill.disbursed{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(88,166,255,.35);}
+.status-pill.rejected{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,.35);}
 
 /* PAGINATION */
 .pagination-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;background:var(--surface);}
@@ -273,7 +312,211 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .mob-card-meta-item{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;}
 .mob-card-meta-item strong{color:var(--text2);}
 .mob-view-btn{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--radius);border:1px solid var(--teal);background:var(--teal-dim);color:var(--teal);font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--font);flex:1;justify-content:center;}
+
+
+/* MODAL */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:400;align-items:center;justify-content:center;padding:16px;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;max-width:520px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-header h2{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.modal-body{padding:18px 20px;overflow-y:auto;flex:1;}
+.modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+.detail-modal{max-width:580px;}
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.detail-row{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 13px;}
+.detail-row.full{grid-column:1/-1;}
+.detail-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px;display:flex;align-items:center;gap:4px;}
+.detail-value{font-size:13px;color:var(--text);font-weight:500;}
+.detail-value.mono{font-family:var(--mono);font-size:12px;}
+.detail-value.purple{color:var(--purple);font-weight:700;}
+.detail-value.teal{color:var(--teal);font-weight:700;}
+.detail-value.accent{color:var(--accent);font-weight:700;}
+.detail-value.amber{color:var(--amber);font-weight:700;}
+.emp-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:12.5px;color:var(--text2);margin-bottom:14px;}
+.emp-strip strong{color:var(--text);}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.field label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
+.field select{padding:9px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:13px;outline:none;}
+.field select:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-dim);}
+.info-box{display:flex;align-items:flex-start;gap:10px;background:var(--accent-dim);border:1px solid rgba(88,166,255,.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text2);margin-bottom:14px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:11px 16px;display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:var(--text);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:9999;max-width:340px;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-icon-wrap{flex-shrink:0;}
+.toast.warn .toast-icon-wrap svg{color:var(--amber);}
+.toast.error .toast-icon-wrap svg{color:var(--red);}
+.toast .toast-icon-wrap svg{color:var(--teal);}
+
+@keyframes pulse-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.pulse{animation:pulse-spin .7s linear infinite;display:inline-flex;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.new-row{animation:fadeSlideIn .22s ease-out;}
+<!-- 
+/* MOBILE */
+@media(max-width:680px){
+  .page{padding:10px 10px 40px;}
+  .section-header-top{flex-direction:column;gap:8px;}
+  /* Keep action buttons in ONE line — icon-only on mobile */
+  .section-actions{
+    width:100%;
+    justify-content:flex-start;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    gap:5px;
+    padding-bottom:2px;
+  }
+  .section-actions .tb-btn .btn-text{display:none;}
+  .section-actions .tb-btn{padding:7px 9px;gap:0;min-width:34px;justify-content:center;}
+  /* Summary cards: one row, no wrap, compact */
+  .summary-cards{flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-bottom:2px;}
+  .summary-card{flex:0 0 auto;min-width:72px;max-width:90px;padding:8px 8px;gap:5px;flex-direction:column;align-items:flex-start;}
+  .summary-card-icon{width:26px;height:26px;border-radius:6px;flex-shrink:0;}
+  .summary-card-icon svg{width:14px!important;height:14px!important;}
+  .summary-card-value{font-size:clamp(11px,2.8vw,13px)!important;white-space:nowrap;}
+  .summary-card-label{font-size:8px!important;letter-spacing:.02em;}
+  .summary-card-label svg{display:none;}
+  .desktop-table{display:none!important;}
+  .mobile-cards-list{display:flex!important;}
+  .pagination-bar{flex-direction:column;align-items:flex-start;}
+  .top-bar{flex-direction:column;gap:8px;}
+  .filter-input{width:100%;}
+  .filter-field{flex:1 1 100px;}
+  .filter-panel{flex-wrap:wrap;}
+} -->
+
+/* MOBILE */
+@media(max-width:680px){
+.page{padding:10px 10px 40px;}
+.section-header-top{flex-direction:column;gap:8px;}
+
+.section-actions{width:100%;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:2px;}
+.section-actions .tb-btn .btn-text{display:none;}
+.section-actions .tb-btn{padding:7px 9px;gap:0;min-width:34px;justify-content:center;}
+
+.summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding-bottom:2px;}
+
+.summary-card{width:100%;min-width:0;max-width:none;padding:8px 8px;gap:5px;flex-direction:column;align-items:flex-start;}
+
+.summary-card-icon{width:26px;height:26px;border-radius:6px;flex-shrink:0;}
+.summary-card-icon svg{width:14px!important;height:14px!important;}
+.summary-card-value{font-size:clamp(11px,2.8vw,13px)!important;white-space:nowrap;}
+.summary-card-label{font-size:8px!important;letter-spacing:.02em;}
+.summary-card-label svg{display:none;}
+
+.desktop-table{display:none!important;}
+.mobile-cards-list{display:flex!important;}
+.pagination-bar{flex-direction:column;align-items:flex-start;}
+.top-bar{flex-direction:column;gap:8px;}
+.filter-input{width:100%;}
+.filter-field{flex:1 1 100px;}
+.filter-panel{flex-wrap:wrap;}
+}
+
+
+
+@media(min-width:681px){.mobile-cards-list{display:none!important;}}
+
+.mobile-cards-list{padding:10px 14px;display:none;flex-direction:column;gap:10px;}
+.mob-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 14px;}
+.mob-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.mob-card-name{font-size:13.5px;font-weight:700;color:var(--text);}
+.mob-card-ref{font-family:var(--mono);font-size:10.5px;color:var(--text3);margin-top:2px;}
+.mob-card-amount{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--purple);white-space:nowrap;}
+.mob-card-meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px;}
+.mob-card-meta-item{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+.mob-card-meta-item strong{color:var(--text2);}
+.mob-card-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.mob-accept-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius);border:1px solid var(--teal);background:var(--teal-dim);color:var(--teal);font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--font);flex:1;justify-content:center;}
+.mob-reject-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius);border:1px solid var(--red);background:var(--red-dim);color:var(--red);font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.mob-view-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius);border:1px solid var(--accent);background:var(--accent-dim);color:var(--accent);font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--font);flex:1;justify-content:center;}
+
+#scroll-top{position:fixed;bottom:70px;right:22px;width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;box-shadow:var(--shadow-md);z-index:100;}
+#scroll-top.show{opacity:1;pointer-events:auto;}
+#scroll-top:hover{background:var(--surface2);}
+
+/* Search */
+.search-wrap{position:relative;display:flex;align-items:center;}
+.search-wrap .search-ico{position:absolute;left:9px;pointer-events:none;color:var(--text3);}
+.search-input{padding:7px 10px 7px 30px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;transition:border-color .15s,box-shadow .15s;width:200px;}
+.search-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-dim);}
+
+/* ═══ BULK UPLOAD CSS ═══ */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:20px;margin-bottom:16px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.card-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);position:relative;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--purple);background:var(--purple-dim);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone .uz-icon{font-size:36px;color:var(--purple);margin-bottom:10px;display:block;}
+.upload-zone p{font-size:13px;color:var(--text2);margin-bottom:4px;}
+.upload-zone small{font-size:11px;color:var(--text3);}
+.upload-step{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text3);margin-bottom:6px;}
+.upload-step .step-num{width:20px;height:20px;border-radius:50%;background:var(--purple-dim);border:1px solid rgba(163,113,247,.3);color:var(--purple);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.col-map-grid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:10px;}
+.col-map-grid select{padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12px;outline:none;}
+.col-map-grid select:focus{border-color:var(--purple);box-shadow:0 0 0 2px var(--purple-dim);}
+.map-arrow{color:var(--text3);text-align:center;}
+.map-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.preview-summary{display:flex;gap:16px;flex-wrap:wrap;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);align-items:center;}
+.preview-summary .ps-item{display:flex;align-items:center;gap:6px;font-size:13px;}
+.ps-val{font-weight:700;font-family:var(--mono);}
+.ps-val.green{color:var(--teal);}.ps-val.purple{color:var(--purple);}.ps-val.amber{color:var(--amber);}.ps-val.red{color:var(--red);}
+.row-error td{background:rgba(248,81,73,.07)!important;}
+.row-warn td{background:rgba(227,179,65,.07)!important;}
+.ref-badge{display:inline-flex;align-items:center;gap:4px;background:var(--purple-dim);border:1px solid rgba(163,113,247,.25);border-radius:20px;padding:2px 9px;font-size:10.5px;font-family:var(--mono);color:var(--purple);font-weight:700;max-width:100%;word-break:break-all;}
+.btn-group{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.info-box.success{background:var(--teal-dim);border-color:rgba(57,211,83,.2);}
+.info-box.success svg{color:var(--teal);}
+/* Bulk panel toggle — now handled via drawer JS */
+
+/* ═══ DRAWER — Disbursed Panel ═══ */
+.drawer-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(3px);z-index:500;
+  opacity:0;transition:opacity .3s ease;
+}
+.drawer-backdrop.open{display:block;}
+.drawer-backdrop.visible{opacity:1;}
+
+#bulk-drawer{
+  position:fixed;top:0;right:0;bottom:0;
+  width:min(600px,100vw);
+  background:var(--bg2);
+  border-left:1px solid var(--border2);
+  box-shadow:-8px 0 32px rgba(0,0,0,.5);
+  z-index:501;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+#bulk-drawer.open{transform:translateX(0);}
+
+.drawer-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 20px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  background:var(--bg3);
+}
+.drawer-header-left{display:flex;align-items:center;gap:10px;}
+.drawer-title{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.drawer-subtitle{font-size:11px;color:var(--text3);font-weight:400;}
+.drawer-body{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch;}
+.drawer-body .card{margin-bottom:0;box-shadow:none;border:none;padding:0;}
+.drawer-body .card-header{padding:0 0 12px 0;border-bottom:1px solid var(--border);}
+
+/* Stacked name+eid cell */
+.cell-name-eid{display:flex;flex-direction:column;gap:1px;}
+.cell-name{font-weight:700;color:var(--text);font-size:12.5px;display:flex;align-items:center;gap:5px;}
+.cell-eid{font-family:var(--mono);font-size:10.5px;color:var(--text3);display:flex;align-items:center;gap:4px;margin-top:1px;}
+
+
+
 </style>
+
 </head>
 <body>
 <div class="page" id="main-page">
@@ -302,6 +545,14 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export CSV
         </button>
+		
+		
+		<button class="tb-btn" id="btn-bulk-toggle" onclick="toggleBulkPanel()" style="background: var(--purple-dim); border-color: var(--purple); color: var(--purple);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <span class="btn-text">Disbursed</span>
+        </button>
+		
+
       </div>
     </div>
     <div class="section-sep"></div>
@@ -447,6 +698,132 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
     </div>
   </div>
 </div>
+
+
+<!-- ═══ DISBURSED DRAWER ═══ -->
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="toggleBulkPanel()"></div>
+<div id="bulk-drawer">
+  <div class="drawer-header">
+    <div class="drawer-header-left">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div>
+        <div class="drawer-title">Disbursed</div>
+        <div class="drawer-subtitle">Bulk upload · CSV → Disbursed Sheet</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="tb-btn sm" onclick="downloadBulkTemplate()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="btn-text">Template</span>
+      </button>
+      <button class="tb-btn sm icon-only" onclick="toggleBulkPanel()" title="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <div class="card" style="margin-bottom:0;">
+
+    <!-- STEP 1 — Upload -->
+    <div id="bulk-step1">
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px;">
+        <div class="upload-step"><span class="step-num">1</span>Download template or use your own CSV with columns: REF ID, Emp ID, Amount, DisbDate, tb-uname</div>
+        <div class="upload-step"><span class="step-num">2</span>First row with text is treated as header; first row all-numeric = data row (no header)</div>
+        <div class="upload-step"><span class="step-num">3</span>Upload → map columns → preview → Save All to Disbursed Sheet</div>
+      </div>
+      <div class="upload-zone" id="bulk-drop-zone" ondragover="bulkDragOver(event)" ondragleave="bulkDragLeave(event)" ondrop="bulkDrop(event)">
+        <input type="file" accept=".csv,.txt" onchange="handleBulkFile(this.files[0])" id="bulk-file-input"/>
+        <svg class="uz-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
+        <p><strong>Click to upload</strong> or drag &amp; drop</p>
+        <small>CSV or TXT · REF ID, Emp ID, Amount, DisbDate, tb-uname</small>
+      </div>
+    </div>
+
+    <!-- STEP 2 — Map Columns -->
+    <div id="bulk-step2" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Step 2 — Map Columns
+        </div>
+        <span class="badge purple" id="bulk-col-count">0 columns detected</span>
+      </div>
+      <div class="info-box" style="margin-bottom:12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Map each required field to the corresponding column detected in your file.
+      </div>
+      <div id="bulk-map-area"></div>
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">
+        <button class="tb-btn sm" onclick="resetBulkUpload()">Cancel</button>
+        <button class="tb-btn sm primary" onclick="applyBulkMapping()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          Apply &amp; Preview
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3 — Preview & Confirm -->
+    <div id="bulk-step3" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          Step 3 — Preview &amp; Confirm
+        </div>
+        <div class="btn-group">
+          <span style="font-size:11px;color:var(--text3);">Entries: <strong style="font-family:var(--mono);color:var(--purple);" id="bulk-count">0</strong></span>
+          <span style="font-size:11px;color:var(--text3);">Total: <strong style="font-family:var(--mono);color:var(--teal);" id="bulk-total">AED 0.00</strong></span>
+          <span style="font-size:11px;color:var(--text3);">Errors: <strong style="font-family:var(--mono);color:var(--red);" id="bulk-errors">0</strong></span>
+          <span style="font-size:11px;color:var(--text3);">Warns: <strong style="font-family:var(--mono);color:var(--amber);" id="bulk-warns">0</strong></span>
+        </div>
+      </div>
+      <div class="preview-summary">
+        <div class="ps-item"><span style="font-size:11px;color:var(--text3);">File:</span><span style="font-size:12px;font-weight:600;" id="bulk-filename">—</span></div>
+        <div class="ps-item"><span style="font-size:11px;color:var(--text3);">Disb Date:</span><span class="ps-val purple" id="bulk-disp-date">—</span></div>
+        <div class="ps-item"><span style="font-size:11px;color:var(--text3);">tb-uname:</span><span class="ps-val" id="bulk-disp-acc">—</span></div>
+      </div>
+      <div style="overflow-x:auto;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);">
+        <table class="data-table" style="min-width:520px;">
+          <thead><tr><th>#</th><th>REF ID</th><th>Emp ID</th><th>Amount (AED)</th><th>Disb Date</th><th>tb-uname</th><th>Status</th></tr></thead>
+          <tbody id="bulk-preview-tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
+        <button class="tb-btn sm" onclick="resetBulkUpload()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+          Start Over
+        </button>
+        <button class="tb-btn sm success" id="bulk-save-btn2" onclick="saveBulkDisbursement()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save All to Disbursed Sheet
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 4 — Results -->
+    <div id="bulk-step4" style="display:none;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Submission Complete
+      </div>
+      <div id="bulk-results-body"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="tb-btn sm" onclick="resetBulkUpload()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Another File
+        </button>
+        <button class="tb-btn sm success" onclick="downloadBulkResultCSV()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Results CSV
+        </button>
+      </div>
+    </div>
+
+    </div><!-- /card -->
+  </div><!-- /drawer-body -->
+</div><!-- /bulk-drawer -->
+
+
+
 
 <!-- DETAIL MODAL -->
 <div class="modal-backdrop" id="modal-detail">
@@ -599,38 +976,69 @@ const SVG={
 // ── LOAD DATA ────────────────────────────────────────────────
 async function loadData(forceRefresh=false){
   setSyncLoading(true);
+
   if(!forceRefresh){
-    const cached=loadCacheData();
-    if(cached){processFetchedData(cached.data);setSyncLoading(false);updateCacheInfo(cached.age,false);return;}
+    const cached = loadCacheData();
+    if(cached){
+      processFetchedData(cached.data);
+      setSyncLoading(false);
+      updateCacheInfo(cached.age,false);
+      return;
+    }
   }
+
   showSkeletons(5);
+
   try{
-    const res=await fetch(MASTER_API+'&t='+Date.now(),{cache:'no-store'});
-    const data=await res.json();
-    const rows=Array.isArray(data)?data:(data.data||[]);
+    const res = await fetch(MASTER_API+'&t='+Date.now(),{cache:'no-store'});
+    const data = await res.json();
+
+    const rows = Array.isArray(data) ? data : (data.data || []);
+
     saveCache(rows);
+
     processFetchedData(rows);
+
     updateCacheInfo(0,true);
-    showToast('Loaded '+rows.filter(r=>String(r[COL.REQ_STATUS]||'').toLowerCase()==='approved').length+' approved records','ok');
+
+    showToast(
+      'Loaded ' +
+      rows.filter(r =>
+        String(r[COL.REQ_STATUS] || '').toLowerCase() === 'approved'
+      ).length +
+      ' approved records',
+      'ok'
+    );
+
   }catch(err){
     console.error('[loadData]',err);
+
     showToast('Could not load data — check network','error');
+
     document.getElementById('approved-tbody').innerHTML=`<tr><td colspan="7"><div class="empty-state">
       <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 10px;display:block;opacity:.3;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <p>Network error loading data</p><small>Check console for details</small></div></td></tr>`;
   }
+
   setSyncLoading(false);
 }
 
+
+// ── PROCESS DATA ─────────────────────────────────────────────
 function processFetchedData(rows){
-  // Filter ONLY approved rows
-  allRows=rows.filter(r=>{
-    const st=String(r[COL.REQ_STATUS]||'').trim().toLowerCase();
-    return st==='approved'||st==='approve';
+
+  allRows = rows.filter(r => {
+    const status = String(r[COL.REQ_STATUS] || '').trim().toLowerCase();
+    const colO = String(r[14] || '').trim(); // Column O (Amount)
+
+    return status === 'approved' && colO === '';
   });
+
   applyFilters();
   updateSummaryCards();
 }
+
+
 
 // ── FILTERS ──────────────────────────────────────────────────
 function validateDateRange(){
@@ -937,6 +1345,213 @@ try{const s=localStorage.getItem('approvedSheet_theme');if(s)applyTheme(s);}catc
 
 // ── INIT ─────────────────────────────────────────────────────
 (async()=>{await loadData();})();
+
+
+
+// ══════════════════════════════════════
+//  BULK UPLOAD
+// ══════════════════════════════════════
+const BULK_FORM_ACTION='https://docs.google.com/forms/d/e/1FAIpQLSdORhdY950sTH0FavO64cJsEy-4Ouxjovff6Rn0dcey5QU7WQ/formResponse';
+const BULK_FORM_FIELDS={disRef:'entry.629206624',sheetRef:'entry.259978321',empId:'entry.1291463236',amount:'entry.2077992815',disbDate:'entry.1615956699',name:'entry.1549410189'};
+const BULK_FIELDS=[{key:'ref',label:'REF ID',required:true},{key:'empId',label:'Emp ID',required:true},{key:'amount',label:'Amount',required:true},{key:'disbDate',label:'Disbursement Date',required:true},{key:'tbUname',label:'tb-uname',required:false}];
+const BULK_FIELD_HINTS={ref:['ref','ref id','refid','reference','adv-'],empId:['emp','empid','employee','emp id','id'],amount:['amount','amt','salary','advance','value'],disbDate:['date','disbdate','disbursedate','diss','dissdate'],tbUname:['tb-uname','tbuname','uname','username','user']};
+
+let bulkRawRows=[],bulkHeaders=[],bulkHasHeader=false,bulkMapped=[],bulkFileName='',bulkResultsData=[];
+
+function nowStr(){const n=new Date();const pad=x=>String(x).padStart(2,'0');const ms=String(n.getMilliseconds()).padStart(3,'0');return`${pad(n.getDate())}${pad(n.getMonth()+1)}${n.getFullYear()}${pad(n.getHours())}${pad(n.getMinutes())}${pad(n.getSeconds())}${ms}`;}
+function todayVal(){return new Date().toISOString().slice(0,10);}
+function exportCSV(name,headers,rows){const csv=[headers.map(h=>`"${h}"`), ...rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`))].map(r=>r.join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name+'-'+todayVal()+'.csv';a.click();URL.revokeObjectURL(url);}
+
+function toggleBulkPanel(){
+  const drawer=document.getElementById('bulk-drawer');
+  const backdrop=document.getElementById('drawer-backdrop');
+  const btn=document.getElementById('btn-bulk-toggle');
+  const isOpen=drawer.classList.toggle('open');
+  if(isOpen){
+    backdrop.style.display='block';
+    requestAnimationFrame(()=>backdrop.classList.add('visible'));
+    document.body.style.overflow='hidden';
+    btn.style.background='var(--purple)';btn.style.color='#fff';
+  } else {
+    backdrop.classList.remove('visible');
+    setTimeout(()=>{backdrop.style.display='none';},300);
+    document.body.style.overflow='';
+    btn.style.background='var(--purple-dim)';btn.style.color='var(--purple)';
+    resetBulkUpload();
+  }
+}
+
+function bulkDragOver(e){e.preventDefault();document.getElementById('bulk-drop-zone').classList.add('drag');}
+function bulkDragLeave(){document.getElementById('bulk-drop-zone').classList.remove('drag');}
+function bulkDrop(e){e.preventDefault();bulkDragLeave();if(e.dataTransfer.files[0])handleBulkFile(e.dataTransfer.files[0]);}
+
+function handleBulkFile(file){
+  if(!file)return;
+  bulkFileName=file.name;
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(ext==='csv'||ext==='txt'){const reader=new FileReader();reader.onload=e=>parseBulkCSV(e.target.result);reader.readAsText(file);}
+  else{showToast('Please upload a CSV or TXT file','warn');}
+}
+
+function parseBulkCSV(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length){showToast('Empty file','error');return;}
+  const parseRow=line=>{const result=[];let cur='';let inQ=false;for(let c of line){if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){result.push(cur.trim());cur='';}else cur+=c;}result.push(cur.trim());return result;};
+  const firstRow=parseRow(lines[0]);
+  const isHeader=firstRow.some(v=>isNaN(parseFloat(v))&&v.length>0);
+  bulkHasHeader=isHeader;
+  bulkHeaders=isHeader?firstRow:firstRow.map((_,i)=>'Column '+(i+1));
+  bulkRawRows=lines.slice(isHeader?1:0).map(parseRow).filter(r=>r.some(v=>v));
+  document.getElementById('bulk-col-count').textContent=bulkHeaders.length+' columns detected';
+  const mapArea=document.getElementById('bulk-map-area');
+  mapArea.innerHTML=BULK_FIELDS.map(f=>{
+    const best=autoDetectCol(f.key,bulkHeaders);
+    return`<div style="margin-bottom:10px;">
+      <div class="map-label">${f.label}${f.required?' <span style="color:var(--red);">*</span>':''}</div>
+      <div class="col-map-grid">
+        <div style="font-size:12px;color:var(--text3);">→ Maps to your column:</div>
+        <div class="map-arrow">→</div>
+        <select id="col-map-${f.key}">
+          ${!f.required?'<option value="">— Not mapped —</option>':''}
+          ${bulkHeaders.map((h,i)=>`<option value="${i}"${best===i?' selected':''}>${h}</option>`).join('')}
+        </select>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('bulk-step1').style.display='none';
+  document.getElementById('bulk-step2').style.display='block';
+}
+
+function autoDetectCol(key,headers){const hints=BULK_FIELD_HINTS[key]||[];for(let i=0;i<headers.length;i++){const h=headers[i].toLowerCase();if(hints.some(hint=>h.includes(hint)))return i;}return 0;}
+
+function applyBulkMapping(){
+  const colMap={};
+  BULK_FIELDS.forEach(f=>{const sel=document.getElementById('col-map-'+f.key);colMap[f.key]=sel&&sel.value!==''?parseInt(sel.value):null;});
+  bulkMapped=bulkRawRows.map((row,i)=>{
+    const get=k=>colMap[k]!=null?row[colMap[k]]||'':'';
+    const sheetRef=get('ref').trim();const empId=get('empId').trim();
+    const amtRaw=get('amount').replace(/[^0-9.]/g,'');const amount=parseFloat(amtRaw)||0;
+    const disbDate=get('disbDate').trim();const tbUname=get('tbUname').trim();
+    const errors=[];const warns=[];
+    if(!sheetRef)errors.push('Missing REF');if(!empId)errors.push('Missing Emp ID');
+    if(!amount)errors.push('Invalid amount');if(!disbDate)warns.push('No disb date');
+    return{sheetRef,empId,amount,disbDate,tbUname,rowIdx:i+1,errors,warns};
+  });
+  renderBulkPreview();
+}
+
+function renderBulkPreview(){
+  const totalAmt=bulkMapped.reduce((s,r)=>s+(isNaN(r.amount)?0:r.amount),0);
+  const errCount=bulkMapped.filter(r=>r.errors.length).length;
+  const warnCount=bulkMapped.filter(r=>r.warns.length).length;
+  document.getElementById('bulk-count').textContent=bulkMapped.length;
+  document.getElementById('bulk-total').textContent='AED '+fmt(totalAmt);
+  document.getElementById('bulk-errors').textContent=errCount;
+  document.getElementById('bulk-warns').textContent=warnCount;
+  document.getElementById('bulk-filename').textContent=bulkFileName;
+  const dates=[...new Set(bulkMapped.map(r=>r.disbDate).filter(Boolean))];
+  const users=[...new Set(bulkMapped.map(r=>r.tbUname).filter(Boolean))];
+  document.getElementById('bulk-disp-date').textContent=dates.join(', ')||'—';
+  document.getElementById('bulk-disp-acc').textContent=users.join(', ')||'—';
+  const tbody=document.getElementById('bulk-preview-tbody');
+  tbody.innerHTML=bulkMapped.map(r=>{
+    const hasErr=r.errors.length>0;const hasWarn=!hasErr&&r.warns.length>0;
+    const cls=hasErr?'row-error':hasWarn?'row-warn':'';
+    const statusHtml=hasErr
+      ?r.errors.map(e=>`<span class="badge red">${esc(e)}</span>`).join(' ')
+      :hasWarn?r.warns.map(w=>`<span class="badge amber">${esc(w)}</span>`).join(' ')
+      :`<span class="badge green">Ready</span>`;
+    return`<tr class="${cls}">
+      <td style="font-size:11px;color:var(--text3);">${r.rowIdx}</td>
+      <td><span class="ref-badge">${esc(r.sheetRef)}</span></td>
+      <td style="font-family:var(--mono);font-size:12px;">${esc(r.empId)}</td>
+      <td style="font-family:var(--mono);font-weight:700;color:var(--teal);">${isNaN(r.amount)?'—':'AED '+fmt(r.amount)}</td>
+      <td style="font-family:var(--mono);font-size:12px;">${esc(r.disbDate)}</td>
+      <td style="font-size:12px;">${esc(r.tbUname||'—')}</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('bulk-step2').style.display='none';
+  document.getElementById('bulk-step3').style.display='block';
+  document.getElementById('bulk-save-btn2').disabled=errCount===bulkMapped.length;
+}
+
+async function saveBulkDisbursement(){
+  const validRows=bulkMapped.filter(r=>r.errors.length===0);
+  if(!validRows.length){showToast('No valid rows to submit','error');return;}
+  const btn=document.getElementById('bulk-save-btn2');
+  btn.disabled=true;btn.innerHTML='Submitting…';
+  bulkResultsData=[];let successCount=0;
+  for(const row of validRows){
+    try{
+      const ts=nowStr();const disRef=`ADV-${ts.slice(0,8)}-${ts.slice(8)}`;
+      const body=new FormData();
+      body.append(BULK_FORM_FIELDS.disRef,disRef);body.append(BULK_FORM_FIELDS.sheetRef,row.sheetRef);
+      body.append(BULK_FORM_FIELDS.empId,row.empId);body.append(BULK_FORM_FIELDS.amount,row.amount.toFixed(2));
+      body.append(BULK_FORM_FIELDS.disbDate,row.disbDate);body.append(BULK_FORM_FIELDS.name,row.tbUname||'');
+      await fetch(BULK_FORM_ACTION,{method:'POST',mode:'no-cors',body});
+      bulkResultsData.push({...row,disRef,submitted:true});successCount++;
+    }catch(e){bulkResultsData.push({...row,disRef:'',submitted:false});}
+    await new Promise(r=>setTimeout(r,120));
+  }
+  renderBulkResults(successCount,validRows.length);
+}
+
+function renderBulkResults(success,total){
+  document.getElementById('bulk-step3').style.display='none';
+  document.getElementById('bulk-step4').style.display='block';
+  const totalAmt=bulkResultsData.filter(r=>r.submitted).reduce((s,r)=>s+r.amount,0);
+  document.getElementById('bulk-results-body').innerHTML=`
+    <div class="info-box success" style="margin-bottom:12px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <div><strong>${success} of ${total}</strong> entries submitted. Total: <strong>AED ${fmt(totalAmt)}</strong></div>
+    </div>
+    <div style="overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);">
+      <table class="data-table" style="min-width:560px;">
+        <thead><tr><th>Sheet REF ID</th><th>Dis REF (auto)</th><th>Emp ID</th><th>Amount</th><th>Date</th><th>tb-uname</th><th>Status</th></tr></thead>
+        <tbody>${bulkResultsData.map(r=>`<tr>
+          <td><span class="ref-badge">${esc(r.sheetRef)}</span></td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--accent);">${esc(r.disRef||'—')}</td>
+          <td style="font-family:var(--mono);font-size:12px;">${esc(r.empId)}</td>
+          <td style="font-family:var(--mono);font-weight:700;color:var(--teal);">AED ${fmt(r.amount)}</td>
+          <td style="font-family:var(--mono);font-size:12px;">${esc(r.disbDate)}</td>
+          <td style="font-size:12px;">${esc(r.tbUname||'—')}</td>
+          <td>${r.submitted?'<span class="badge green">Submitted</span>':'<span class="badge red">Failed</span>'}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  showToast(success+' records submitted!');
+}
+
+function downloadBulkResultCSV(){
+  if(!bulkResultsData.length)return;
+  exportCSV('bulk-disbursement-results',['Sheet REF ID','Dis REF','Emp ID','Amount','Disb Date','tb-uname','Submitted'],
+    bulkResultsData.map(r=>[r.sheetRef,r.disRef||'',r.empId,r.amount.toFixed(2),r.disbDate,r.tbUname||'',r.submitted?'Yes':'No']));
+}
+
+function downloadBulkTemplate(){
+  exportCSV('bulk-disb-template',['REF ID','Emp ID','Amount','DisbDate','tb-uname'],[]);
+  showToast('Template downloaded');
+}
+
+function resetBulkUpload(){
+  bulkRawRows=[];bulkHeaders=[];bulkHasHeader=false;bulkMapped=[];bulkFileName='';bulkResultsData=[];
+  document.getElementById('bulk-step1').style.display='block';
+  document.getElementById('bulk-step2').style.display='none';
+  document.getElementById('bulk-step3').style.display='none';
+  document.getElementById('bulk-step4').style.display='none';
+  document.getElementById('bulk-file-input').value='';
+}
+
+(async()=>{await loadData();})();
+
+// ESC closes drawer
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('bulk-drawer').classList.contains('open'))toggleBulkPanel();});
+
+
+
+
+
 </script>
 </body>
 </html>
