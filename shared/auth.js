@@ -275,3 +275,5 @@ window.handleLoginRedirect = function () {
     window.location.href = 'https://effimalik.github.io/FleetManagement/login.html';
   }
 })();
+
+console.log("FILE LOADED SUCCESSFULLY");
