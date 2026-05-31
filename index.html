@@ -7,7 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+<script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
 
+	
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
@@ -559,11 +561,11 @@ html,body{
       <div class="tb-vsep"></div>
 
       <!-- User -->
-      <div class="tb-user" title="Signed in as Admin">
-        <div class="tb-avatar">AD</div>
+      <div class="tb-user" id="tb-user-chip" title="Loading...">
+        <div class="tb-avatar" id="tb-avatar">--</div>
         <div>
-          <div class="tb-uname">Admin</div>
-          <div class="tb-urole">Super Admin</div>
+          <div class="tb-uname" id="tb-uname">Loading...</div>
+          <div class="tb-urole" id="tb-urole">Please wait</div>
         </div>
       </div>
 
@@ -590,15 +592,6 @@ html,body{
       </button>
       <div class="ib-spacer"></div>
       <div class="ib-divider"></div>
-      <!-- Admin-only: Manage Users — shown only when role === 'Admin' -->
-      <button class="ib-btn" id="ib-admin-users"
-        onclick="loadPage('Reg/manageUsers.html',null,'Manage Users','ti-users-group','System user management','var(--purple-dim)','var(--purple)')"
-        title="Manage Users"
-        style="display:none;">
-        <i class="ti ti-users-group"></i>
-        <span class="ib-tip">Manage Users</span>
-      </button>
-      <div class="ib-divider" id="ib-admin-divider" style="display:none;"></div>
     </nav>
 
     <!-- SUB BAR -->
@@ -619,7 +612,7 @@ html,body{
 
   </div>
 </div>
-
+<script src="../shared/devPre.js"></script>
 <script>
 'use strict';
 
@@ -870,11 +863,69 @@ function closeThemeDropdown() {
   setTimeout(tick, 1000);
 })();
 
+/* ══ SESSION GUARD ══
+   Redirect to login.html if no valid session exists.
+   Session is set by login.html after Apps Script verification. */
+(function sessionGuard(){
+  try{
+    const raw = sessionStorage.getItem('ap_user');
+    if(!raw){ window.location.href = 'https://effimalik.github.io/FleetManagement/login.html'; return; }
+    const u = JSON.parse(raw);
+    if(!u || !u.email){ window.location.href = 'https://effimalik.github.io/FleetManagement/login.html'; return; }
+  } catch(e){
+    window.location.href = 'https://effimalik.github.io/FleetManagement/login.html';
+  }
+})();
+
+/* ── Sign out ── */
+function signOut(){
+  sessionStorage.removeItem('ap_user');
+  // Revoke Google session hint so they must re-authenticate
+  if(window.google && window.google.accounts && window.google.accounts.id){
+    google.accounts.id.disableAutoSelect();
+  }
+  window.location.href = 'login.html';
+}
+
+/* ── Populate user chip from session ── */
+function populateUserChip(){
+  try{
+    const u = JSON.parse(sessionStorage.getItem('ap_user') || '{}');
+    if(!u || !u.email) return;
+
+    // Build initials from full name (e.g. "Afan Haidar" → "AH")
+    const nameParts = (u.name || u.email).trim().split(/\s+/);
+    const initials  = nameParts.length >= 2
+      ? (nameParts[0][0] + nameParts[nameParts.length-1][0]).toUpperCase()
+      : (u.name || u.email).substring(0,2).toUpperCase();
+
+    // Full name (e.g. "Afan Haidar")
+    const fullName = u.name || u.email;
+
+    // Role exactly as stored in sheet (e.g. "HR Manager")
+    const role = u.role || 'User';
+
+    const avatarEl = document.getElementById('tb-avatar');
+    const nameEl   = document.getElementById('tb-uname');
+    const roleEl   = document.getElementById('tb-urole');
+    const chip     = document.getElementById('tb-user-chip');
+
+    if(avatarEl) avatarEl.textContent = initials;
+    if(nameEl)   nameEl.textContent   = fullName;
+    if(roleEl)   roleEl.textContent   = role;
+    if(chip){
+      chip.title   = `Signed in as ${u.email}\nClick to sign out`;
+      chip.onclick = ()=>{ if(confirm(`Sign out ${fullName}?`)) signOut(); };
+    }
+  } catch(e){ console.error('populateUserChip:', e); }
+}
+
 /* ── Init ── */
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('theme') || 'dark';
   setTheme(saved);
   ibOpen('ib-emp', document.getElementById('ib-emp'));
+  populateUserChip();
 });
 </script>
 </body>
