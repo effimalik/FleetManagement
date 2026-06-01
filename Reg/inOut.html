@@ -6,9 +6,6 @@
 <title>Rider Asset Management</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
-
-  
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root,[data-theme="dark"]{
@@ -46,46 +43,53 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 
 /* SECTION HEADER */
 .section-header{margin-bottom:8px;}
-.section-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.section-title-group h2{font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;}
+.section-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+.section-header-top::-webkit-scrollbar{display:none;}
+.section-title-group h2{font-size:18px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;white-space:nowrap;}
 .section-sep{height:1px;background:var(--border);margin:10px 0 14px;}
-.section-desc{font-size:12px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:6px;}
-.section-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.section-desc{font-size:12px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.section-actions{display:flex;gap:8px;flex-wrap:nowrap;align-items:center;flex-shrink:0;}
 
 /* SVG ICON */
 .ico{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .ico svg{display:block;}
 
-/* TOP BAR */
-.top-bar{display:flex;align-items:stretch;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
-.summary-cards{display:flex;gap:10px;flex:1 1 auto;flex-wrap:wrap;min-width:0;}
-.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:11px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--card-shadow);transition:transform .15s,box-shadow .15s;flex:1 1 130px;min-width:0;cursor:default;}
-.summary-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md);}
-.summary-card-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+/* TOP BAR / SUMMARY CARDS — same style as .filter-panel */
+.top-bar{display:block;margin-bottom:14px;}
+.summary-cards{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:8px 12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+.summary-cards::-webkit-scrollbar{display:none;}
+.summary-card{display:flex;align-items:center;gap:7px;flex-shrink:0;cursor:default;padding:4px 6px;border-radius:var(--radius);transition:background .15s;}
+.summary-card:hover{background:var(--surface2);}
+.summary-card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.summary-card-icon svg{width:14px;height:14px;}
 .summary-card-icon.purple{background:var(--purple-dim);color:var(--purple);}
 .summary-card-icon.teal{background:var(--teal-dim);color:var(--teal);}
 .summary-card-icon.amber{background:var(--amber-dim);color:var(--amber);}
 .summary-card-icon.accent{background:var(--accent-dim);color:var(--accent);}
 .summary-card-icon.red{background:var(--red-dim);color:var(--red);}
 .summary-card-icon.orange{background:var(--orange-dim);color:var(--orange);}
-.summary-card-body{min-width:0;}
-.summary-card-value{font-size:16px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.summary-card-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:1px;white-space:nowrap;display:flex;align-items:center;gap:4px;}
+.summary-card-body{min-width:0;display:flex;align-items:baseline;gap:5px;}
+.summary-card-value{font-size:13px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1.1;white-space:nowrap;}
+.summary-card-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.summary-card-divider{width:1px;background:var(--border);align-self:stretch;margin:0 2px;flex-shrink:0;}
 
 /* TABS */
-.tabs-row{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap;}
-.tab-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-size:12.5px;font-family:var(--font);font-weight:600;transition:all .18s;white-space:nowrap;}
+.tabs-row{display:flex;gap:4px;margin-bottom:14px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+.tabs-row::-webkit-scrollbar{display:none;}
+.tab-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-size:12.5px;font-family:var(--font);font-weight:600;transition:all .18s;white-space:nowrap;flex-shrink:0;}
 .tab-btn:hover{background:var(--surface2);color:var(--text);}
 .tab-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 .tab-btn.active svg{stroke:var(--accent);}
+.tab-btn .tab-label{display:inline;}
 
 /* FILTER PANEL */
-.filter-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;box-shadow:var(--shadow);display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
-.filter-field{display:flex;flex-direction:column;gap:4px;}
-.filter-label{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:5px;}
-.filter-input{padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;transition:border-color .15s,box-shadow .15s;width:160px;}
+.filter-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:8px 12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;}
+.filter-panel::-webkit-scrollbar{display:none;}
+.filter-field{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.filter-label{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.filter-input{padding:6px 8px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border-color .15s,box-shadow .15s;width:130px;}
 .filter-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim);}
-.filter-select{padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;width:140px;}
+.filter-select{padding:6px 8px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12px;outline:none;width:120px;}
 .filter-select:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim);}
 .filter-divider{width:1px;background:var(--border);align-self:stretch;margin:0 2px;}
 .cache-info{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;white-space:nowrap;}
@@ -109,9 +113,10 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 
 /* DATA TABLE CARD */
 .data-table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;}
-.data-table-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;}
-.data-table-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
-.data-table-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.data-table-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+.data-table-header::-webkit-scrollbar{display:none;}
+.data-table-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0;}
+.data-table-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;flex-shrink:0;}
 .data-table-wrap{overflow-x:auto;width:100%;}
 .data-table{width:100%;border-collapse:collapse;font-size:clamp(9px,1.1vw,12.5px);}
 .data-table thead th{position:sticky;top:0;z-index:2;background:var(--bg3);text-align:left;font-size:clamp(8px,0.9vw,10px);font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:clamp(5px,0.8vw,8px) clamp(4px,0.8vw,10px);border-bottom:2px solid var(--border);white-space:nowrap;}
@@ -147,6 +152,8 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:400;align-items:center;justify-content:center;padding:16px;}
 .modal-backdrop.open{display:flex;}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;max-width:580px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+#modal-cio{align-items:flex-start;padding:16px;}
+#modal-cio .modal{height:calc(100vh - 32px);max-height:calc(100vh - 32px);}
 .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .modal-header h2{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
 .modal-body{padding:18px 20px;overflow-y:auto;flex:1;}
@@ -314,6 +321,24 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .log-cell-value.yes{color:var(--teal);}
 .log-cell-value.no{color:var(--text3);}
 
+/* SEARCHABLE DROPDOWN */
+.sd-wrap{position:relative;width:100%;}
+.sd-trigger{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:13px;cursor:pointer;gap:6px;min-height:38px;transition:border-color .15s,box-shadow .15s;width:100%;text-align:left;}
+.sd-trigger:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);outline:none;}
+.sd-trigger-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);}
+.sd-trigger-text.placeholder{color:var(--text3);}
+.sd-chevron{flex-shrink:0;transition:transform .2s;color:var(--text3);}
+.sd-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:9999;max-height:260px;overflow:hidden;flex-direction:column;}
+.sd-dropdown.open{display:flex;}
+.sd-search-wrap{padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sd-search{width:100%;padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;}
+.sd-search:focus{border-color:var(--teal);}
+.sd-list{overflow-y:auto;flex:1;}
+.sd-option{padding:8px 12px;font-size:12.5px;color:var(--text);cursor:pointer;transition:background .1s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sd-option:hover,.sd-option.focused{background:var(--surface2);}
+.sd-option.selected{background:var(--accent-dim);color:var(--accent);font-weight:600;}
+.sd-option.empty{color:var(--text3);cursor:default;font-style:italic;}
+
 /* COLUMN width helpers */
 .w40{min-width:40px;}
 .w80{min-width:80px;}
@@ -326,13 +351,35 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .action-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
 
 /* Avatar initials */
-.avatar-sm{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;flex-shrink:0;font-family:var(--font);}
+.avatar-sm{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:#fff;flex-shrink:0;font-family:var(--font);}
 
-@media(max-width:700px){
-  .summary-card{flex:1 1 45%;}
-  .filter-input,.filter-select{width:120px;}
-  .data-table-toolbar{gap:6px;}
-  .search-input{width:150px;}
+@media(max-width:900px){
+  .summary-cards{gap:6px;}
+  .summary-card{padding:6px 8px;gap:6px;}
+  .filter-input,.filter-select{width:110px;}
+  .search-input{width:140px;}
+}
+@media(max-width:600px){
+  .page{padding:12px 12px 50px;}
+  .summary-card{padding:5px 7px;gap:5px;min-width:76px;}
+  .summary-card-value{font-size:12px;}
+  .summary-card-label{font-size:8px;}
+  .filter-panel{padding:6px 8px;gap:6px;}
+  .filter-input{width:100px;}
+  .filter-select{width:90px;}
+  .search-input{width:120px;}
+  .data-table{font-size:11px;}
+  .tab-btn{padding:8px 10px;gap:0;}
+  .tab-label{display:none;}
+  .modal{border-radius:var(--radius-lg);}
+  .section-actions{gap:5px;}
+  .tb-btn{padding:7px 11px;font-size:11.5px;}
+  .data-table-header{padding:10px 12px;}
+}
+@media(max-width:420px){
+  .summary-card{min-width:64px;}
+  .summary-card-label{display:none;}
+  .filter-input,.filter-select,.search-input{width:80px;}
 }
 </style>
 </head>
@@ -347,10 +394,6 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
           Rider Asset Management
         </h2>
-        <div class="section-desc">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-          <span id="desc-text">Live data from Google Sheets · Bikes, SIMs, Phones & Accessories</span>
-        </div>
       </div>
       <div class="section-actions">
 
@@ -481,42 +524,47 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <div class="summary-card-icon teal"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
           <div class="summary-card-body">
             <div class="summary-card-value" id="card-riders">0</div>
-            <div class="summary-card-label"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg> Active Riders</div>
+            <div class="summary-card-label">Active Riders</div>
           </div>
         </div>
+        <div class="summary-card-divider"></div>
         <div class="summary-card">
           <div class="summary-card-icon orange"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><path d="M13 16v-1a2 2 0 1 1 4 0v1"/></svg></div>
           <div class="summary-card-body">
             <div class="summary-card-value" id="card-bikes-assigned">0</div>
-            <div class="summary-card-label"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg> Bikes Out</div>
+            <div class="summary-card-label">Bikes Out</div>
           </div>
         </div>
+        <div class="summary-card-divider"></div>
         <div class="summary-card">
           <div class="summary-card-icon accent"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div>
           <div class="summary-card-body">
             <div class="summary-card-value" id="card-bikes-avail">0</div>
-            <div class="summary-card-label"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg> Bikes Available</div>
+            <div class="summary-card-label">Bikes Avail</div>
           </div>
         </div>
+        <div class="summary-card-divider"></div>
         <div class="summary-card">
           <div class="summary-card-icon purple"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
           <div class="summary-card-body">
             <div class="summary-card-value" id="card-sims-assigned">0</div>
-            <div class="summary-card-label"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg> SIMs Assigned</div>
+            <div class="summary-card-label">SIMs Assigned</div>
           </div>
         </div>
+        <div class="summary-card-divider"></div>
         <div class="summary-card">
           <div class="summary-card-icon red"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
           <div class="summary-card-body">
             <div class="summary-card-value" id="card-checkins-today">0</div>
-            <div class="summary-card-label"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg> Check-ins Today</div>
+            <div class="summary-card-label">In Today</div>
           </div>
         </div>
+        <div class="summary-card-divider"></div>
         <div class="summary-card">
           <div class="summary-card-icon amber"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div class="summary-card-body">
             <div class="summary-card-value" id="card-checkouts-today">0</div>
-            <div class="summary-card-label"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg> Check-outs Today</div>
+            <div class="summary-card-label">Out Today</div>
           </div>
         </div>
       </div>
@@ -526,19 +574,19 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
     <div class="tabs-row">
       <button class="tab-btn active" id="tab-checkinout" onclick="switchTab('checkinout')">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Check In / Out
+        <span class="tab-label">Check In / Out</span>
       </button>
       <button class="tab-btn" id="tab-bikes" onclick="switchTab('bikes')">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1 1v6h-6l-3.5-5H4a1 1 0 0 0 0 2h.5l3.5 5H14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1z"/><path d="M16 4.5l4 2.5-4 2.5V4.5z"/></svg>
-        Bikes
+        <span class="tab-label">Bikes</span>
       </button>
       <button class="tab-btn" id="tab-employees" onclick="switchTab('employees')">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Employees
+        <span class="tab-label">Employees</span>
       </button>
       <button class="tab-btn" id="tab-log" onclick="switchTab('log')">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Activity Log
+        <span class="tab-label">Activity Log</span>
       </button>
     </div>
 
@@ -547,57 +595,29 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
       <!-- Filter panel -->
       <div class="filter-panel">
         <div class="filter-field">
-          <div class="filter-label">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Search
-          </div>
           <div class="search-wrap">
             <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" id="cio-search" type="text" placeholder="Rider, EID, Asset ID…" oninput="applyCheckinFilter()"/>
+            <input class="search-input" id="cio-search" type="text" placeholder="Rider, EID, Asset ID…" oninput="applyCheckinFilter()" style="width:160px;"/>
           </div>
         </div>
-        <div class="filter-field">
-          <div class="filter-label">Action</div>
-          <select class="filter-select" id="cio-action" onchange="applyCheckinFilter()">
-            <option value="">All Actions</option>
-            <option value="Check Out">Check Out</option>
-            <option value="Check In">Check In</option>
-          </select>
-        </div>
-        <div class="filter-field">
-          <div class="filter-label">Asset Type</div>
-          <select class="filter-select" id="cio-type" onchange="applyCheckinFilter()">
-            <option value="">All Types</option>
-            <option value="Bike">Bike</option>
-            <option value="SIM">SIM Card</option>
-            <option value="Phone">Phone</option>
-            <option value="Charger">Charger</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div class="filter-field">
-          <div class="filter-label">From Date</div>
-          <input type="date" class="filter-input" id="cio-from" onchange="applyCheckinFilter()"/>
-        </div>
-        <div class="filter-field">
-          <div class="filter-label">To Date</div>
-          <input type="date" class="filter-input" id="cio-to" onchange="applyCheckinFilter()"/>
-        </div>
         <div class="filter-divider"></div>
-        <div style="display:flex;flex-direction:column;gap:5px;justify-content:flex-end;">
-          <button class="tb-btn sm" onclick="clearCheckinFilter()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Clear
-          </button>
-          <span class="cache-info" id="cio-cache-info"><span class="cache-dot stale"></span>Not synced</span>
-        </div>
-        <div style="display:flex;gap:6px;align-items:flex-end;margin-left:auto;">
+        <input type="date" class="filter-input" id="cio-from" onchange="applyCheckinFilter()" title="From Date"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--text3);flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <input type="date" class="filter-input" id="cio-to" onchange="applyCheckinFilter()" title="To Date"/>
+        <button class="tb-btn sm icon-only" onclick="clearCheckinFilter()" title="Clear filters">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <span class="cache-info" id="cio-cache-info" style="margin-left:4px;"><span class="cache-dot stale"></span><span class="tab-label">Not synced</span></span>
+        <div style="display:flex;gap:6px;align-items:center;margin-left:auto;flex-shrink:0;">
           <button class="tb-btn primary" onclick="openNewCheckinModal()">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New Check-in/out
+            <span class="tab-label">New Check-in/out</span>
           </button>
         </div>
       </div>
+      <!-- hidden selects kept for filter logic compatibility -->
+      <select id="cio-action" style="display:none;" onchange="applyCheckinFilter()"><option value=""></option></select>
+      <select id="cio-type" style="display:none;" onchange="applyCheckinFilter()"><option value=""></option></select>
 
       <div class="data-table-card">
         <div class="data-table-header">
@@ -654,29 +674,25 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
     <div id="tab-panel-bikes" style="display:none;">
       <div class="filter-panel">
         <div class="filter-field">
-          <div class="filter-label">Search</div>
           <div class="search-wrap">
             <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input class="search-input" id="bike-search" type="text" placeholder="ID, model, plate…" oninput="applyBikeFilter()"/>
           </div>
         </div>
-        <div class="filter-field">
-          <div class="filter-label">Status</div>
-          <select class="filter-select" id="bike-status" onchange="applyBikeFilter()">
-            <option value="">All</option>
-            <option value="Available">Available</option>
-            <option value="Assigned">Assigned</option>
-            <option value="Maintenance">Maintenance</option>
-          </select>
-        </div>
         <div class="filter-divider"></div>
-        <button class="tb-btn sm" onclick="clearBikeFilter()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Clear
+        <select class="filter-select" id="bike-status" onchange="applyBikeFilter()" title="Status">
+          <option value="">All Status</option>
+          <option value="Available">Available</option>
+          <option value="Assigned">Assigned</option>
+          <option value="Maintenance">Maintenance</option>
+        </select>
+        <button class="tb-btn sm icon-only" onclick="clearBikeFilter()" title="Clear filters">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div style="margin-left:auto;">
+        <div style="margin-left:auto;flex-shrink:0;">
           <button class="tb-btn primary" onclick="openAddBikeModal()">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Bike
+            <span class="tab-label">Add Bike</span>
           </button>
         </div>
       </div>
@@ -717,29 +733,22 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
     <div id="tab-panel-employees" style="display:none;">
       <div class="filter-panel">
         <div class="filter-field">
-          <div class="filter-label">Search</div>
           <div class="search-wrap">
             <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input class="search-input" id="emp-search" type="text" placeholder="Name, EID, company…" oninput="applyEmpFilter()"/>
           </div>
         </div>
-        <div class="filter-field">
-          <div class="filter-label">Status</div>
-          <select class="filter-select" id="emp-status" onchange="applyEmpFilter()">
-            <option value="">All</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
-        <div class="filter-field">
-          <div class="filter-label">Company</div>
-          <select class="filter-select" id="emp-company" onchange="applyEmpFilter()">
-            <option value="">All Companies</option>
-          </select>
-        </div>
         <div class="filter-divider"></div>
-        <button class="tb-btn sm" onclick="clearEmpFilter()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Clear
+        <select class="filter-select" id="emp-status" onchange="applyEmpFilter()" title="Status">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+        <select class="filter-select" id="emp-company" onchange="applyEmpFilter()" title="Company">
+          <option value="">All Companies</option>
+        </select>
+        <button class="tb-btn sm icon-only" onclick="clearEmpFilter()" title="Clear filters">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
@@ -777,6 +786,32 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 
     <!-- LOG TAB -->
     <div id="tab-panel-log" style="display:none;">
+      <!-- Log filter panel -->
+      <div class="filter-panel" style="margin-bottom:14px;">
+        <div class="filter-field">
+          <div class="search-wrap">
+            <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" id="log-search" type="text" placeholder="Rider, EID, Bike, SIM…" oninput="applyLogFilter()" style="width:160px;"/>
+          </div>
+        </div>
+        <div class="filter-divider"></div>
+        <select class="filter-select" id="log-type-filter" onchange="applyLogFilter()" title="Asset Type">
+          <option value="">All Types</option>
+          <option value="Bike">Bike</option>
+          <option value="SIM">SIM</option>
+          <option value="Phone">Phone</option>
+          <option value="Other">Other</option>
+        </select>
+        <select class="filter-select" id="log-action-filter" onchange="applyLogFilter()" title="Action">
+          <option value="">All Actions</option>
+          <option value="out">Check Out</option>
+          <option value="in">Check In</option>
+          <option value="swap">Swap</option>
+        </select>
+        <button class="tb-btn sm icon-only" onclick="clearLogFilter()" title="Clear filters">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
       <div class="data-table-card">
         <div class="data-table-header">
           <div class="data-table-title">
@@ -815,9 +850,21 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Rider *</label>
-          <select class="form-select" id="cio-rider-select" onchange="onRiderSelected()">
-            <option value="">— Select Rider —</option>
-          </select>
+          <!-- Searchable rider dropdown -->
+          <div class="sd-wrap" id="sd-rider-wrap">
+            <button type="button" class="sd-trigger" id="sd-rider-trigger" onclick="sdToggle('rider')">
+              <span class="sd-trigger-text placeholder" id="sd-rider-label">— Select Rider —</span>
+              <svg class="sd-chevron" id="sd-rider-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="sd-dropdown" id="sd-rider-dropdown">
+              <div class="sd-search-wrap">
+                <input class="sd-search" id="sd-rider-search" type="text" placeholder="Search rider…" oninput="sdFilter('rider')" autocomplete="off"/>
+              </div>
+              <div class="sd-list" id="sd-rider-list"></div>
+            </div>
+          </div>
+          <!-- hidden value holder -->
+          <input type="hidden" id="cio-rider-select" value=""/>
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Action *</label>
@@ -865,9 +912,20 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <div style="flex:1;min-width:0;">
             <div id="co-items-panel" style="display:none;">
               <div id="co-type-label" style="font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;"></div>
-              <select class="form-select" id="co-item-select" style="margin-bottom:6px;">
-                <option value="">— Select Available Item —</option>
-              </select>
+              <!-- Searchable asset dropdown -->
+              <div class="sd-wrap" id="sd-coitem-wrap" style="margin-bottom:6px;">
+                <button type="button" class="sd-trigger" id="sd-coitem-trigger" onclick="sdToggle('coitem')">
+                  <span class="sd-trigger-text placeholder" id="sd-coitem-label">— Select Available Item —</span>
+                  <svg class="sd-chevron" id="sd-coitem-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="sd-dropdown" id="sd-coitem-dropdown">
+                  <div class="sd-search-wrap">
+                    <input class="sd-search" id="sd-coitem-search" type="text" placeholder="Search…" oninput="sdFilter('coitem')" autocomplete="off"/>
+                  </div>
+                  <div class="sd-list" id="sd-coitem-list"></div>
+                </div>
+              </div>
+              <input type="hidden" id="co-item-select" value=""/>
               <button class="tb-btn sm success" onclick="addCoItem()" style="width:100%;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Add Item
@@ -933,9 +991,20 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           </div>
           <div class="swap-arrow">↓ Replace with ↓</div>
           <div style="font-size:10.5px;color:var(--text3);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Select replacement (available only):</div>
-          <select class="form-select" id="swap-new-select" style="margin-bottom:4px;">
-            <option value="">— Select Replacement —</option>
-          </select>
+          <!-- Searchable swap replacement dropdown -->
+          <div class="sd-wrap" id="sd-swapnew-wrap" style="margin-bottom:4px;">
+            <button type="button" class="sd-trigger" id="sd-swapnew-trigger" onclick="sdToggle('swapnew')">
+              <span class="sd-trigger-text placeholder" id="sd-swapnew-label">— Select Replacement —</span>
+              <svg class="sd-chevron" id="sd-swapnew-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="sd-dropdown" id="sd-swapnew-dropdown">
+              <div class="sd-search-wrap">
+                <input class="sd-search" id="sd-swapnew-search" type="text" placeholder="Search…" oninput="sdFilter('swapnew')" autocomplete="off"/>
+              </div>
+              <div class="sd-list" id="sd-swapnew-list"></div>
+            </div>
+          </div>
+          <input type="hidden" id="swap-new-select" value=""/>
         </div>
       </div>
 
@@ -971,6 +1040,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 </div>
 <!-- Hidden iframe for Google Form submission -->
 <iframe name="cio-form-target" id="cio-form-target" style="display:none;" aria-hidden="true"></iframe>
+<iframe name="cio-form-target2" id="cio-form-target2" style="display:none;" aria-hidden="true"></iframe>
 
 <!-- ── DETAIL MODAL ── -->
 <div class="modal-backdrop" id="modal-detail">
@@ -1125,17 +1195,17 @@ function setSyncLoading(on){
   ico.style.animation=on?'pulse-spin .7s linear infinite':'none';
 }
 
+const REAL_API_BASE='https://script.google.com/macros/s/AKfycbx3cBEHNnU73qHVNolKFfnMsfbNJ5jxTZHtXdPso684Gu3L3OqqMXHYnVedwxjg3dalnQ/exec';
+
 async function syncAll(force=true){
-  if(!config.checkinoutUrl&&!config.bikesUrl&&!config.employeesUrl){
-    showToast('No sheet URLs configured. Click Settings.','warn');
-    loadDemoData();
-    return;
-  }
   setSyncLoading(true);
-  const promises=[];
+  const promises=[
+    fetchSheet('bikes',REAL_API_BASE+'?type=bike'),
+    fetchSheet('emp',REAL_API_BASE+'?type=employee'),
+    fetchSheet('sim',REAL_API_BASE+'?type=sim'),
+    fetchSheet('checklog',REAL_API_BASE+'?type=checklog')
+  ];
   if(config.checkinoutUrl) promises.push(fetchSheet('cio',config.checkinoutUrl));
-  if(config.bikesUrl) promises.push(fetchSheet('bikes',config.bikesUrl));
-  if(config.employeesUrl) promises.push(fetchSheet('emp',config.employeesUrl));
   await Promise.allSettled(promises);
   processAll();
   setSyncLoading(false);
@@ -1147,43 +1217,124 @@ async function fetchSheet(type,url){
     const res=await fetch(url+'&t='+Date.now(),{cache:'no-store'});
     const raw=await res.json();
 
-    // Handle raw [[...]] array format (first row = headers OR pure data rows)
+    // Data comes as array of arrays: [[col0,col1,...], ...]
     let rows=[];
     if(Array.isArray(raw)&&raw.length&&Array.isArray(raw[0])){
-      // Raw array of arrays — map to objects using known column schemas
-      const schemas={
-        cio:  ['RefID','EmpID','Action','AssetType','AssetID'],          // check-in/out sheet
-        bikes:['BikeID','Model','PlateNo','Year','Color','Status','AssignedTo','Notes'],
-        emp:  ['EmpID','RiderID','Name','Phone','Company','JoinDate','Status','Nationality','Bike','SIM','Inventory','Notes']
-      };
-      const cols=schemas[type]||[];
-      rows=raw.map(arr=>{
-        const obj={};
-        cols.forEach((col,i)=>{ obj[col]=arr[i]!==undefined?String(arr[i]):''; });
-        // Keep raw array too for future columns
-        obj._raw=arr;
-        return obj;
-      });
+      if(type==='bikes'){
+        // col B (index 1) = BikeNumber, col K (index 10) = status (Active / ExpActive)
+        rows=raw.filter(arr=>{
+          const status=String(arr[10]||'').trim();
+          return status==='Active'||status==='ExpActive';
+        }).map(arr=>({
+          BikeID:String(arr[1]||'').trim(),
+          Model:String(arr[3]||'').trim()||String(arr[1]||'').trim(),
+          PlateNo:String(arr[2]||'').trim(),
+          Year:String(arr[4]||'').trim(),
+          Color:String(arr[5]||'').trim(),
+          Status:(String(arr[10]||'').trim()==='Active')?'Available':'Available',
+          AssignedTo:'',
+          Notes:'',
+          _raw:arr
+        }));
+      }else if(type==='emp'){
+        // col N (index 8) = Active or ExpActive
+        rows=raw.filter(arr=>{
+          const status=String(arr[8]||'').trim();
+          return status==='Active'||status==='ExpActive';
+        }).map(arr=>({
+          EmpID:String(arr[0]||'').trim(),
+          EID:String(arr[0]||'').trim(),
+          RiderID:String(arr[1]||'').trim(),
+          Name:String(arr[2]||'').trim(),
+          Phone:String(arr[3]||'').trim(),
+          Company:String(arr[4]||'').trim(),
+          JoinDate:String(arr[5]||'').trim(),
+          Status:'Active',
+          Nationality:String(arr[6]||'').trim(),
+          Bike:String(arr[8]||'').trim(),
+          SIM:String(arr[9]||'').trim(),
+          Inventory:String(arr[10]||'').trim(),
+          Notes:String(arr[11]||'').trim(),
+          _raw:arr
+        }));
+      }else if(type==='sim'){
+        // col E (index 4) = Active
+        rows=raw.filter(arr=>{
+          const status=String(arr[4]||'').trim();
+          return status==='Active';
+        }).map(arr=>({
+          SimID:String(arr[0]||'').trim(),
+          ID:String(arr[0]||'').trim(),
+          Network:String(arr[1]||'').trim()||String(arr[2]||'').trim(),
+          Number:String(arr[2]||'').trim(),
+          AssignedTo:'',
+          _raw:arr
+        }));
+      }else if(type==='checklog'){
+        // CheckLog sheet: Timestamp, RefID, RiderName, EmpID, RiderID, Company, AssetType, AssetID, Action, Condition, Notes, CheckedBy
+        rows=raw.map(arr=>({
+          Timestamp:String(arr[0]||'').trim(),
+          RefID:String(arr[1]||'').trim(),
+          RiderName:String(arr[2]||'').trim(),
+          EmpID:String(arr[3]||'').trim(),
+          EID:String(arr[3]||'').trim(),
+          RiderID:String(arr[4]||'').trim(),
+          Company:String(arr[5]||'').trim(),
+          AssetType:String(arr[6]||'').trim(),
+          AssetID:String(arr[7]||'').trim(),
+          Action:String(arr[8]||'').trim(),
+          Condition:String(arr[9]||'').trim(),
+          Notes:String(arr[10]||'').trim(),
+          CheckedBy:String(arr[11]||'').trim(),
+          _raw:arr
+        })).filter(r=>r.RefID||r.EmpID);
+      }else{
+        // cio or fallback
+        const schemas={
+          cio:['RefID','EmpID','Action','AssetType','AssetID']
+        };
+        const cols=schemas[type]||[];
+        rows=raw.map(arr=>{
+          const obj={};
+          cols.forEach((col,i)=>{ obj[col]=arr[i]!==undefined?String(arr[i]):''; });
+          obj._raw=arr;
+          return obj;
+        });
+      }
     }else{
-      // Already objects (Apps Script JSON output)
       rows=Array.isArray(raw)?raw:(raw.data||raw.values||[]);
     }
 
     if(type==='cio'){
-      // Normalise RiderName field — API uses EmpID, map to name via employees
       state.checkinout=rows;
+    }else if(type==='checklog'){
+      // Merge CheckLog sheet records into checkinout, deduplicating by RefID
+      const existing=new Set((state.checkinout||[]).map(r=>r.RefID).filter(Boolean));
+      const newRows=rows.filter(r=>!r.RefID||!existing.has(r.RefID));
+      state.checkinout=[...state.checkinout,...newRows];
+      // Sort by timestamp descending
+      state.checkinout.sort((a,b)=>{
+        const ta=(a.Timestamp||'');const tb=(b.Timestamp||'');
+        return tb.localeCompare(ta);
+      });
     }else if(type==='bikes'){
       state.bikes=rows;
     }else if(type==='emp'){
       state.employees=rows;
-      // Extract SIM assignments from employee rows if present
+      // Extract SIM assignments from employee rows
       state.sims=(rows||[]).filter(e=>e.SIM&&e.SIM.trim()).map(e=>({
         SimID:e.SIM,ID:e.SIM,Network:'',AssignedTo:e.EmpID
       }));
+    }else if(type==='sim'){
+      // Merge with existing sims (employee-assigned ones stay)
+      const existing=(state.sims||[]).filter(s=>(s.AssignedTo||'').trim());
+      const existingIds=new Set(existing.map(s=>s.SimID||s.ID));
+      const fresh=rows.filter(s=>!existingIds.has(s.SimID||s.ID));
+      state.sims=[...existing,...fresh];
     }
   }catch(e){
     console.error('[fetchSheet]',type,e);
-    showToast('Failed to load '+type+' sheet','error');
+    showToast('Failed to load '+type+' data','error');
   }
 }
 
@@ -1642,13 +1793,12 @@ function genRefId(){
     String(n.getSeconds()).padStart(2,'0')+String(n.getMilliseconds()).padStart(3,'0');
 }
 
-function submitToGoogleForm(params){
-  // Build a form and submit to the hidden iframe
+function submitToGoogleForm(params, target){
   try{
     const f=document.createElement('form');
     f.method='POST';
     f.action=GFORM_URL;
-    f.target='cio-form-target';
+    f.target=target||'cio-form-target';
     f.style.display='none';
     Object.entries(params).forEach(([k,v])=>{
       const i=document.createElement('input');
@@ -1663,7 +1813,7 @@ function submitToGoogleForm(params){
 
 function buildGFormPayload(rec){
   // Map record fields to form entries
-  const assetTypeVal=[rec.AssetType||'',rec.AssetID||'',rec.RiderID||''].filter(Boolean).join(' ');
+  const assetTypeVal=rec.AssetType||'';
   const assetDetailVal=rec.AssetID||rec.Notes||'';
   return {
     [GFORM_FIELDS.refId]: rec.RefID||genRefId(),
@@ -1673,6 +1823,113 @@ function buildGFormPayload(rec){
     [GFORM_FIELDS.assetDetail]: assetDetailVal
   };
 }
+
+// ─────────────────────────────────────────────────────────────────
+// SEARCHABLE DROPDOWN ENGINE
+// ─────────────────────────────────────────────────────────────────
+const _sdState={
+  rider:{options:[],filtered:[],value:'',focusIdx:-1},
+  coitem:{options:[],filtered:[],value:'',focusIdx:-1},
+  swapnew:{options:[],filtered:[],value:'',focusIdx:-1}
+};
+
+function sdToggle(key){
+  const dd=document.getElementById('sd-'+key+'-dropdown');
+  const isOpen=dd.classList.contains('open');
+  // Close all others
+  Object.keys(_sdState).forEach(k=>{
+    document.getElementById('sd-'+k+'-dropdown').classList.remove('open');
+    const chev=document.getElementById('sd-'+k+'-chevron');
+    if(chev) chev.style.transform='';
+  });
+  if(!isOpen){
+    dd.classList.add('open');
+    const chev=document.getElementById('sd-'+key+'-chevron');
+    if(chev) chev.style.transform='rotate(180deg)';
+    const search=document.getElementById('sd-'+key+'-search');
+    if(search){search.value='';search.focus();}
+    _sdState[key].filtered=[..._sdState[key].options];
+    _sdState[key].focusIdx=-1;
+    sdRenderList(key);
+  }
+}
+
+function sdFilter(key){
+  const q=(document.getElementById('sd-'+key+'-search').value||'').toLowerCase().trim();
+  _sdState[key].filtered=q
+    ?_sdState[key].options.filter(o=>(o.label||'').toLowerCase().includes(q))
+    :[..._sdState[key].options];
+  _sdState[key].focusIdx=-1;
+  sdRenderList(key);
+}
+
+function sdRenderList(key){
+  const list=document.getElementById('sd-'+key+'-list');
+  const s=_sdState[key];
+  if(!s.filtered.length){
+    list.innerHTML='<div class="sd-option empty">No options found</div>';
+    return;
+  }
+  list.innerHTML=s.filtered.map((o,i)=>`
+    <div class="sd-option${o.value===s.value?' selected':''}${i===s.focusIdx?' focused':''}"
+      data-value="${esc(o.value)}"
+      data-label="${esc(o.label)}"
+      onmousedown="sdSelectByIndex('${key}',${i})"
+    >${esc(o.label)}</div>`).join('');
+}
+function sdSelectByIndex(key,i){
+  const o=_sdState[key].filtered[i];
+  if(!o) return;
+  sdSelect(key, o.value, o.label);
+}
+
+function sdSelect(key,value,label){
+  _sdState[key].value=value;
+  const lbl=document.getElementById('sd-'+key+'-label');
+  lbl.textContent=label;
+  lbl.classList.toggle('placeholder',!value);
+  document.getElementById('sd-'+key+'-dropdown').classList.remove('open');
+  const chev=document.getElementById('sd-'+key+'-chevron');
+  if(chev) chev.style.transform='';
+  // Update hidden input
+  const hidden=document.getElementById(key==='rider'?'cio-rider-select':key==='coitem'?'co-item-select':'swap-new-select');
+  if(hidden) hidden.value=value;
+  // Trigger callbacks
+  if(key==='rider') onRiderSelected();
+}
+
+function sdSetOptions(key,options){
+  // options = [{value, label}]
+  _sdState[key].options=options;
+  _sdState[key].filtered=[...options];
+  // Reset selection
+  _sdState[key].value='';
+  _sdState[key].focusIdx=-1;
+  const lbl=document.getElementById('sd-'+key+'-label');
+  if(lbl){lbl.textContent=key==='rider'?'— Select Rider —':key==='coitem'?'— Select Available Item —':'— Select Replacement —';lbl.classList.add('placeholder');}
+  const hidden=document.getElementById(key==='rider'?'cio-rider-select':key==='coitem'?'co-item-select':'swap-new-select');
+  if(hidden) hidden.value='';
+}
+
+function sdSetValue(key,value,label){
+  _sdState[key].value=value;
+  const lbl=document.getElementById('sd-'+key+'-label');
+  if(lbl){lbl.textContent=label||value||'';lbl.classList.toggle('placeholder',!value);}
+  const hidden=document.getElementById(key==='rider'?'cio-rider-select':key==='coitem'?'co-item-select':'swap-new-select');
+  if(hidden) hidden.value=value;
+}
+
+// Close dropdowns on outside click
+document.addEventListener('mousedown',function(e){
+  Object.keys(_sdState).forEach(k=>{
+    const wrap=document.getElementById('sd-'+k+'-wrap');
+    if(wrap&&!wrap.contains(e.target)){
+      document.getElementById('sd-'+k+'-dropdown').classList.remove('open');
+      const chev=document.getElementById('sd-'+k+'-chevron');
+      if(chev) chev.style.transform='';
+    }
+  });
+});
 
 // ─────────────────────────────────────────────────────────────────
 // NEW CHECK IN/OUT MODAL — enhanced with strict assignment rules
@@ -1685,10 +1942,14 @@ let _checkinPending=null; // {type, id, assetObj}
 let _swapSelectedOld=null; // {type, id}
 
 function openNewCheckinModal(){
-  const riderSel=document.getElementById('cio-rider-select');
-  riderSel.innerHTML='<option value="">— Select Rider —</option>'+
-    (state.employees||[]).filter(e=>(e.Status||'Active').toLowerCase()==='active')
-      .map(e=>`<option value="${esc(e.EmpID||e.EID)}">${esc(e.Name)} · ${esc(e.EmpID||e.EID)}${e.RiderID?' ['+esc(e.RiderID)+']':''}</option>`).join('');
+  // Populate searchable rider dropdown
+  const riderOptions=(state.employees||[])
+    .filter(e=>(e.Status||'Active').toLowerCase()==='active')
+    .map(e=>({
+      value:e.EmpID||e.EID,
+      label:(e.RiderID||e.EmpID||e.EID)
+    }));
+  sdSetOptions('rider',riderOptions);
   document.getElementById('rider-info-panel').classList.remove('visible');
   document.getElementById('cio-action-select').value='Check Out';
   document.getElementById('cio-notes').value='';
@@ -1793,13 +2054,12 @@ function renderCoSection(eid){
 function renderCoItemsPanel(type, eid){
   const panel=document.getElementById('co-items-panel');
   const empty=document.getElementById('co-items-empty');
-  const sel=document.getElementById('co-item-select');
   const label=document.getElementById('co-type-label');
   panel.style.display='';
   empty.style.display='none';
   label.textContent=type+' — Available Items';
-  sel.innerHTML='<option value="">— Select Available Item —</option>';
   let hasLocked=false;
+  let options=[];
 
   if(type==='Bike'){
     const available=(state.bikes||[]).filter(b=>{
@@ -1809,12 +2069,10 @@ function renderCoItemsPanel(type, eid){
     });
     const locked=(state.bikes||[]).filter(b=>(b.AssignedTo||'').trim()&&(b.AssignedTo||'')!==eid);
     hasLocked=locked.length>0;
-    available.forEach(b=>{
-      const o=document.createElement('option');
-      o.value=b.BikeID;
-      o.textContent=b.BikeID+' · '+b.Model+(b.PlateNo?' ['+b.PlateNo+']':'')+(b.Color?' '+b.Color:'');
-      sel.appendChild(o);
-    });
+    options=available.map(b=>({
+      value:b.BikeID,
+      label:b.BikeID
+    }));
   }else if(type==='SIM'){
     const available=(state.sims||[]).filter(s=>{
       const isAvail=!(s.AssignedTo||'').trim();
@@ -1823,28 +2081,15 @@ function renderCoItemsPanel(type, eid){
     });
     const locked=(state.sims||[]).filter(s=>(s.AssignedTo||'').trim()&&(s.AssignedTo||'')!==eid);
     hasLocked=locked.length>0;
-    available.forEach(s=>{
-      const o=document.createElement('option');
-      o.value=s.SimID||s.ID;
-      o.textContent=(s.SimID||s.ID)+(s.Network?' · '+s.Network:'');
-      sel.appendChild(o);
-    });
+    options=available.map(s=>({
+      value:s.SimID||s.ID,
+      label:(s.SimID||s.ID)
+    }));
   }else{
-    // Phone/Charger/Inventory — free text IDs, check if already assigned in records
-    const usedIds=new Set((state.checkinout||[])
-      .filter(r=>(r.AssetType||'')===(type)&&(r.Action||'').toLowerCase().includes('out'))
-      .map(r=>r.AssetID));
-    // Remove checked-in ones from used
-    (state.checkinout||[]).filter(r=>(r.AssetType||'')===(type)&&(r.Action||'').toLowerCase().includes('in'))
-      .forEach(r=>usedIds.delete(r.AssetID));
-    // Show used as locked, rest as available from a known list (if any)
-    // We just show a free-entry since no static list
-    const o=document.createElement('option');
-    o.value='__manual__';
-    o.textContent='Enter ID manually below';
-    sel.appendChild(o);
-    // Also add a text input below
+    options=[{value:'__manual__',label:'Enter ID manually in Notes'}];
   }
+
+  sdSetOptions('coitem',options);
 
   document.getElementById('co-locked-notice').style.display=hasLocked?'':'none';
   if(hasLocked){
@@ -2042,17 +2287,16 @@ function selectSwapOld(idx){
   // Show new section
   document.getElementById('swap-current-type').textContent=_swapSelectedOld.type;
   document.getElementById('swap-current-id').textContent=_swapSelectedOld.id;
-  // Populate replacement dropdown (same type, available only)
-  const newSel=document.getElementById('swap-new-select');
-  newSel.innerHTML='<option value="">— Select Replacement —</option>';
-  const eid=document.getElementById('cio-rider-select').value;
+  // Populate searchable replacement dropdown (same type, available only)
+  let replOptions=[];
   if(_swapSelectedOld.type==='Bike'){
-    (state.bikes||[]).filter(b=>(b.Status||'').toLowerCase()==='available'&&!(b.AssignedTo||'').trim()&&b.BikeID!==_swapSelectedOld.id)
-      .forEach(b=>{const o=document.createElement('option');o.value=b.BikeID;o.textContent=b.BikeID+' · '+b.Model+(b.PlateNo?' ['+b.PlateNo+']':'');newSel.appendChild(o);});
+    replOptions=(state.bikes||[]).filter(b=>(b.Status||'').toLowerCase()==='available'&&!(b.AssignedTo||'').trim()&&b.BikeID!==_swapSelectedOld.id)
+      .map(b=>({value:b.BikeID,label:b.BikeID}));
   }else if(_swapSelectedOld.type==='SIM'){
-    (state.sims||[]).filter(s=>!(s.AssignedTo||'').trim()&&(s.SimID||s.ID)!==_swapSelectedOld.id)
-      .forEach(s=>{const o=document.createElement('option');o.value=s.SimID||s.ID;o.textContent=(s.SimID||s.ID)+(s.Network?' · '+s.Network:'');newSel.appendChild(o);});
+    replOptions=(state.sims||[]).filter(s=>!(s.AssignedTo||'').trim()&&(s.SimID||s.ID)!==_swapSelectedOld.id)
+      .map(s=>({value:s.SimID||s.ID,label:(s.SimID||s.ID)}));
   }
+  sdSetOptions('swapnew',replOptions);
   document.getElementById('swap-new-section').style.display='';
 }
 
@@ -2118,21 +2362,33 @@ async function submitCheckin(){
     if(!newId){showToast('Select a replacement item','warn');return;}
     const oldType=_swapSelectedOld.type;
     const oldId=_swapSelectedOld.id;
-    // Validate new item is available
+
+    // Validate: item to return must be checked out (assigned to this rider)
+    if(oldType==='Bike'){
+      const ob=state.bikes.find(b=>b.BikeID===oldId);
+      if(!ob||(ob.AssignedTo||'').trim()!==riderEid){showToast(oldId+' is not currently checked out to this rider','error');return;}
+    }else if(oldType==='SIM'){
+      const os=(state.sims||[]).find(s=>(s.SimID||s.ID)===oldId);
+      if(!os||(os.AssignedTo||'').trim()!==riderEid){showToast(oldId+' is not currently checked out to this rider','error');return;}
+    }
+
+    // Validate: replacement must be available (checked in, not assigned)
     if(oldType==='Bike'){
       const nb=state.bikes.find(b=>b.BikeID===newId);
-      if(nb&&(nb.AssignedTo||'').trim()){showToast(newId+' is no longer available','error');return;}
+      if(!nb||(nb.AssignedTo||'').trim()||(nb.Status||'').toLowerCase()!=='available'){showToast(newId+' is not available','error');return;}
     }else if(oldType==='SIM'){
       const ns=(state.sims||[]).find(s=>(s.SimID||s.ID)===newId);
-      if(ns&&(ns.AssignedTo||'').trim()){showToast(newId+' is no longer available','error');return;}
+      if(!ns||(ns.AssignedTo||'').trim()){showToast(newId+' is not available','error');return;}
     }
+
     const recIn={Timestamp:ts,RefID:makeRef(),RiderName:rider?rider.Name:'Unknown',EmpID:riderEid,
       RiderID:rider?rider.RiderID||'':'',Company:rider?rider.Company||'':'',
-      AssetType:oldType,AssetID:oldId,Action:'Check In (Swap)',Condition:condition,Notes:'SWAP: returning '+oldId,CheckedBy:checkedBy};
+      AssetType:oldType,AssetID:oldId,Action:'Check In',Condition:condition,Notes:notes,CheckedBy:checkedBy};
+
     const recOut={Timestamp:ts,RefID:makeRef(),RiderName:rider?rider.Name:'Unknown',EmpID:riderEid,
       RiderID:rider?rider.RiderID||'':'',Company:rider?rider.Company||'':'',
-      AssetType:oldType,AssetID:newId,Action:'Check Out (Swap)',Condition:'Good',Notes:'SWAP: issuing '+newId,CheckedBy:checkedBy};
-    // Update states
+      AssetType:oldType,AssetID:newId,Action:'Check Out',Condition:condition,Notes:notes,CheckedBy:checkedBy};
+
     if(oldType==='Bike'){
       const ob=state.bikes.find(b=>b.BikeID===oldId);if(ob){ob.AssignedTo='';ob.Status='Available';}
       const nb=state.bikes.find(b=>b.BikeID===newId);if(nb){nb.AssignedTo=riderEid;nb.Status='Assigned';}
@@ -2140,13 +2396,20 @@ async function submitCheckin(){
       const os=(state.sims||[]).find(s=>(s.SimID||s.ID)===oldId);if(os) os.AssignedTo='';
       const ns=(state.sims||[]).find(s=>(s.SimID||s.ID)===newId);if(ns) ns.AssignedTo=riderEid;
     }
-    state.checkinout.unshift(recOut);state.checkinout.unshift(recIn);
+
+    // Check In first — wait for it to save before Check Out
+    state.checkinout.unshift(recIn);
+    submitToGoogleForm(buildGFormPayload(recIn), 'cio-form-target');
+    await postRecord(recIn);
+    await new Promise(r=>setTimeout(r,1500));
+    // Check Out second
+    state.checkinout.unshift(recOut);
     addLog('swap','Swap: '+oldId+' ↔ '+newId+' for '+(rider?rider.Name:riderEid),recIn);
-    submitToGoogleForm(buildGFormPayload(recIn));
-    submitToGoogleForm(buildGFormPayload(recOut));
-    await postRecord(recIn);await postRecord(recOut);
+    submitToGoogleForm(buildGFormPayload(recOut), 'cio-form-target2');
+    await postRecord(recOut);
+
     processAll();closeModal('modal-cio');
-    showToast('Swap done: '+oldId+' ↔ '+newId,'ok');
+    showToast('Swap done: '+oldId+' returned ↔ '+newId+' issued','ok');
     return;
   }
 }
@@ -2171,35 +2434,22 @@ function addLog(type,msg,rec){
 }
 
 function renderLog(){
-  const el=document.getElementById('log-list');
-  document.getElementById('log-count-badge').textContent=state.log.length+' entries';
-  if(!state.log.length){
-    el.innerHTML='<div class="empty-state"><p>No activity yet</p><small>Check-in/out actions will appear here.</small></div>';
-    return;
+  _logFiltered=[...state.log];
+  // Respect any active filters
+  const search=(document.getElementById('log-search')?document.getElementById('log-search').value||'':'').trim();
+  const typeF=(document.getElementById('log-type-filter')?document.getElementById('log-type-filter').value||'':'');
+  const actionF=(document.getElementById('log-action-filter')?document.getElementById('log-action-filter').value||'':'');
+  if(search||typeF||actionF){
+    applyLogFilter();
+  } else {
+    document.getElementById('log-count-badge').textContent=state.log.length+' entries';
+    const el=document.getElementById('log-list');
+    if(!state.log.length){
+      el.innerHTML='<div class="empty-state"><p>No activity yet</p><small>Check-in/out actions will appear here.</small></div>';
+      return;
+    }
+    renderLogFiltered();
   }
-  el.innerHTML=state.log.map(l=>{
-    const r=l.rec||{};
-    const bike=r.EmpID?getAssignedBike(r.EmpID):null;
-    const sim=r.EmpID?getAssignedSim(r.EmpID):null;
-    const hasInv=r.EmpID?getEmployeeInventory(r.EmpID):false;
-    const dotClass=l.type==='out'?'out':l.type==='in'?'in':l.type==='swap'?'swap':'info';
-    return `<div class="log-item">
-      <div class="log-dot ${dotClass}"></div>
-      <div class="log-body" style="flex:1;">
-        <div class="log-msg">${esc(l.msg)}</div>
-        ${r.RefID?`<div class="log-row-grid">
-          <div class="log-cell"><div class="log-cell-label">Ref ID</div><div class="log-cell-value">${esc(r.RefID)}</div></div>
-          <div class="log-cell"><div class="log-cell-label">Emp ID</div><div class="log-cell-value">${esc(r.EmpID||'—')}</div></div>
-          <div class="log-cell"><div class="log-cell-label">Rider ID</div><div class="log-cell-value">${esc(r.RiderID||'—')}</div></div>
-          <div class="log-cell"><div class="log-cell-label">Company</div><div class="log-cell-value">${esc(r.Company||'—')}</div></div>
-          <div class="log-cell"><div class="log-cell-label">Bike</div><div class="log-cell-value asset">${bike?esc(bike.BikeID):(r.AssetType==='Bike'?esc(r.AssetID):'—')}</div></div>
-          <div class="log-cell"><div class="log-cell-label">SIM</div><div class="log-cell-value asset">${sim?(esc(sim.SimID||sim.ID)):(r.AssetType==='SIM'?esc(r.AssetID):'—')}</div></div>
-          <div class="log-cell"><div class="log-cell-label">Inventory</div><div class="log-cell-value ${hasInv?'yes':'no'}">${hasInv?'Yes':'No'}</div></div>
-        </div>`:''}
-        <div class="log-time">${l.time}</div>
-      </div>
-    </div>`;
-  }).join('');
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -2234,6 +2484,78 @@ function renderAssetHistoryHTML(assetId){
 }
 
 function clearLog(){state.log=[];renderLog();showToast('Log cleared','ok');}
+
+// ─────────────────────────────────────────────────────────────────
+// ACTIVITY LOG FILTER
+// ─────────────────────────────────────────────────────────────────
+let _logFiltered=[];
+
+function applyLogFilter(){
+  const search=(document.getElementById('log-search')?document.getElementById('log-search').value||'':'').toLowerCase().trim();
+  const typeF=(document.getElementById('log-type-filter')?document.getElementById('log-type-filter').value||'':'').toLowerCase();
+  const actionF=(document.getElementById('log-action-filter')?document.getElementById('log-action-filter').value||'':'').toLowerCase();
+
+  _logFiltered=(state.log||[]).filter(l=>{
+    const r=l.rec||{};
+    // Action type filter (log type: out/in/swap)
+    if(actionF&&l.type!==actionF)return false;
+    // Asset type filter
+    if(typeF&&!(r.AssetType||'').toLowerCase().includes(typeF))return false;
+    // Search: rider name, EID, RiderID, Bike ID, SIM ID, SIM number, Asset ID
+    if(search){
+      const sim=r.EmpID?getAssignedSim(r.EmpID):null;
+      const simNum=sim?(sim.Number||sim.SimID||sim.ID||''):'';
+      const hay=[
+        r.RiderName||'', r.EmpID||'', r.RiderID||'',
+        r.AssetID||'', r.AssetType||'', r.Notes||'',
+        simNum, l.msg||''
+      ].join(' ').toLowerCase();
+      if(!hay.includes(search))return false;
+    }
+    return true;
+  });
+  renderLogFiltered();
+}
+
+function clearLogFilter(){
+  if(document.getElementById('log-search')) document.getElementById('log-search').value='';
+  if(document.getElementById('log-type-filter')) document.getElementById('log-type-filter').value='';
+  if(document.getElementById('log-action-filter')) document.getElementById('log-action-filter').value='';
+  _logFiltered=[...state.log];
+  renderLogFiltered();
+}
+
+function renderLogFiltered(){
+  const el=document.getElementById('log-list');
+  document.getElementById('log-count-badge').textContent=_logFiltered.length+' entries';
+  if(!_logFiltered.length){
+    el.innerHTML='<div class="empty-state"><p>No activity matches your filters</p><small>Try adjusting the search or filters.</small></div>';
+    return;
+  }
+  el.innerHTML=_logFiltered.map(l=>{
+    const r=l.rec||{};
+    const bike=r.EmpID?getAssignedBike(r.EmpID):null;
+    const sim=r.EmpID?getAssignedSim(r.EmpID):null;
+    const hasInv=r.EmpID?getEmployeeInventory(r.EmpID):false;
+    const dotClass=l.type==='out'?'out':l.type==='in'?'in':l.type==='swap'?'swap':'info';
+    return `<div class="log-item">
+      <div class="log-dot ${dotClass}"></div>
+      <div class="log-body" style="flex:1;">
+        <div class="log-msg">${esc(l.msg)}</div>
+        ${r.RefID?`<div class="log-row-grid">
+          <div class="log-cell"><div class="log-cell-label">Ref ID</div><div class="log-cell-value">${esc(r.RefID)}</div></div>
+          <div class="log-cell"><div class="log-cell-label">Emp ID</div><div class="log-cell-value">${esc(r.EmpID||'—')}</div></div>
+          <div class="log-cell"><div class="log-cell-label">Rider ID</div><div class="log-cell-value">${esc(r.RiderID||'—')}</div></div>
+          <div class="log-cell"><div class="log-cell-label">Company</div><div class="log-cell-value">${esc(r.Company||'—')}</div></div>
+          <div class="log-cell"><div class="log-cell-label">Bike</div><div class="log-cell-value asset">${bike?esc(bike.BikeID):(r.AssetType==='Bike'?esc(r.AssetID):'—')}</div></div>
+          <div class="log-cell"><div class="log-cell-label">SIM</div><div class="log-cell-value asset">${sim?(esc(sim.SimID||sim.ID)):(r.AssetType==='SIM'?esc(r.AssetID):'—')}</div></div>
+          <div class="log-cell"><div class="log-cell-label">Inventory</div><div class="log-cell-value ${hasInv?'yes':'no'}">${hasInv?'Yes':'No'}</div></div>
+        </div>`:''}
+        <div class="log-time">${l.time}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 function getEmployeeInventory(eid){
   const e=(state.employees||[]).find(emp=>(emp.EmpID||emp.EID)===eid);
@@ -2289,6 +2611,13 @@ function switchTab(tab){
   ['checkinout','bikes','employees','log'].forEach(t=>{
     document.getElementById('tab-panel-'+t).style.display=t===tab?'block':'none';
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+}
+
+function switchView(view){
+  ['main','config'].forEach(v=>{
+    const el=document.getElementById('view-'+v);
+    if(el) el.style.display=v===view?'block':'none';
   });
 }
 
@@ -2350,8 +2679,8 @@ function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
   // Initial render
   switchTab('checkinout');
   switchView('main');
-  // Load demo data to show the UI immediately
-  loadDemoData();
+  // Auto-sync real API data
+  syncAll(true).catch(e=>console.warn('Auto-sync error:',e));
 })();
 </script>
 </body>
