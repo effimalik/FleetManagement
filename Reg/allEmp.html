@@ -1391,35 +1391,8 @@ function toast(msg, type='success') {
   toastTimer=setTimeout(()=>{ el.classList.remove('show'); }, 3500);
 }
 
-/* ═══════════ THEME — driven by parent via postMessage ═══════════ */
-const VALID_THEMES = ['dark','light','purple','ocean','slate'];
-
-function applyTheme(mode) {
-  if (!VALID_THEMES.includes(mode)) mode = 'dark';
-  document.documentElement.setAttribute('data-theme', mode);
-}
-
-/* Listen for theme broadcast from parent iframe controller */
-window.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'setTheme' && e.data.theme) {
-    applyTheme(e.data.theme);
-  }
-});
-
-/* On load: ask parent for current theme, fallback to localStorage / dark */
-function syncThemeFromParent() {
-  try {
-    // Try to read parent's html[data-theme] directly (same-origin)
-    const parentTheme = window.parent.document.documentElement.getAttribute('data-theme');
-    if (parentTheme) { applyTheme(parentTheme); return; }
-  } catch(e) { /* cross-origin — rely on postMessage */ }
-  // Fallback: use stored or default
-  applyTheme(localStorage.getItem('theme') || 'dark');
-}
-
 /* ═══════════ INIT ═══════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  syncThemeFromParent();
   loadEmployees();
 });
 </script>
