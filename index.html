@@ -781,6 +781,12 @@ function setTheme(mode) {
   document.documentElement.setAttribute('data-theme', mode);
   localStorage.setItem('theme', mode);
 
+	  // ✅ ADD THESE 4 LINES HERE
+  const frame = document.getElementById('main-frame');
+  if (frame && frame.contentWindow) {
+    frame.contentWindow.postMessage({ type: 'setTheme', theme: mode }, '*');
+  }
+
   // Update label
   const labelMap = { dark:'Dark', light:'Light', purple:'Purple Night', ocean:'Ocean', slate:'Slate' };
   const lbl = document.getElementById('theme-dd-label');
