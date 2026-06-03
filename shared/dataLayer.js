@@ -353,13 +353,25 @@ AdminPro.getCacheStatus = function() {
     const ageMs  = AdminPro.cache.age(k);          // ms or Infinity
     const ttl    = AdminPro.cache.TTL[k] ?? 300000;
     const fresh  = ageMs < ttl;
+
+    /* hasData: true if cache entry exists AND contains at least one row */
+    let hasData = false;
+    try {
+      const d = AdminPro.cache.get(k);
+      hasData = Array.isArray(d) ? d.length > 0 : d != null;
+    } catch(_) {}
+
     let ageLabel = 'Not loaded';
+    let lastSync = null;   // human-readable timestamp string
     if (ageMs !== Infinity) {
       const s = Math.floor(ageMs / 1000);
       ageLabel = s < 60  ? `${s}s ago`
                : s < 3600 ? `${Math.floor(s/60)}m ago`
                : `${Math.floor(s/3600)}h ago`;
+      const d = new Date(Date.now() - ageMs);
+      lastSync = d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+               + ', ' + d.toLocaleDateString([], { day:'2-digit', month:'short' });
     }
-    return { key: k, label: labels[k], ageMs, ageLabel, fresh };
+    return { key: k, label: labels[k], ageMs, ageLabel, fresh, hasData, lastSync };
   });
 };
