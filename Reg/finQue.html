@@ -7,8 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
-<!-- line 10 (after the auth.js script tag) -->
-<script src="https://effimalik.github.io/FleetManagement/shared/dataLayer.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root,[data-theme="dark"]{
@@ -858,101 +856,9 @@ img,svg{max-width:100%;height:auto;}
   <span id="toast-msg"></span>
 </div>
 
+
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
-const MASTER_API = API_BASE + '?type=employee';
-const CACHE_KEY    = 'approvedSheet_v1';
-const CACHE_TTL    = 3 * 60 * 1000;
-
-// ── COLUMN MAP ───────────────────────────────────────────────
-// [0]REF ID [1]EmpID [2]EID No [3]EmpName [4]ReqAmount [5]ReqInstallments
-// [6]RetReqMonths [7]ReqForMonth [8]ReqReason [9]Timestamp [10]AppAmount
-// [11]AppInstallments [12]RetAppMonths [13]ReqStatus [14]Amount [15]DissDate
-const COL = {
-  REF_ID:0,EMP_ID:1,EID_NO:2,EMP_NAME:3,
-  REQ_AMOUNT:4,REQ_INSTALLMENTS:5,RET_REQ_MONTHS:6,
-  REQ_FOR_MONTH:7,REQ_REASON:8,TIMESTAMP:9,
-  APP_AMOUNT:10,APP_INSTALLMENTS:11,RET_APP_MONTHS:12,
-  REQ_STATUS:13,AMOUNT:14,DISS_DATE:15
-};
-
-let allRows=[], filteredRows=[], currentPage=1, rowsPerPage=20;
-
-// ── HELPERS ──────────────────────────────────────────────────
-function fmt(n,dec=2){return Number(n||0).toLocaleString('en-AE',{minimumFractionDigits:dec,maximumFractionDigits:dec});}
-function fmtShort(n){return Number(n||0).toLocaleString('en-AE',{minimumFractionDigits:0,maximumFractionDigits:0});}
-function esc(v){if(v==null)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-function fmtDate(val){
-  if(!val)return'—';
-  try{const d=new Date(val);if(isNaN(d))return esc(val);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
-  catch(e){return esc(val);}
-}
-
-function fmtMonth(val){
-  if(!val)return'—';
-  try{const d=new Date(val);if(isNaN(d))return esc(val);return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});}
-  catch(e){return esc(val);}
-}
-
-// Full millisecond-precision timestamp parse & display
-function parseTimestamp(ts){
-  if(!ts) return null;
-  ts=String(ts).trim();
-  // Format: DDMMYYYYHHmmssSSS (14+ digits)
-  if(/^\d{14,17}$/.test(ts)){
-    const d=ts.slice(0,2),m=ts.slice(2,4),y=ts.slice(4,8);
-    const hh=ts.slice(8,10)||'00',mm=ts.slice(10,12)||'00',ss=ts.slice(12,14)||'00';
-    const ms=ts.slice(14,17)||'000';
-    const date=new Date(`${y}-${m}-${d}T${hh}:${mm}:${ss}.${ms}`);
-    return isNaN(date)?null:date;
-  }
-  const d=new Date(ts);
-  return isNaN(d)?null:d;
-}
-
-function fmtTimestamp(ts){
-  const d=parseTimestamp(ts);
-  if(!d) return {date:'—',time:'—',ms:'',age:''};
-  const date=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  const time=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const ms=String(d.getMilliseconds()).padStart(3,'0');
-  const now=Date.now();
-  const diff=now-d.getTime();
-  let age='',ageClass='old';
-  if(diff<60*60*1000){age=Math.floor(diff/60000)+'m ago';ageClass='fresh';}
-  else if(diff<24*60*60*1000){age=Math.floor(diff/3600000)+'h ago';ageClass='recent';}
-  else if(diff<7*24*60*60*1000){age=Math.floor(diff/86400000)+'d ago';ageClass='old';}
-  else{age=date;ageClass='old';}
-  return{date,time,ms,age,ageClass};
-}
-
-function fmtRetReqMonths(val){
-  if(!val)return'—';
-  return val.split(/[,;]/).map(s=>{
-    s=s.trim();if(!s)return'';
-    const d=new Date(s);
-    if(!isNaN(d)&&s.includes('T')){return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});}
-    return s;
-  }).filter(Boolean).join(' · ');
-}
-
-function refToDate(ref){
-  const m=String(ref).match(/ADV-(\d{4})(\d{2})(\d{2})-/);
-  if(!m)return null;
-  return`${m[1]}-${m[2]}-${m[3]}`;
-}
-
-// ── CACHE ────────────────────────────────────────────────────
-function saveCache(data){try{sessionStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data}));}catch(e){}}
-function loadCacheData(){
-  try{
-    const r=sessionStorage.getItem(CACHE_KEY);if(!r)return null;
-    const o=JSON.parse(r);if(Date.now()-o.ts>CACHE_TTL)return null;
-    return{data:o.data,age:Math.round((Date.now()-o.ts)/1000)};
-  }catch(e){return null;}
-}
-function clearCache(){try{sessionStorage.removeItem(CACHE_KEY);}catch(e){}}
 
 function updateCacheInfo(age,fresh){
   const el=document.getElementById('cache-info');if(!el)return;
@@ -993,7 +899,7 @@ async function loadData(forceRefresh=false){
   showSkeletons(5);
 
   try{
-    const res = await fetch(MASTER_API+'&t='+Date.now(),{cache:'no-store'});
+    const res = await AdminPro.fetch('employee', { force: true });
     const data = await res.json();
 
     const rows = Array.isArray(data) ? data : (data.data || []);
