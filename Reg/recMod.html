@@ -7,9 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css"/>
-<script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
-<!-- line 10 (after the auth.js script tag) -->
-<script src="https://effimalik.github.io/FleetManagement/shared/dataLayer.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -363,10 +360,7 @@ tr.overdue td:first-child{border-left:2px solid var(--red);}
 // ══════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxP_zK-aqHyleejukkvrP0yPSZFhsQR46Ckim24k8CSu9YgfQCQyT-xFmS4IPA8TS3Zdg/exec';
-const CACHE_KEY   = 'recovery_data_v1';
-const CACHE_TS_KEY = 'recovery_data_ts_v1';
-const CACHE_TTL   = 6 * 60 * 60 * 1000; // 6 hours in ms
+
 
 const EMPLOYEES = [
   { empId:1, name:'Ahmed Al Mansoori', eid:'784199995170001' },
@@ -443,50 +437,38 @@ function updateCachePill(ts) {
   const pill = document.getElementById('cache-pill');
   const lbl  = document.getElementById('cache-label');
   if (!ts) { lbl.textContent = 'No cache'; pill.className = 'cache-pill'; return; }
-  const age = Date.now() - ts;
-  const fresh = age < CACHE_TTL;
+  const ttl  = (AdminPro.cache.TTL && AdminPro.cache.TTL.recovery) || AdminPro.cache.TTL || (6 * 60 * 60 * 1000);
+  const age  = Date.now() - ts;
+  const fresh = age < ttl;
   lbl.textContent = 'Cache ' + formatTimeAgo(ts);
   pill.className = 'cache-pill ' + (fresh ? 'fresh' : 'stale');
   pill.title = fresh
-    ? 'Fresh cache — expires in ' + Math.round((CACHE_TTL - age)/60000) + 'm'
+    ? 'Fresh cache — expires in ' + Math.round((ttl - age)/60000) + 'm'
     : 'Stale cache — will refresh on next Sync';
 }
 
 // ══════════════════════════════════════
-//  LOCAL STORAGE CACHE (6 hours)
+//  CACHE (via AdminPro.cache)
 // ══════════════════════════════════════
 function saveCache(data) {
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-    localStorage.setItem(CACHE_TS_KEY, String(Date.now()));
+    AdminPro.cache.set('recovery', { data, ts: Date.now() });
   } catch(e) { /* storage full — skip */ }
 }
 
 function loadCache() {
   try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    const ts  = parseInt(localStorage.getItem(CACHE_TS_KEY) || '0');
-    if (!raw || !ts) return null;
-    if (Date.now() - ts > CACHE_TTL) return null; // expired
-    return { data: JSON.parse(raw), ts };
+    const entry = AdminPro.cache.get('recovery');
+    if (!entry) return null;
+    return { data: entry.data, ts: entry.ts };
   } catch(e) { return null; }
 }
 
 function clearCache() {
-  localStorage.removeItem(CACHE_KEY);
-  localStorage.removeItem(CACHE_TS_KEY);
+  AdminPro.cache.clear('recovery');
 }
 
-// ══════════════════════════════════════
-//  FETCH FROM GAS
-// ══════════════════════════════════════
-async function gasCall(action) {
-  const url = GAS_URL + '?action=' + action + '&t=' + Date.now();
-  const res  = await fetch(url, { cache:'no-store' });
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error || 'GAS error');
-  return json.data;
-}
+
 
 // ══════════════════════════════════════
 //  BUILD INSTALLMENT ROWS
@@ -563,20 +545,19 @@ async function loadData(forceRefresh = false) {
 
   setLoading(true, 'Fetching from server…', 'Connecting to Google Sheets…');
   try {
-    const disbursedData = await gasCall('getDisbursedRequests');
-    saveCache(disbursedData);
+    const rows = await AdminPro.fetch('recovery', { force: forceRefresh });
+    saveCache(rows);
     updateCachePill(Date.now());
-    allRows = buildRows(disbursedData);
+    allRows = buildRows(rows);
     finishLoad(false);
   } catch (err) {
     console.error(err);
     // Try stale cache as fallback
     try {
-      const raw = localStorage.getItem(CACHE_KEY);
-      const ts  = parseInt(localStorage.getItem(CACHE_TS_KEY) || '0');
-      if (raw && ts) {
-        allRows = buildRows(JSON.parse(raw));
-        updateCachePill(ts);
+      const entry = AdminPro.cache.get('recovery');
+      if (entry && entry.data && entry.ts) {
+        allRows = buildRows(entry.data);
+        updateCachePill(entry.ts);
         showInfo('Using stale cache — could not reach server: ' + err.message);
         showToast('Loaded from stale cache', 'ti-database', 'warn');
         finishLoad(true);
@@ -1014,14 +995,14 @@ function downloadCSV(rows, filename) {
 // ══════════════════════════════════════
 (async () => {
   // Show stale cache indicator immediately
-  const ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || '0');
-  if (ts) updateCachePill(ts);
+  const cached = AdminPro.cache.get('recovery');
+  if (cached && cached.ts) updateCachePill(cached.ts);
   await loadData(false);
 
   // Refresh cache pill every minute
   setInterval(() => {
-    const t = parseInt(localStorage.getItem(CACHE_TS_KEY) || '0');
-    if (t) updateCachePill(t);
+    const entry = AdminPro.cache.get('recovery');
+    if (entry && entry.ts) updateCachePill(entry.ts);
   }, 60000);
 })();
 </script>
