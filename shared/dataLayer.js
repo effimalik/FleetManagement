@@ -318,3 +318,48 @@ AdminPro.forceRefresh = async function(type) {
   AdminPro.cache.clear(type);
   return AdminPro.fetch(type, { force: true });
 };
+/* ─────────────────────────────────────────
+   9. POST-LOGIN CACHE WARM-UP
+   Call immediately after login succeeds (before redirect).
+   Fires background fetches for all key datasets so cache
+   is hot when the dashboard loads — user never waits.
+   
+   Usage in login.html (after sessionStorage.setItem):
+     await AdminPro.warmCache();
+───────────────────────────────────────── */
+AdminPro.warmCache = async function() {
+  const types = ['bike', 'employee', 'master', 'cioLog'];
+  // Fire all in parallel — don't await individually so one failure
+  // doesn't block the others. Errors are silently swallowed here;
+  // individual pages will retry on load.
+  await Promise.allSettled(
+    types.map(t => AdminPro.fetch(t, { force: false }))
+  );
+};
+
+/* ─────────────────────────────────────────
+   10. CACHE STATUS INSPECTOR
+   Returns an array of { key, age, ageLabel, fresh }
+   for every known cache key — used by the topbar
+   cache-reload button tooltip in index.html.
+───────────────────────────────────────── */
+AdminPro.getCacheStatus = function() {
+  const keys = ['bike','employee','master','cioLog','approvedSheet','recovery'];
+  const labels = {
+    bike:'Bikes', employee:'Employees', master:'Master Data',
+    cioLog:'Check-In/Out Log', approvedSheet:'Approved Sheet', recovery:'Recovery',
+  };
+  return keys.map(k => {
+    const ageMs  = AdminPro.cache.age(k);          // ms or Infinity
+    const ttl    = AdminPro.cache.TTL[k] ?? 300000;
+    const fresh  = ageMs < ttl;
+    let ageLabel = 'Not loaded';
+    if (ageMs !== Infinity) {
+      const s = Math.floor(ageMs / 1000);
+      ageLabel = s < 60  ? `${s}s ago`
+               : s < 3600 ? `${Math.floor(s/60)}m ago`
+               : `${Math.floor(s/3600)}h ago`;
+    }
+    return { key: k, label: labels[k], ageMs, ageLabel, fresh };
+  });
+};
