@@ -245,6 +245,73 @@ body::after{
   transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;
 }
 .btn-retry:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ══ CACHE REFRESH PANEL (shown after login success) ══ */
+.cache-panel{
+  margin-top:14px;border-radius:10px;overflow:visible;
+  border:1px solid var(--border);display:none;
+  position:relative;
+}
+.cache-panel.show{display:block;}
+.cache-panel-header{
+  padding:8px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg3);border-bottom:1px solid var(--border);
+}
+.cache-panel-title{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);display:flex;align-items:center;gap:6px;
+}
+.cache-panel-title i{font-size:12px;color:var(--teal);}
+.btn-cache-refresh{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:6px;
+  border:1px solid rgba(57,211,83,.3);
+  background:var(--teal-dim);color:var(--teal);
+  font-family:var(--font);font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .18s;position:relative;
+}
+.btn-cache-refresh:hover{background:var(--teal);color:#fff;border-color:var(--teal);}
+.btn-cache-refresh:disabled{opacity:.5;cursor:not-allowed;}
+.btn-cache-refresh i{font-size:13px;}
+.btn-cache-refresh.spinning i{animation:spin .8s linear infinite;}
+
+/* Tooltip on the refresh button */
+.cache-refresh-tooltip{
+  position:absolute;top:calc(100% + 6px);right:0;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:10px;padding:10px 12px;min-width:240px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  z-index:500;pointer-events:none;
+  opacity:0;transform:translateY(-4px);
+  transition:opacity .18s,transform .18s;font-size:11px;
+}
+.btn-cache-refresh:hover .cache-refresh-tooltip{opacity:1;transform:translateY(0);}
+.cache-refresh-tooltip-title{
+  font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:7px;padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.cr-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;gap:10px;}
+.cr-row-left{display:flex;align-items:center;gap:5px;}
+.cr-row-data{
+  width:14px;height:14px;border-radius:50%;font-size:8px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.cr-row-data.has{background:var(--teal-dim);color:var(--teal);}
+.cr-row-data.no{background:var(--red-dim);color:var(--red);}
+.cr-row-label{font-size:10.5px;color:var(--text2);}
+.cr-row-sync{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:1px;}
+.cr-row-age{
+  font-family:var(--mono);font-size:9.5px;padding:1px 4px;border-radius:3px;
+  background:var(--teal-dim);color:var(--teal);white-space:nowrap;flex-shrink:0;
+}
+.cr-row-age.stale{background:var(--amber-dim);color:var(--amber);}
+.cr-row-age.empty{background:var(--surface);color:var(--text3);}
+.cr-foot{
+  margin-top:7px;padding-top:6px;border-top:1px solid var(--border);
+  font-size:9.5px;color:var(--text3);display:flex;align-items:center;gap:5px;
+}
 </style>
 </head>
 <body>
@@ -305,6 +372,25 @@ body::after{
           <div class="step" id="step-5"><div class="step-dot"></div><span>Opening AdminPro UAE</span></div>
         </div>
         <div class="status-msg" id="status-msg" style="display:none;margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- Cache Refresh Panel (shown after login success) -->
+    <div class="cache-panel" id="cache-panel">
+      <div class="cache-panel-header">
+        <div class="cache-panel-title">
+          <i class="ti ti-database"></i>Data Cache
+        </div>
+        <button class="btn-cache-refresh" id="btn-cache-refresh" onclick="manualCacheRefresh()" title="Refresh all cached data">
+          <i class="ti ti-refresh" id="cache-refresh-icon"></i>
+          Refresh Cache
+          <!-- Tooltip -->
+          <div class="cache-refresh-tooltip" id="cache-refresh-tooltip">
+            <div class="cache-refresh-tooltip-title">Cache Status</div>
+            <div id="cr-rows">Loading…</div>
+            <div class="cr-foot"><i class="ti ti-bolt"></i>Click to reload all data</div>
+          </div>
+        </button>
       </div>
     </div>
 
@@ -510,14 +596,18 @@ async function startGoogleLogin(){
     lastActive: Date.now(),
   }));
 
-  await sleep(400);
-  // Warm the cache in background while redirect navigates.
-  // dataLayer.js may not be loaded on login page, so guard it.
+  // Show cache refresh panel and start background warm-up
   try {
     if (window.AdminPro && typeof AdminPro.warmCache === 'function') {
-      AdminPro.warmCache(); // fire-and-forget intentionally
+      document.getElementById('cache-panel').classList.add('show');
+      updateLoginCacheTooltip();
+      AdminPro.warmCache().then(() => {
+        updateLoginCacheTooltip();
+      }).catch(() => {});
     }
   } catch(_) {}
+
+  await sleep(400);
   handleLoginRedirect();
 }
 
@@ -570,6 +660,52 @@ async function verifyWithAppsScript(idToken){
 }
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+/* ── Cache tooltip renderer for login page ── */
+function updateLoginCacheTooltip() {
+  const container = document.getElementById('cr-rows');
+  if (!container || !window.AdminPro || !AdminPro.getCacheStatus) return;
+  const statuses = AdminPro.getCacheStatus();
+  container.innerHTML = statuses.map(s => {
+    const ageCls    = s.ageMs === Infinity ? 'empty' : s.fresh ? '' : 'stale';
+    const dataBadge = s.hasData
+      ? `<span class="cr-row-data has">✓</span>`
+      : `<span class="cr-row-data no">✗</span>`;
+    const syncLine  = s.lastSync
+      ? `<div class="cr-row-sync">${s.lastSync}</div>`
+      : '';
+    return `<div class="cr-row">
+      <div class="cr-row-left">
+        ${dataBadge}
+        <div>
+          <div class="cr-row-label">${s.label}</div>
+          ${syncLine}
+        </div>
+      </div>
+      <span class="cr-row-age ${ageCls}">${s.ageLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ── Manual cache refresh button on login page ── */
+async function manualCacheRefresh() {
+  if (!window.AdminPro || typeof AdminPro.warmCache !== 'function') return;
+  const btn  = document.getElementById('btn-cache-refresh');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  try {
+    AdminPro.cache.clearAll();
+    await AdminPro.warmCache();
+    updateLoginCacheTooltip();
+  } catch(e) {
+    console.warn('manualCacheRefresh error:', e);
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('spinning');
+    updateLoginCacheTooltip();
+  }
+}
 
 /* ── Skip login if valid session exists ── */
 (function checkExistingSession(){

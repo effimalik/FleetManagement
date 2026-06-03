@@ -199,7 +199,7 @@ html,body{
   border:1px solid var(--border2);
   border-radius:10px;
   padding:10px 12px;
-  min-width:210px;
+  min-width:250px;
   box-shadow:0 8px 24px rgba(0,0,0,.45);
   z-index:99999;
   pointer-events:none;
@@ -219,13 +219,28 @@ html,body{
 }
 .cache-row{
   display:flex;justify-content:space-between;align-items:center;
-  padding:3px 0;gap:12px;
+  padding:4px 0;gap:8px;
 }
-.cache-row-label{color:var(--text2);font-size:11px;}
+.cache-row-left{
+  display:flex;align-items:center;gap:6px;min-width:0;
+}
+.cache-row-label{color:var(--text2);font-size:11px;display:block;}
+.cache-row-sync{
+  font-family:var(--mono);font-size:9px;color:var(--text3);
+  margin-top:1px;
+}
+.cache-row-data{
+  width:16px;height:16px;border-radius:50%;
+  font-size:9px;font-weight:700;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.cache-row-data.has{background:var(--teal-dim);color:var(--teal);}
+.cache-row-data.no{background:var(--red-dim);color:var(--red);}
 .cache-row-age{
   font-family:var(--mono);font-size:10px;
   padding:1px 5px;border-radius:4px;
   background:var(--teal-dim);color:var(--teal);
+  white-space:nowrap;flex-shrink:0;
 }
 .cache-row-age.stale{
   background:var(--amber-dim);color:var(--amber);
@@ -947,10 +962,22 @@ function updateCacheTooltip() {
   if (!container || !window.AdminPro || !AdminPro.getCacheStatus) return;
   const statuses = AdminPro.getCacheStatus();
   container.innerHTML = statuses.map(s => {
-    const cls = s.ageMs === Infinity ? 'empty' : s.fresh ? '' : 'stale';
+    const ageCls    = s.ageMs === Infinity ? 'empty' : s.fresh ? '' : 'stale';
+    const dataBadge = s.hasData
+      ? `<span class="cache-row-data has">✓</span>`
+      : `<span class="cache-row-data no">✗</span>`;
+    const syncLine  = s.lastSync
+      ? `<div class="cache-row-sync">${s.lastSync}</div>`
+      : '';
     return `<div class="cache-row">
-      <span class="cache-row-label">${s.label}</span>
-      <span class="cache-row-age ${cls}">${s.ageLabel}</span>
+      <div class="cache-row-left">
+        ${dataBadge}
+        <div>
+          <span class="cache-row-label">${s.label}</span>
+          ${syncLine}
+        </div>
+      </div>
+      <span class="cache-row-age ${ageCls}">${s.ageLabel}</span>
     </div>`;
   }).join('');
 }
