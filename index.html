@@ -542,11 +542,19 @@ html,body{
         <div class="tb-app-name">AdminPro UAE</div>
         <div class="tb-app-sub">HR &amp; Fleet Management</div>
       </div>
-      <!-- Day/Night icon toggle -->
-      <button class="tb-daynight" id="daynight-btn"
-        onclick="quickToggleDarkLight()"
-        title="Toggle dark / light mode">
-        <i class="ti ti-moon" id="daynight-icon"></i>
+	<!-- Cache Hard-Reload Button -->
+      <button class="tb-cache-btn" id="cache-reload-btn"
+        onclick="hardReloadCache()"
+        title="Hard reload all cached data">
+        <i class="ti ti-refresh" id="cache-reload-icon"></i>
+        <!-- Tooltip: cache age per dataset -->
+        <div class="cache-tooltip" id="cache-tooltip">
+          <div class="cache-tooltip-title">Cache Status</div>
+          <div id="cache-tooltip-rows">Loading…</div>
+          <div class="cache-tooltip-foot">
+            <i class="ti ti-bolt"></i>Click to hard-reload all data
+          </div>
+        </div>
       </button>
     </div>
 
@@ -862,26 +870,37 @@ function setTheme(mode) {
   // Mark active
   document.querySelectorAll('.td-item').forEach(el => el.classList.toggle('active', el.dataset.t === mode));
 
-  // Update day/night icon
-  updateDayNightIcon(mode);
+
 
   closeThemeDropdown();
 }
 
-function updateDayNightIcon(mode) {
-  const icon = document.getElementById('daynight-icon');
-  if (!icon) return;
-  if (mode === 'light') {
-    icon.className = 'ti ti-sun';
-  } else {
-    icon.className = 'ti ti-moon';
+/* Hard-reload all cached data (replaces day/night quick toggle) */
+async function hardReloadCache() {
+  const btn = document.getElementById('cache-reload-btn');
+  const icon = document.getElementById('cache-reload-icon');
+  if (!btn || btn.classList.contains('spinning')) return;
+  btn.classList.add('spinning');
+  try {
+    if (window.AdminPro && AdminPro.cache) {
+      AdminPro.cache.clearAll();
+      await Promise.allSettled([
+        AdminPro.fetch('bike',     { force: true }),
+        AdminPro.fetch('employee', { force: true }),
+        AdminPro.fetch('master',   { force: true }),
+        AdminPro.fetch('cioLog',   { force: true }),
+      ]);
+    }
+    // Also tell the iframe to refresh if it listens
+    const frame = document.getElementById('main-frame');
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.postMessage({ type: 'cacheReloaded' }, '*');
+    }
+  } catch(e) { console.warn('hardReloadCache error:', e); }
+  finally {
+    btn.classList.remove('spinning');
+    updateCacheTooltip(); // refresh tooltip after reload
   }
-}
-
-/* Quick dark ↔ light toggle via the icon button */
-function quickToggleDarkLight() {
-  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-  setTheme(cur === 'light' ? 'dark' : 'light');
 }
 
 /* Theme dropdown — position:fixed, computed from button bounds */
@@ -921,6 +940,26 @@ function closeThemeDropdown() {
   document.getElementById('theme-dd-btn')?.classList.remove('open');
 }
 
+
+/* Update the cache-status tooltip content */
+function updateCacheTooltip() {
+  const container = document.getElementById('cache-tooltip-rows');
+  if (!container || !window.AdminPro || !AdminPro.getCacheStatus) return;
+  const statuses = AdminPro.getCacheStatus();
+  container.innerHTML = statuses.map(s => {
+    const cls = s.ageMs === Infinity ? 'empty' : s.fresh ? '' : 'stale';
+    return `<div class="cache-row">
+      <span class="cache-row-label">${s.label}</span>
+      <span class="cache-row-age ${cls}">${s.ageLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+/* Refresh tooltip every 30s while page is open */
+setInterval(updateCacheTooltip, 30_000);
+
+
+	
 /* ── Clock ── */
 (function tick() {
   const now = new Date();
@@ -994,12 +1033,22 @@ function populateUserChip(){
 }
 
 /* ── Init ── */
+
+
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('theme') || 'dark';
   setTheme(saved);
   ibOpen('ib-emp', document.getElementById('ib-emp'));
   populateUserChip();
+
+  // Warm cache on load — if not yet populated from login warm-up
+  if (window.AdminPro && typeof AdminPro.warmCache === 'function') {
+    AdminPro.warmCache().then(updateCacheTooltip).catch(() => {});
+  }
+  // Initial tooltip render (may show "Not loaded" until warm-up finishes)
+  updateCacheTooltip();
 });
+	
 </script>
 </body>
 </html>
