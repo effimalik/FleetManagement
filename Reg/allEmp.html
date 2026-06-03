@@ -629,7 +629,7 @@ function toggleCacheSub() {
 /* ═══════════ LOAD ═══════════ */
 async function loadEmployees() {
   // Always show whatever we have from cache immediately — table is never blank during refresh
-  const cached = empCacheLoad();
+  const cached = AdminPro.cache.get('employee');  // FIX: was empCacheLoad() — function removed in dataLayer.js
   if (cached && cached.length) {
     employees = cached.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
@@ -648,9 +648,9 @@ async function loadEmployees() {
   showCacheBanner(true);
 
   try {
-    const res = await AdminPro.fetch('employee', { force: true });
-    const raw  = await res.json();
-    const rows = parseRows(raw);
+    // FIX: AdminPro.fetch() returns already-parsed data (not a Response object),
+    // so we must NOT call .json() on it. dataLayer.js handles fetch + parse + cache internally.
+    const rows = parseRows(await AdminPro.fetch('employee', { force: true }));
     // ── Column inspector: logs first 2 data rows so you can verify column mapping ──
     if (rows.length && Array.isArray(rows[0])) {
       console.group('📋 Sheet column map (first 2 rows)');
@@ -662,7 +662,7 @@ async function loadEmployees() {
       });
       console.groupEnd();
     }
-    empCacheSave(rows);
+    AdminPro.cache.set('employee', rows);  // FIX: was empCacheSave(rows)
     employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
     showCacheBanner(false);
@@ -682,7 +682,8 @@ async function forceRefreshEmployees() {
   AdminPro.cache.clear('employee');
   showCacheBanner(true); // spinner in banner, table stays
   try {
-    const res  = await fetch(EMP_SHEET_URL + '&nocache=' + Date.now());
+    // FIX: EMP_SHEET_URL was never defined — use AdminPro.api.get('employee') instead
+    const res  = await fetch(AdminPro.api.get('employee', { nocache: Date.now() }), { cache: 'no-store' });
     const raw  = await res.json();
     const rows = parseRows(raw);
     // ── Column inspector ──
@@ -696,7 +697,7 @@ async function forceRefreshEmployees() {
       });
       console.groupEnd();
     }
-    empCacheSave(rows);
+    AdminPro.cache.set('employee', rows);  // FIX: was empCacheSave(rows)
     employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
     showCacheBanner(false);
@@ -929,7 +930,8 @@ async function viewEmployee(empId) {
 
   if (!_empDetailCache[empId]) {
     try {
-      const res  = await fetch(EMP_SHEET_URL.replace('?type=employee', '?type=employeeDetail&empId=' + encodeURIComponent(empId)) + '&nocache=' + Date.now());
+      // FIX: EMP_SHEET_URL was never defined — build the detail URL using AdminPro.api.get
+      const res  = await fetch(AdminPro.api.get('employeeDetail', { empId: encodeURIComponent(empId), nocache: Date.now() }), { cache: 'no-store' });
       const data = await res.json();
       if (data && (data.id || data.empId)) {
         _empDetailCache[empId] = data;
@@ -1055,7 +1057,7 @@ async function _dpSave() {
   if (vals.labourExpiry !== undefined) emp.expiry.labour = computeExpiry(vals.labourExpiry);
   if (vals.insExpiry !== undefined) emp.expiry.insurance = computeExpiry(vals.insExpiry);
 
-  renderEmpTable(employees); empCacheClear();
+  renderEmpTable(employees); AdminPro.cache.clear('employee'); // FIX: was empCacheClear()
   _dpResetButtons(); _renderEmpDetail(emp, emp.expiry || {});
 
   const payload = { action:'updateEmployee', empId:String(emp.id), name:emp.name, eid:emp.eid, mobile:emp.mobile, mobilePak:emp.mobilePak||'', reference:emp.ref||'', eidExpiry:vals.eidExp||'', licExpiry:vals.licExpiry||'', labourExpiry:vals.labourExpiry||'', insExpiry:vals.insExpiry||'' };
