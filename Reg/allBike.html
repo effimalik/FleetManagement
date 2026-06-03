@@ -8,8 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
 <script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
-<!-- line 10 (after the auth.js script tag) -->
-<script src="https://effimalik.github.io/FleetManagement/shared/dataLayer.js"></script>
   
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -467,14 +465,14 @@ th, td { border-left: none !important; border-right: none !important; }
 <div class="toast" id="toast"><i id="toast-icon" class="ti ti-circle-check"></i><span id="toast-msg"></span></div>
 
 <script>
+<script>
 'use strict';
 /* ═══════════════════════════════════════
-   CONFIG — update SHEET_URL to your deployed Apps Script URL
+   CONFIG
+   SHEET_URL / CACHE_KEY / CACHE_TTL removed —
+   all handled by dataLayer.js (AdminPro.*)
 ═══════════════════════════════════════ */
-const SHEET_URL = API_BASE
 const WARN_DAYS = 60;
-const CACHE_KEY = 'bike_fleet_v4';
-const CACHE_TTL = 5 * 60 * 1000;
 
 /* Sheet column order (0-based) */
 const COL = {
@@ -506,18 +504,16 @@ const hasDate    = d => d && String(d).trim().length > 0;
 /** docStatus: status of a single date field
  *  Missing, blank, or invalid date → treated as expired (red) */
 function docStatus(d) {
-  if (!hasDate(d)) return 'expired';                    // missing = expired
+  if (!hasDate(d)) return 'expired';
   const dt = new Date(d);
-  if (isNaN(dt.getTime())) return 'expired';            // invalid = expired
+  if (isNaN(dt.getTime())) return 'expired';
   if (isExpired(d))  return 'expired';
   if (isExpiring(d)) return 'expiring';
   return 'valid';
 }
 
 /** fleetStatus: normalise sheet status.
- *  Only "available" (any case) → 'available'.
- *  Everything else (inactive, maintenance, retired, deactivated, active, …) → 'unavailable'.
- *  We still preserve the raw value for display purposes. */
+ *  Only "available" (any case) → 'available'. */
 function fleetStatus(b) {
   const raw = (b.status || '').toLowerCase().trim();
   return raw === 'available' ? 'available' : 'unavailable';
@@ -529,8 +525,7 @@ function fleetStatusRaw(b) {
   return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
 }
 
-/** docHealthStatus: computed from the 3 expiry dates.
- *  Missing/invalid dates are counted as expired. */
+/** docHealthStatus: computed from the 3 expiry dates */
 function docHealthStatus(b) {
   const s = d => docStatus(d);
   if (s(b.mulkiyaExp)==='expired' || s(b.passingExp)==='expired' || s(b.insExp)==='expired') return 'expired';
@@ -572,42 +567,10 @@ function bikeAv(i) {
   return `<div class="bk-av" style="background:${AV_BG[idx]};color:${AV_FG[idx]};"><i class="ti ti-motorbike"></i></div>`;
 }
 
-/* ═══  CACHE  ═══ */
-function bikeCacheSave(rows) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),rows})); } catch {} }
-function bikeCacheLoad() {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const {ts,rows} = JSON.parse(raw);
-    if (Date.now()-ts > CACHE_TTL) return null;
-    return rows;
-  } catch { return null; }
-}
-function bikeCacheClear() { try { localStorage.removeItem(CACHE_KEY); } catch {} }
-
-/* ═══  CACHE BAR  ═══ */
-function setCacheBar(state, ts) {
-  const pill = document.getElementById('cache-pill');
-  const tsEl = document.getElementById('cache-ts');
-  if (state === 'loading') {
-    pill.className='cache-pill syncing';
-    pill.innerHTML='<i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i>';
-    tsEl.textContent='Loading…';
-  } else if (state === 'synced') {
-    pill.className='cache-pill synced';
-    pill.innerHTML='<i class="ti ti-circle-check"></i>';
-    const d = new Date(ts||Date.now());
-    tsEl.textContent=`${d.toLocaleDateString([],{day:'2-digit',month:'short'})}, ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
-  } else {
-    pill.className='cache-pill err';
-    pill.innerHTML='<i class="ti ti-alert-circle"></i>';
-    tsEl.textContent='Fetch error';
-  }
-}
-
-async function forceFresh() { bikeCacheClear(); await loadBikes(); }
-
-/* ═══  NORMALISE ROW  ═══ */
+/* ═══  NORMALISE ROW  ═══
+   Kept here because CSV-upload path also uses it for object rows.
+   Array-row normalisation now done inside dataLayer.js (_normBike),
+   but we keep this for the upload merge path which passes plain objects. */
 function normaliseRow(r, i) {
   if (!r) return null;
   if (Array.isArray(r)) {
@@ -615,66 +578,72 @@ function normaliseRow(r, i) {
     const plate = (r[COL.plate]||'').toString().trim();
     if (!plate) return null;
     return {
-      _rowIndex: i+2,
-      timestamp:  (r[COL.timestamp]||'').toString(),
-      bikeId:     (r[COL.bikeId]   ||String(i+1)).toString(),
+      _rowIndex:  i+2,
+      timestamp:  (r[COL.timestamp]  ||'').toString(),
+      bikeId:     (r[COL.bikeId]     ||String(i+1)).toString(),
       plate,
-      chassis:    (r[COL.chassis]  ||'').toString(),
-      make:       (r[COL.make]     ||'—').toString(),
-      model:      (r[COL.model]    ||'—').toString(),
-      emirate:    (r[COL.emirate]  ||'').toString(),
-      mulkiyaExp: (r[COL.mulkiyaExp]||'').toString(),
-      passingExp: (r[COL.passingExp]||'').toString(),
-      insExp:     (r[COL.insExp]   ||'').toString(),
-      status:     (r[COL.status]   ||'active').toString().toLowerCase(),
+      chassis:    (r[COL.chassis]    ||'').toString(),
+      make:       (r[COL.make]       ||'—').toString(),
+      model:      (r[COL.model]      ||'—').toString(),
+      emirate:    (r[COL.emirate]    ||'').toString(),
+      mulkiyaExp: (r[COL.mulkiyaExp] ||'').toString(),
+      passingExp: (r[COL.passingExp] ||'').toString(),
+      insExp:     (r[COL.insExp]     ||'').toString(),
+      status:     (r[COL.status]     ||'active').toString().toLowerCase(),
     };
   }
   const plate = (r.plate||r.plateNumber||r['Plate Number']||'').toString().trim();
   if (!plate) return null;
   return {
-    _rowIndex: r._rowIndex || (i+2),
-    timestamp:  (r.timestamp||r.Timestamp||'').toString(),
-    bikeId:     (r.bikeId||r['Bike ID']||String(i+1)).toString(),
+    _rowIndex:  r._rowIndex || (i+2),
+    timestamp:  (r.timestamp  ||r.Timestamp              ||'').toString(),
+    bikeId:     (r.bikeId     ||r['Bike ID']             ||String(i+1)).toString(),
     plate,
-    chassis:    (r.chassis||r['Chassis Number']||'').toString(),
-    make:       (r.make||r.Make||'—').toString(),
-    model:      (r.model||r.Model||'—').toString(),
-    emirate:    (r.emirate||r.Emirate||'').toString(),
-    mulkiyaExp: (r.mulkiyaExp||r['Mulkiya Expiry']||'').toString(),
-    passingExp: (r.passingExp||r['Passing Expiry']||'').toString(),
-    insExp:     (r.insExp||r['Insurance Expiry']||'').toString(),
-    status:     (r.status||r.Status||'active').toString().toLowerCase(),
+    chassis:    (r.chassis    ||r['Chassis Number']      ||'').toString(),
+    make:       (r.make       ||r.Make                   ||'—').toString(),
+    model:      (r.model      ||r.Model                  ||'—').toString(),
+    emirate:    (r.emirate    ||r.Emirate                ||'').toString(),
+    mulkiyaExp: (r.mulkiyaExp ||r['Mulkiya Expiry']      ||'').toString(),
+    passingExp: (r.passingExp ||r['Passing Expiry']      ||'').toString(),
+    insExp:     (r.insExp     ||r['Insurance Expiry']    ||'').toString(),
+    status:     (r.status     ||r.Status                 ||'active').toString().toLowerCase(),
   };
 }
 
-/* ═══  LOAD  ═══ */
+/* ═══  LOAD  ═══
+   Now delegates to AdminPro.fetch() from dataLayer.js.
+   - Cache read/write handled by dataLayer
+   - In-flight deduplication handled by dataLayer
+   - Cache bar updated via AdminPro.setCacheBar()             */
 async function loadBikes() {
-  setCacheBar('loading');
+  AdminPro.setCacheBar('loading');
   const tbody = document.getElementById('bike-tbody');
-  const cached = bikeCacheLoad();
+
+  /* Show cached data instantly while fresh fetch runs in background */
+  const cached = AdminPro.cache.get('bike');
   if (cached && cached.length) {
     bikes = cached.map((r,i) => normaliseRow(r,i)).filter(Boolean);
     renderAll();
   } else {
-    if(tbody) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;font-size:22px;color:var(--text3);"></i><div style="margin-top:8px;color:var(--text3);font-size:13px;">Loading bikes…</div></td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;font-size:22px;color:var(--text3);"></i><div style="margin-top:8px;color:var(--text3);font-size:13px;">Loading bikes…</div></td></tr>`;
   }
+
   try {
-    const res  = await fetch(SHEET_URL + '?type=bike&t=' + Date.now());
-    const raw  = await res.json();
-    const rows = Array.isArray(raw) ? raw : (raw.data||raw.values||raw.rows||[]);
-    const clean = (rows.length && Array.isArray(rows[0]) && typeof rows[0][0]==='string' && /timestamp|date/i.test(rows[0][0])) ? rows.slice(1) : rows;
-    bikeCacheSave(clean);
-    bikes = clean.map((r,i) => normaliseRow(r,i)).filter(Boolean);
+    const rows = await AdminPro.fetch('bike');
+    bikes = rows.map((r,i) => normaliseRow(r,i)).filter(Boolean);
     renderAll();
-    setCacheBar('synced', Date.now());
+    AdminPro.setCacheBar('synced', Date.now());
   } catch(e) {
     console.error('loadBikes:', e);
-    if (cached && cached.length) { setCacheBar('error'); }
-    else {
-      setCacheBar('error');
-      if (tbody && !bikes.length) tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--red);">Failed to load. Check SHEET_URL.</td></tr>`;
-    }
+    AdminPro.setCacheBar('error');
+    if (tbody && !bikes.length) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--red);">Failed to load. Check API_BASE in dataLayer.js.</td></tr>`;
   }
+}
+
+/* Force-refresh: clears the shared cache then reloads */
+async function forceFresh() {
+  AdminPro.cache.clear('bike');
+  await loadBikes();
 }
 
 /* ═══  STATS  ═══ */
@@ -980,8 +949,8 @@ async function saveEdit() {
   document.getElementById('dp-saving').classList.add('show');
 
   try {
-    const payload = {
-      action:   'updateRow',
+    /* ── AdminPro.post replaces the raw fetch(SHEET_URL, {method:'POST',...}) ── */
+    await AdminPro.post('updateRow', {
       rowIndex: b._rowIndex,
       row: [
         updated.timestamp,
@@ -996,14 +965,7 @@ async function saveEdit() {
         updated.insExp,
         updated.status,
       ]
-    };
-    const res = await fetch(SHEET_URL, {
-      method:'POST',
-      body: JSON.stringify(payload),
-      headers:{'Content-Type':'application/json'}
     });
-    const result = await res.json();
-    if (result.success !== true && result.status !== 'ok') throw new Error(result.error||'Unknown error');
 
     Object.assign(b, updated);
     document.getElementById('dp-name').textContent=`${b.make} ${b.model}`;
@@ -1023,7 +985,7 @@ async function saveEdit() {
     document.getElementById('dp-saving').classList.remove('show');
     renderViewMode(b);
     renderAll();
-    bikeCacheClear();
+    AdminPro.cache.clear('bike');   /* ── replaces bikeCacheClear() ── */
     toast('Saved to Google Sheet ✓');
   } catch(e) {
     document.getElementById('dp-saving').classList.remove('show');
@@ -1102,50 +1064,36 @@ function handleFile(file) {
   errEl.classList.remove('show'); prevEl.classList.remove('show'); btn.disabled=true; _pendingUpload=[];
 
   const reader = new FileReader();
-  reader.onload = ev => {
+  reader.onload = e => {
     try {
-      const text = ev.target.result;
+      const text  = e.target.result;
       const lines = text.split(/\r?\n/).filter(l=>l.trim());
-      if (lines.length < 2) throw new Error('File needs at least a header row and one data row.');
+      if (lines.length < 2) throw new Error('File has no data rows.');
 
       const rawHeaders = lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
-      const colIdx = {};
-      for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
-        const idx = rawHeaders.findIndex(h => aliases.some(a => a.toLowerCase()===h.toLowerCase()));
-        colIdx[field] = idx >= 0 ? idx : -1;
-      }
-
-      const plateIdx = colIdx.plate;
-      if (plateIdx < 0) throw new Error('CSV must have a "plate" or "Plate Number" column to match records.');
-
-      const get = (cols, field) => {
-        const i = colIdx[field];
-        return i >= 0 ? (cols[i]||'').replace(/^"|"$/g,'').trim() : '';
-      };
-
-      const parsed = [];
-      for (let r=1; r<lines.length; r++) {
-        const cols = lines[r].split(',');
-        const plate = (cols[plateIdx]||'').replace(/^"|"$/g,'').trim();
-        if (!plate) continue;
-        const entry = { plate, _csvFields: Object.keys(colIdx).filter(f=>colIdx[f]>=0) };
-        for (const field of entry._csvFields) {
-          entry[field] = get(cols, field);
+      const fieldMap   = {};
+      rawHeaders.forEach((h,i)=>{
+        for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
+          if (aliases.some(a=>a.toLowerCase()===h.toLowerCase())) { fieldMap[field]=i; break; }
         }
-        parsed.push(entry);
-      }
+      });
 
-      if (!parsed.length) throw new Error('No valid rows found. Make sure the "plate" column has data.');
+      if (!('plate' in fieldMap)) throw new Error('Could not find a "Plate Number" column.');
 
-      _pendingUpload = parsed;
-      const modeLabel = _upMode==='add' ? 'add' : 'update';
-      document.getElementById('up-preview-text').innerHTML =
-        `<strong>${file.name}</strong> — ${parsed.length} row${parsed.length!==1?'s':''} ready to <strong>${modeLabel}</strong>.<br>
-         <span style="font-size:11px;color:var(--text3);">Fields detected: ${parsed[0]._csvFields.join(', ')}</span>`;
+      _pendingUpload = lines.slice(1).map(line=>{
+        const cols = line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));
+        const row  = { _csvFields: Object.keys(fieldMap) };
+        for (const [field, idx] of Object.entries(fieldMap)) row[field] = cols[idx]||'';
+        return row;
+      }).filter(r=>r.plate);
+
+      if (!_pendingUpload.length) throw new Error('No valid rows found (every row is missing a plate number).');
+
+      prevEl.innerHTML = `<strong>${_pendingUpload.length} row${_pendingUpload.length!==1?'s':''} ready to ${_upMode==='add'?'add':'update'}.</strong> First plate: ${_pendingUpload[0].plate}`;
       prevEl.classList.add('show');
       btn.disabled = false;
-    } catch(e) {
-      errEl.textContent = e.message;
+    } catch(err) {
+      errEl.textContent = err.message;
       errEl.classList.add('show');
     }
   };
@@ -1166,7 +1114,7 @@ async function confirmUpload() {
 
     for (const r of toAdd) {
       const newBike = {
-        _rowIndex: bikes.length + 2,
+        _rowIndex:  bikes.length + 2,
         timestamp:  r.timestamp  || new Date().toISOString(),
         bikeId:     r.bikeId     || 'BIKE-'+String(Date.now()).slice(-5),
         plate:      r.plate,
@@ -1180,17 +1128,14 @@ async function confirmUpload() {
         status:     r.status     || 'active',
       };
       try {
-        const res = await fetch(SHEET_URL,{
-          method:'POST',
-          body:JSON.stringify({action:'appendRow', row:[
+        /* ── AdminPro.post replaces the raw fetch(SHEET_URL,{method:'POST',...}) ── */
+        await AdminPro.post('appendRow', {
+          row: [
             newBike.timestamp, newBike.bikeId, newBike.plate, newBike.chassis,
             newBike.make, newBike.model, newBike.emirate,
             newBike.mulkiyaExp, newBike.passingExp, newBike.insExp, newBike.status
-          ]}),
-          headers:{'Content-Type':'application/json'}
+          ]
         });
-        const result = await res.json();
-        if (result.success!==true && result.status!=='ok') throw new Error('Sheet error');
         bikes.push(newBike);
         added++;
       } catch { errors++; }
@@ -1208,17 +1153,15 @@ async function confirmUpload() {
       }
 
       try {
-        const res = await fetch(SHEET_URL,{
-          method:'POST',
-          body:JSON.stringify({action:'updateRow', rowIndex:existing._rowIndex, row:[
+        /* ── AdminPro.post replaces the raw fetch(SHEET_URL,{method:'POST',...}) ── */
+        await AdminPro.post('updateRow', {
+          rowIndex: existing._rowIndex,
+          row: [
             merged.timestamp, merged.bikeId, merged.plate, merged.chassis,
             merged.make, merged.model, merged.emirate,
             merged.mulkiyaExp, merged.passingExp, merged.insExp, merged.status
-          ]}),
-          headers:{'Content-Type':'application/json'}
+          ]
         });
-        const result = await res.json();
-        if (result.success!==true && result.status!=='ok') throw new Error('Sheet error');
         Object.assign(existing, merged);
         updated++;
       } catch { errors++; }
@@ -1227,7 +1170,7 @@ async function confirmUpload() {
 
   closeUploadModal();
   renderAll();
-  bikeCacheClear();
+  AdminPro.cache.clear('bike');   /* ── replaces bikeCacheClear() ── */
 
   let msg = _upMode==='add'
     ? `Added ${added} bike${added!==1?'s':''}${skipped>0?' ('+skipped+' duplicate'+(skipped>1?'s':'')+' skipped)':''}${errors>0?' | '+errors+' error(s)':''}.`
@@ -1259,6 +1202,7 @@ function toast(msg,type='success'){
 
 /* ═══  INIT  ═══ */
 document.addEventListener('DOMContentLoaded', loadBikes);
+</script>
 </script>
 </body>
 </html>
