@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
 <script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
+
 	
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -173,89 +174,6 @@ html,body{
 .tb-daynight:hover{transform:scale(1.15);border-color:var(--accent);}
 [data-theme="light"] .tb-daynight{color:var(--amber);box-shadow:0 0 8px rgba(227,179,65,.35);}
 
-
-/* ── Cache Reload Button (replaces day/night toggle) ── */
-.tb-cache-btn{
-  margin-left:auto;flex-shrink:0;
-  position:relative;
-  width:28px;height:28px;border-radius:7px;
-  border:1px solid var(--border2);
-  background:var(--bg3);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all .2s;
-  color:var(--teal);font-size:14px;
-  box-shadow:0 0 6px rgba(57,211,83,.2);
-}
-.tb-cache-btn:hover{transform:scale(1.1);border-color:var(--teal);box-shadow:0 0 10px rgba(57,211,83,.35);}
-.tb-cache-btn.spinning i{animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* Cache tooltip (shows on hover) */
-.cache-tooltip{
-  position:fixed;
-  /* top/left set by JS on mouseenter */
-  top:0; left:0;
-  background:var(--surface2);
-  border:1px solid var(--border2);
-  border-radius:10px;
-  padding:10px 12px;
-  min-width:250px;
-  box-shadow:0 8px 24px rgba(0,0,0,.45);
-  z-index:99999;
-  pointer-events:none;
-  opacity:0;
-  transform:translateY(-4px);
-  transition:opacity .18s,transform .18s;
-  font-size:11px;
-}
-.tb-cache-btn:hover .cache-tooltip{
-  opacity:1;transform:translateY(0);
-}
-.cache-tooltip-title{
-  font-size:9px;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--text3);
-  margin-bottom:8px;padding-bottom:6px;
-  border-bottom:1px solid var(--border);
-}
-.cache-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:4px 0;gap:8px;
-}
-.cache-row-left{
-  display:flex;align-items:center;gap:6px;min-width:0;
-}
-.cache-row-label{color:var(--text2);font-size:11px;display:block;}
-.cache-row-sync{
-  font-family:var(--mono);font-size:9px;color:var(--text3);
-  margin-top:1px;
-}
-.cache-row-data{
-  width:16px;height:16px;border-radius:50%;
-  font-size:9px;font-weight:700;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-}
-.cache-row-data.has{background:var(--teal-dim);color:var(--teal);}
-.cache-row-data.no{background:var(--red-dim);color:var(--red);}
-.cache-row-age{
-  font-family:var(--mono);font-size:10px;
-  padding:1px 5px;border-radius:4px;
-  background:var(--teal-dim);color:var(--teal);
-  white-space:nowrap;flex-shrink:0;
-}
-.cache-row-age.stale{
-  background:var(--amber-dim);color:var(--amber);
-}
-.cache-row-age.empty{
-  background:var(--surface);color:var(--text3);
-}
-.cache-tooltip-foot{
-  margin-top:8px;padding-top:6px;
-  border-top:1px solid var(--border);
-  font-size:10px;color:var(--text3);
-  display:flex;align-items:center;gap:5px;
-}
-	
-	
 /* ── Main strip ── */
 .tb-strip{
   flex:1;display:flex;align-items:center;
@@ -557,19 +475,11 @@ html,body{
         <div class="tb-app-name">AdminPro UAE</div>
         <div class="tb-app-sub">HR &amp; Fleet Management</div>
       </div>
-	<!-- Cache Hard-Reload Button -->
-      <button class="tb-cache-btn" id="cache-reload-btn"
-        onclick="hardReloadCache()"
-        title="Hard reload all cached data">
-        <i class="ti ti-refresh" id="cache-reload-icon"></i>
-        <!-- Tooltip: cache age per dataset -->
-        <div class="cache-tooltip" id="cache-tooltip">
-          <div class="cache-tooltip-title">Cache Status</div>
-          <div id="cache-tooltip-rows">Loading…</div>
-          <div class="cache-tooltip-foot">
-            <i class="ti ti-bolt"></i>Click to hard-reload all data
-          </div>
-        </div>
+      <!-- Day/Night icon toggle -->
+      <button class="tb-daynight" id="daynight-btn"
+        onclick="quickToggleDarkLight()"
+        title="Toggle dark / light mode">
+        <i class="ti ti-moon" id="daynight-icon"></i>
       </button>
     </div>
 
@@ -702,7 +612,7 @@ html,body{
 
   </div>
 </div>
-<!-- <script src="shared/devPre.js"></script> -->
+<script src="../shared/devPre.js"></script>
 <script>
 'use strict';
 
@@ -871,12 +781,6 @@ function setTheme(mode) {
   document.documentElement.setAttribute('data-theme', mode);
   localStorage.setItem('theme', mode);
 
-	  // ✅ ADD THESE 4 LINES HERE
-  const frame = document.getElementById('main-frame');
-  if (frame && frame.contentWindow) {
-    frame.contentWindow.postMessage({ type: 'setTheme', theme: mode }, '*');
-  }
-
   // Update label
   const labelMap = { dark:'Dark', light:'Light', purple:'Purple Night', ocean:'Ocean', slate:'Slate' };
   const lbl = document.getElementById('theme-dd-label');
@@ -885,37 +789,26 @@ function setTheme(mode) {
   // Mark active
   document.querySelectorAll('.td-item').forEach(el => el.classList.toggle('active', el.dataset.t === mode));
 
-
+  // Update day/night icon
+  updateDayNightIcon(mode);
 
   closeThemeDropdown();
 }
 
-/* Hard-reload all cached data (replaces day/night quick toggle) */
-async function hardReloadCache() {
-  const btn = document.getElementById('cache-reload-btn');
-  const icon = document.getElementById('cache-reload-icon');
-  if (!btn || btn.classList.contains('spinning')) return;
-  btn.classList.add('spinning');
-  try {
-    if (window.AdminPro && AdminPro.cache) {
-      AdminPro.cache.clearAll();
-      await Promise.allSettled([
-        AdminPro.fetch('bike',     { force: true }),
-        AdminPro.fetch('employee', { force: true }),
-        AdminPro.fetch('master',   { force: true }),
-        AdminPro.fetch('cioLog',   { force: true }),
-      ]);
-    }
-    // Also tell the iframe to refresh if it listens
-    const frame = document.getElementById('main-frame');
-    if (frame && frame.contentWindow) {
-      frame.contentWindow.postMessage({ type: 'cacheReloaded' }, '*');
-    }
-  } catch(e) { console.warn('hardReloadCache error:', e); }
-  finally {
-    btn.classList.remove('spinning');
-    updateCacheTooltip(); // refresh tooltip after reload
+function updateDayNightIcon(mode) {
+  const icon = document.getElementById('daynight-icon');
+  if (!icon) return;
+  if (mode === 'light') {
+    icon.className = 'ti ti-sun';
+  } else {
+    icon.className = 'ti ti-moon';
   }
+}
+
+/* Quick dark ↔ light toggle via the icon button */
+function quickToggleDarkLight() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  setTheme(cur === 'light' ? 'dark' : 'light');
 }
 
 /* Theme dropdown — position:fixed, computed from button bounds */
@@ -955,53 +848,6 @@ function closeThemeDropdown() {
   document.getElementById('theme-dd-btn')?.classList.remove('open');
 }
 
-
-/* Update the cache-status tooltip content */
-function updateCacheTooltip() {
-  const container = document.getElementById('cache-tooltip-rows');
-  if (!container || !window.AdminPro || !AdminPro.getCacheStatus) return;
-  const statuses = AdminPro.getCacheStatus();
-  container.innerHTML = statuses.map(s => {
-    const ageCls    = s.ageMs === Infinity ? 'empty' : s.fresh ? '' : 'stale';
-    const dataBadge = s.hasData
-      ? `<span class="cache-row-data has">✓</span>`
-      : `<span class="cache-row-data no">✗</span>`;
-    const syncLine  = s.lastSync
-      ? `<div class="cache-row-sync">${s.lastSync}</div>`
-      : '';
-    return `<div class="cache-row">
-      <div class="cache-row-left">
-        ${dataBadge}
-        <div>
-          <span class="cache-row-label">${s.label}</span>
-          ${syncLine}
-        </div>
-      </div>
-      <span class="cache-row-age ${ageCls}">${s.ageLabel}</span>
-    </div>`;
-  }).join('');
-}
-
-/* Position the fixed tooltip below the button on hover */
-(function initCacheTooltipPosition() {
-  const btn     = document.getElementById('cache-reload-btn');
-  const tooltip = document.getElementById('cache-tooltip');
-  if (!btn || !tooltip) return;
-
-  btn.addEventListener('mouseenter', () => {
-    updateCacheTooltip();                        // refresh ages on every hover
-    const r = btn.getBoundingClientRect();
-    tooltip.style.top  = (r.bottom + 6) + 'px';
-    // align right edge of tooltip to right edge of button
-    tooltip.style.left = 'auto';
-    tooltip.style.right = (window.innerWidth - r.right) + 'px';
-  });
-})();
-
-setInterval(updateCacheTooltip, 30_000);
-
-
-	
 /* ── Clock ── */
 (function tick() {
   const now = new Date();
@@ -1075,22 +921,12 @@ function populateUserChip(){
 }
 
 /* ── Init ── */
-
-
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('theme') || 'dark';
   setTheme(saved);
   ibOpen('ib-emp', document.getElementById('ib-emp'));
   populateUserChip();
-
-  // Warm cache on load — if not yet populated from login warm-up
-  if (window.AdminPro && typeof AdminPro.warmCache === 'function') {
-    AdminPro.warmCache().then(updateCacheTooltip).catch(() => {});
-  }
-  // Initial tooltip render (may show "Not loaded" until warm-up finishes)
-  updateCacheTooltip();
 });
-	
 </script>
 </body>
 </html>
