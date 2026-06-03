@@ -861,7 +861,7 @@ img,svg{max-width:100%;height:auto;}
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
-const MASTER_API = API_BASE + '?type=employee';
+
 const CACHE_KEY    = 'approvedSheet_v1';
 const CACHE_TTL    = 3 * 60 * 1000;
 
@@ -994,7 +994,7 @@ async function loadData(forceRefresh=false){
   showSkeletons(5);
 
   try{
-    const res = await fetch(MASTER_API+'&t='+Date.now(),{cache:'no-store'});
+	const res = await fetch(`${API_BASE}?type=employee&t=${Date.now()}`,{ cache: 'no-store' });
     const data = await res.json();
 
     const rows = Array.isArray(data) ? data : (data.data || []);

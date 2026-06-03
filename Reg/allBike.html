@@ -467,9 +467,9 @@ th, td { border-left: none !important; border-right: none !important; }
 <script>
 'use strict';
 /* ═══════════════════════════════════════
-   CONFIG — update SHEET_URL to your deployed Apps Script URL
+   CONFIG — update API_BASE to your deployed Apps Script URL
 ═══════════════════════════════════════ */
-const SHEET_URL = API_BASE
+
 const WARN_DAYS = 60;
 const CACHE_KEY = 'bike_fleet_v4';
 const CACHE_TTL = 5 * 60 * 1000;
@@ -657,7 +657,7 @@ async function loadBikes() {
     if(tbody) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;font-size:22px;color:var(--text3);"></i><div style="margin-top:8px;color:var(--text3);font-size:13px;">Loading bikes…</div></td></tr>`;
   }
   try {
-    const res  = await fetch(SHEET_URL + '?type=bike&t=' + Date.now());
+    const res  = await fetch(API_BASE + '?type=bike&t=' + Date.now());
     const raw  = await res.json();
     const rows = Array.isArray(raw) ? raw : (raw.data||raw.values||raw.rows||[]);
     const clean = (rows.length && Array.isArray(rows[0]) && typeof rows[0][0]==='string' && /timestamp|date/i.test(rows[0][0])) ? rows.slice(1) : rows;
@@ -670,7 +670,7 @@ async function loadBikes() {
     if (cached && cached.length) { setCacheBar('error'); }
     else {
       setCacheBar('error');
-      if (tbody && !bikes.length) tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--red);">Failed to load. Check SHEET_URL.</td></tr>`;
+      if (tbody && !bikes.length) tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--red);">Failed to load. Check API_BASE.</td></tr>`;
     }
   }
 }
@@ -995,7 +995,7 @@ async function saveEdit() {
         updated.status,
       ]
     };
-    const res = await fetch(SHEET_URL, {
+    const res = await fetch(API_BASE, {
       method:'POST',
       body: JSON.stringify(payload),
       headers:{'Content-Type':'application/json'}
@@ -1178,7 +1178,7 @@ async function confirmUpload() {
         status:     r.status     || 'active',
       };
       try {
-        const res = await fetch(SHEET_URL,{
+        const res = await fetch(API_BASE,{
           method:'POST',
           body:JSON.stringify({action:'appendRow', row:[
             newBike.timestamp, newBike.bikeId, newBike.plate, newBike.chassis,
@@ -1206,7 +1206,7 @@ async function confirmUpload() {
       }
 
       try {
-        const res = await fetch(SHEET_URL,{
+        const res = await fetch(API_BASE,{
           method:'POST',
           body:JSON.stringify({action:'updateRow', rowIndex:existing._rowIndex, row:[
             merged.timestamp, merged.bikeId, merged.plate, merged.chassis,

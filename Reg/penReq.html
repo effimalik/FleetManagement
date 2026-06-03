@@ -552,7 +552,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 </button>
 
 <script>
-const MASTER_API = API_BASE + '?type=master';
+
 const GOOGLE_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfPkgYXjfSLC9HdQVHVQ1NEWpQ99LqST36ekWqh323kx_BrzQ/formResponse';
 const CACHE_KEY = 'masterReq_cache_v3';
 const CACHE_TTL = 5 * 60 * 1000;
@@ -652,7 +652,7 @@ async function loadData(forceRefresh=false){
     if(cached){processFetchedData(cached.data);setSyncLoading(false);updateCacheInfo(cached.age,false);return;}
   }
   try{
-    const res=await fetch(MASTER_API+'&t='+Date.now(),{cache:'no-store'});
+    const res = await fetch(`${API_BASE}?type=master&t=${Date.now()}`,{ cache: 'no-store' });
     const data=await res.json();
     const rows=Array.isArray(data)?data:(data.data||[]);
     saveCache(rows);processFetchedData(rows);updateCacheInfo(0,true);
