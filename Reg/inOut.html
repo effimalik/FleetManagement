@@ -6,10 +6,6 @@
 <title>Rider Asset Management</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
-<script src="https://effimalik.github.io/FleetManagement/shared/dataLayer.js"></script>
-
-  
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root,[data-theme="dark"]{
@@ -698,7 +694,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
             <tbody id="cio-tbody"></tbody>
           </table>
         </div>
-        <!-- <div class="pagination-bar">
+        <div class="pagination-bar">
           <div class="pagination-info" id="cio-page-info">— records</div>
           <div class="pagination-controls" id="cio-page-ctrl"></div>
           <div class="pagination-right">
@@ -710,7 +706,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
               <option value="100">100</option>
             </select>
           </div>
-        </div> -->
+        </div>
       </div>
     </div>
 
@@ -1235,7 +1231,8 @@ function setSyncLoading(on){
 }
 
 // ─── NEW API BASE ───────────────────────────────────────────────
-const CIO_LOG_URL= API_BASE + '?type=cioLog';
+const API_BASE='https://script.google.com/macros/s/AKfycbxLizuKCu3XP9Q1fhiXkRskhnBus84Obvu00jIVBMuLYkS2yp9qf7EaLHOS7j4nPuQfFw/exec';
+const CIO_LOG_URL='https://script.google.com/macros/s/AKfycbzRbHicxdX8qhAdZr5Rri1APZLCTG8zQ0wOcTcr-H_zA9EXSb1SaDCXhvPhxA7KIDYmEg/exec?type=cioLog';
 
 function apiUrl(type){ return API_BASE+'?type='+type+'&t='+Date.now(); }
 
