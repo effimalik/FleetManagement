@@ -73,10 +73,10 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .summary-card-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
 .summary-card-divider{width:1px;background:var(--border);align-self:stretch;margin:0 2px;flex-shrink:0;}
 
-/* TABS */
-.tabs-row{display:flex;gap:4px;margin-bottom:14px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+/* TABS — same visual style as .summary-cards / top-bar, vertical-scroll container */
+.tabs-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:8px 12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;}
 .tabs-row::-webkit-scrollbar{display:none;}
-.tab-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-size:12.5px;font-family:var(--font);font-weight:600;transition:all .18s;white-space:nowrap;flex-shrink:0;}
+.tab-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:12.5px;font-family:var(--font);font-weight:600;transition:all .18s;white-space:nowrap;flex-shrink:0;}
 .tab-btn:hover{background:var(--surface2);color:var(--text);}
 .tab-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 .tab-btn.active svg{stroke:var(--accent);}
@@ -117,7 +117,11 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .data-table-header::-webkit-scrollbar{display:none;}
 .data-table-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0;}
 .data-table-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;flex-shrink:0;}
-.data-table-wrap{overflow-x:auto;width:100%;}
+.data-table-wrap{overflow-x:auto;overflow-y:auto;width:100%;max-height:480px;}
+.data-table-wrap::-webkit-scrollbar{width:6px;height:6px;}
+.data-table-wrap::-webkit-scrollbar-track{background:var(--bg3);}
+.data-table-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.data-table-wrap::-webkit-scrollbar-thumb:hover{background:var(--text3);}
 .data-table{width:100%;border-collapse:collapse;font-size:clamp(9px,1.1vw,12.5px);}
 .data-table thead th{position:sticky;top:0;z-index:2;background:var(--bg3);text-align:left;font-size:clamp(8px,0.9vw,10px);font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:clamp(5px,0.8vw,8px) clamp(4px,0.8vw,10px);border-bottom:2px solid var(--border);white-space:nowrap;}
 .data-table td{padding:clamp(5px,0.8vw,9px) clamp(4px,0.8vw,10px);border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
@@ -339,6 +343,28 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 .sd-option.selected{background:var(--accent-dim);color:var(--accent);font-weight:600;}
 .sd-option.empty{color:var(--text3);cursor:default;font-style:italic;}
 
+/* COMPACT TOOLBAR ROW (tabs + history buttons in ONE line) */
+.toolbar-combined{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:6px 10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;}
+.toolbar-combined::-webkit-scrollbar{display:none;}
+.toolbar-divider-v{width:1px;background:var(--border2);align-self:stretch;margin:0 4px;flex-shrink:0;}
+.tab-btn2{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;height:30px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;font-size:11px;font-family:var(--font);font-weight:600;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.tab-btn2:hover{background:var(--surface2);color:var(--text);}
+.tab-btn2.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.tab-btn2.active svg{stroke:var(--accent);}
+.hist-btn2{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;height:30px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;font-size:11px;font-family:var(--font);font-weight:600;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.hist-btn2:hover{background:var(--surface2);color:var(--text);}
+.hist-btn2.primary{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+/* SEARCH ROW */
+.search-filter-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:6px 10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;}
+.search-filter-row::-webkit-scrollbar{display:none;}
+
+/* ASSET TYPE BUTTON DISABLED STATE */
+.asset-type-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:11.5px;font-family:var(--font);font-weight:600;transition:all .15s;white-space:nowrap;justify-content:center;}
+.asset-type-btn:hover:not(.disabled-asset){background:var(--surface2);color:var(--text);}
+.asset-type-btn.selected{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.asset-type-btn.disabled-asset{opacity:.4;cursor:not-allowed;background:var(--bg3);border-color:var(--border);color:var(--text3);position:relative;}
+.asset-type-btn.disabled-asset::after{content:'assigned';position:absolute;top:-8px;right:-2px;font-size:8px;background:var(--amber);color:#000;border-radius:4px;padding:1px 4px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+
 /* COLUMN width helpers */
 .w40{min-width:40px;}
 .w80{min-width:80px;}
@@ -396,12 +422,15 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
         </h2>
       </div>
       <div class="section-actions">
-
+        <button class="tb-btn primary sm" onclick="openNewCheckinModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New CIO
+        </button>
         <button class="tb-btn" id="btn-sync" onclick="syncAll()">
           <span id="sync-icon-wrap" class="ico">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           </span>
-          <span id="sync-label">Sync Sheets</span>
+          <span id="sync-label">Sync</span>
         </button>
       </div>
     </div>
@@ -413,41 +442,28 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
     <div class="config-card">
       <h3>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-        Google Sheets API Configuration
+        API Configuration — FleetManagement
       </h3>
-      <div class="config-grid">
-        <div class="form-group">
-          <label class="form-label">Asset Check-in/Check-out Sheet API URL</label>
-          <input class="form-input" id="cfg-checkinout-url" type="url" placeholder="https://script.google.com/macros/s/.../exec?sheet=CheckInOut"/>
-          <span class="form-hint">Google Apps Script Web App URL for your check-in/out sheet tab</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Bike Inventory Sheet API URL</label>
-          <input class="form-input" id="cfg-bikes-url" type="url" placeholder="https://script.google.com/macros/s/.../exec?sheet=Bikes"/>
-          <span class="form-hint">URL for the Bikes tab — returns list of all bikes</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Employee / Rider List Sheet API URL</label>
-          <input class="form-input" id="cfg-employees-url" type="url" placeholder="https://script.google.com/macros/s/.../exec?sheet=Employees"/>
-          <span class="form-hint">URL for the Employees/Riders tab</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Write / Submit API URL (POST)</label>
-          <input class="form-input" id="cfg-write-url" type="url" placeholder="https://script.google.com/macros/s/.../exec"/>
-          <span class="form-hint">Apps Script that accepts POST to write new check-in/out rows</span>
-        </div>
-      </div>
-      <div class="config-tip">
-        <strong>Google Apps Script setup guide:</strong> In your spreadsheet go to <em>Extensions → Apps Script</em>. Deploy as a <strong>Web App</strong> (access: Anyone). Your <code>doGet(e)</code> should return <code>ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON)</code>. Use <code>e.parameter.sheet</code> to route to different tabs.
+      <div class="config-tip" style="margin-bottom:16px;">
+        <strong>Connected API:</strong> <code>AKfycbxLizuKCu3X…</code> (Google Apps Script)<br>
+        All data endpoints are auto-configured. The following types are fetched automatically:
+        <br><br>
+        <code>?type=cioSim</code> — SIM check-in/out history<br>
+        <code>?type=cioBike</code> — Bike check-in/out history<br>
+        <code>?type=cioCompany</code> — Company rider assignment history<br>
+        <code>?type=cioMaster</code> — Most recent record per rider (used for current assignment state)<br>
+        <code>?type=sim</code> — Available SIM inventory<br>
+        <code>?type=bike</code> — Active bike fleet<br>
+        <code>?type=employee</code> — Active rider/employee list
       </div>
       <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
-        <button class="tb-btn primary" onclick="saveConfig()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Save Configuration
+        <button class="tb-btn primary" onclick="syncAll();switchView('main');">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Sync All Now
         </button>
-        <button class="tb-btn" onclick="loadDemoData()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Load Demo Data
+        <button class="tb-btn" onclick="switchView('main');">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Dashboard
         </button>
       </div>
     </div>
@@ -570,51 +586,81 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
       </div>
     </div>
 
-    <!-- TABS -->
-    <div class="tabs-row">
-      <button class="tab-btn active" id="tab-checkinout" onclick="switchTab('checkinout')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        <span class="tab-label">Check In / Out</span>
+    <!-- COMBINED TOOLBAR ROW: Tabs + History Buttons + Search/Date in one compact line -->
+    <div class="toolbar-combined">
+      <!-- Main Tab Buttons -->
+      <button class="tab-btn2 active" id="tab-checkinout" onclick="switchTab('checkinout')" title="Check In / Out">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        CIO
       </button>
-      <button class="tab-btn" id="tab-bikes" onclick="switchTab('bikes')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1 1v6h-6l-3.5-5H4a1 1 0 0 0 0 2h.5l3.5 5H14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1z"/><path d="M16 4.5l4 2.5-4 2.5V4.5z"/></svg>
-        <span class="tab-label">Bikes</span>
+      <button class="tab-btn2" id="tab-bikes" onclick="switchTab('bikes')" title="Bikes">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1 1v6h-6l-3.5-5H4a1 1 0 0 0 0 2h.5l3.5 5H14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1z"/></svg>
+        Bikes
       </button>
-      <button class="tab-btn" id="tab-employees" onclick="switchTab('employees')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span class="tab-label">Employees</span>
+      <button class="tab-btn2" id="tab-employees" onclick="switchTab('employees')" title="Employees">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Riders
       </button>
-      <button class="tab-btn" id="tab-log" onclick="switchTab('log')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span class="tab-label">Activity Log</span>
+      <button class="tab-btn2" id="tab-log" onclick="switchTab('log')" title="Activity Log">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Log
       </button>
+
+      <div class="toolbar-divider-v"></div>
+
+      <!-- History Type Buttons -->
+      <span style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;flex-shrink:0;">Hist:</span>
+      <button class="hist-btn2 primary" id="hist-btn-log" onclick="loadHistoryType('log')" title="All CIO Log">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+        All
+      </button>
+      <button class="hist-btn2" id="hist-btn-cioSim" onclick="loadHistoryType('cioSim')" title="SIM History">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        SIM
+      </button>
+      <button class="hist-btn2" id="hist-btn-cioBike" onclick="loadHistoryType('cioBike')" title="Bike History">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1 1v6H8l-3.5-5H4a1 1 0 0 0 0 2h.5l3.5 5H14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1z"/></svg>
+        Bike
+      </button>
+      <button class="hist-btn2" id="hist-btn-cioCompany" onclick="loadHistoryType('cioCompany')" title="Company History">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Co.
+      </button>
+      <button class="hist-btn2" id="hist-btn-cioMaster" onclick="loadHistoryType('cioMaster')" title="Master (current assignments)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Master
+      </button>
+      <span id="hist-loading" style="display:none;font-size:11px;color:var(--text3);flex-shrink:0;">
+        <span class="pulse"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
+      </span>
+
+      <div class="toolbar-divider-v"></div>
+      <span class="cache-info" id="cio-cache-info"><span class="cache-dot stale"></span><span style="font-size:10px;">Not synced</span></span>
+
+      <!-- Search + Date Filter pushed to right -->
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <div class="search-wrap">
+          <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" id="cio-search" type="text" placeholder="EID, Bike No, Rider…" oninput="applyCheckinFilter()" style="width:160px;height:30px;"/>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3);flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <input type="date" class="filter-input" id="cio-from" onchange="applyCheckinFilter()" title="From Date" style="width:110px;height:30px;"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--text3);flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <input type="date" class="filter-input" id="cio-to" onchange="applyCheckinFilter()" title="To Date" style="width:110px;height:30px;"/>
+        <button class="tb-btn sm icon-only" onclick="clearCheckinFilter()" title="Clear filters" style="height:30px;width:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <select class="rpp-select" id="cio-rpp" onchange="cioRppChange()" style="height:30px;">
+          <option value="15">15/pg</option>
+          <option value="25" selected>25/pg</option>
+          <option value="50">50/pg</option>
+          <option value="100">100/pg</option>
+        </select>
+      </div>
     </div>
 
     <!-- CHECK IN/OUT TAB -->
     <div id="tab-panel-checkinout">
-      <!-- Filter panel -->
-      <div class="filter-panel">
-        <div class="filter-field">
-          <div class="search-wrap">
-            <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" id="cio-search" type="text" placeholder="Rider, EID, Asset ID…" oninput="applyCheckinFilter()" style="width:160px;"/>
-          </div>
-        </div>
-        <div class="filter-divider"></div>
-        <input type="date" class="filter-input" id="cio-from" onchange="applyCheckinFilter()" title="From Date"/>
-        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--text3);flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <input type="date" class="filter-input" id="cio-to" onchange="applyCheckinFilter()" title="To Date"/>
-        <button class="tb-btn sm icon-only" onclick="clearCheckinFilter()" title="Clear filters">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <span class="cache-info" id="cio-cache-info" style="margin-left:4px;"><span class="cache-dot stale"></span><span class="tab-label">Not synced</span></span>
-        <div style="display:flex;gap:6px;align-items:center;margin-left:auto;flex-shrink:0;">
-          <button class="tb-btn primary" onclick="openNewCheckinModal()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span class="tab-label">New Check-in/out</span>
-          </button>
-        </div>
-      </div>
       <!-- hidden selects kept for filter logic compatibility -->
       <select id="cio-action" style="display:none;" onchange="applyCheckinFilter()"><option value=""></option></select>
       <select id="cio-type" style="display:none;" onchange="applyCheckinFilter()"><option value=""></option></select>
@@ -627,12 +673,8 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
             <span class="badge blue" id="cio-count-badge">0 records</span>
           </div>
           <div class="data-table-toolbar">
-            <select class="rpp-select" id="cio-rpp" onchange="cioRppChange()">
-              <option value="15">15/page</option>
-              <option value="25" selected>25/page</option>
-              <option value="50">50/page</option>
-              <option value="100">100/page</option>
-            </select>
+            <!-- rpp moved to search-filter-row above -->
+            <select id="cio-rpp2" class="rpp-select" onchange="cioRppChange()" style="display:none;"></select>
           </div>
         </div>
         <div class="data-table-wrap">
@@ -640,15 +682,13 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
             <thead>
               <tr>
                 <th class="w120">Ref ID</th>
-                <th class="w140">Rider</th>
                 <th class="w80">EID</th>
+                <th class="w140">Rider</th>
                 <th class="w80">Asset Type</th>
                 <th class="w100">Asset ID</th>
                 <th class="w80">Action</th>
-                <th class="w80">Condition</th>
-                <th class="w100">Date</th>
-                <th class="w100">Checked By</th>
-                <th class="w80">Details</th>
+                <th class="w120">Date / Time</th>
+                <th class="w60">Details</th>
               </tr>
             </thead>
             <tbody id="cio-tbody"></tbody>
@@ -676,7 +716,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
         <div class="filter-field">
           <div class="search-wrap">
             <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" id="bike-search" type="text" placeholder="ID, model, plate…" oninput="applyBikeFilter()"/>
+            <input class="search-input" id="bike-search" type="text" placeholder="Bike ID, plate, chassis…" oninput="applyBikeFilter()"/>
           </div>
         </div>
         <div class="filter-divider"></div>
@@ -689,12 +729,6 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
         <button class="tb-btn sm icon-only" onclick="clearBikeFilter()" title="Clear filters">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div style="margin-left:auto;flex-shrink:0;">
-          <button class="tb-btn primary" onclick="openAddBikeModal()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span class="tab-label">Add Bike</span>
-          </button>
-        </div>
       </div>
 
       <div class="data-table-card">
@@ -710,13 +744,14 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
             <thead>
               <tr>
                 <th class="w80">Bike ID</th>
-                <th class="w140">Model</th>
                 <th class="w100">Plate No</th>
-                <th class="w60">Year</th>
-                <th class="w60">Color</th>
+                <th class="w100">Chassis No</th>
+                <th class="w80">Make</th>
+                <th class="w120">Model</th>
+                <th class="w80">Emirate</th>
                 <th class="w100">Status</th>
                 <th class="w140">Assigned To</th>
-                <th class="w100">Actions</th>
+                <th class="w60">View</th>
               </tr>
             </thead>
             <tbody id="bike-tbody"></tbody>
@@ -735,7 +770,7 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
         <div class="filter-field">
           <div class="search-wrap">
             <svg class="search-ico" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" id="emp-search" type="text" placeholder="Name, EID, company…" oninput="applyEmpFilter()"/>
+            <input class="search-input" id="emp-search" type="text" placeholder="EID, Name, EID No., phone…" oninput="applyEmpFilter()"/>
           </div>
         </div>
         <div class="filter-divider"></div>
@@ -743,9 +778,6 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <option value="">All Status</option>
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
-        </select>
-        <select class="filter-select" id="emp-company" onchange="applyEmpFilter()" title="Company">
-          <option value="">All Companies</option>
         </select>
         <button class="tb-btn sm icon-only" onclick="clearEmpFilter()" title="Clear filters">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -764,14 +796,13 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
           <table class="data-table">
             <thead>
               <tr>
-                <th class="w80">EID</th>
-                <th class="w160">Full Name</th>
-                <th class="w100">Company</th>
+                <th class="w80">Emp ID</th>
+                <th class="w160">Name / EID No.</th>
                 <th class="w100">Phone</th>
-                <th class="w80">Status</th>
+                <th class="w80">HR Status</th>
                 <th class="w80">Bike</th>
                 <th class="w80">SIM</th>
-                <th class="w80">Actions</th>
+                <th class="w60">View</th>
               </tr>
             </thead>
             <tbody id="emp-tbody"></tbody>
@@ -880,15 +911,15 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
       <div class="rider-info-panel" id="rider-info-panel">
         <div style="font-size:10.5px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:5px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          Rider Details
+          Rider Details — cioMaster
         </div>
         <div class="rider-info-grid">
-          <div class="ri-cell"><span class="ri-label">Rider ID</span><span class="ri-value" id="ri-rider-id">—</span></div>
-          <div class="ri-cell"><span class="ri-label">Company</span><span class="ri-value company" id="ri-company">—</span></div>
-          <div class="ri-cell"><span class="ri-label">Emp ID</span><span class="ri-value" id="ri-emp-id">—</span></div>
-          <div class="ri-cell"><span class="ri-label">Bike</span><span class="ri-value" id="ri-bike">—</span></div>
-          <div class="ri-cell"><span class="ri-label">SIM</span><span class="ri-value" id="ri-sim">—</span></div>
+          <div class="ri-cell"><span class="ri-label">Emp ID</span><span class="ri-value" id="ri-rider-id">—</span></div>
+          <div class="ri-cell"><span class="ri-label">Bike ID</span><span class="ri-value" id="ri-bike">—</span></div>
+          <div class="ri-cell"><span class="ri-label">SIM ID</span><span class="ri-value" id="ri-sim">—</span></div>
+          <div class="ri-cell"><span class="ri-label">Company ID</span><span class="ri-value" id="ri-company">—</span></div>
           <div class="ri-cell"><span class="ri-label">Inventory</span><span class="ri-value" id="ri-inventory">—</span></div>
+          <div class="ri-cell"><span class="ri-label">Status</span><span class="ri-value" id="ri-master-status">—</span></div>
         </div>
       </div>
 
@@ -901,12 +932,23 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
         <!-- Left: item type buttons, Right: available items dropdown -->
         <div style="display:flex;gap:10px;align-items:flex-start;">
           <!-- Type selector -->
-          <div style="display:flex;flex-direction:column;gap:5px;min-width:90px;">
-            <button class="tb-btn sm" id="co-type-Bike" onclick="selectCoType('Bike')" style="justify-content:center;">🏍 Bike</button>
-            <button class="tb-btn sm" id="co-type-SIM" onclick="selectCoType('SIM')" style="justify-content:center;">📱 SIM</button>
-            <button class="tb-btn sm" id="co-type-Phone" onclick="selectCoType('Phone')" style="justify-content:center;">📞 Phone</button>
-            <button class="tb-btn sm" id="co-type-Charger" onclick="selectCoType('Charger')" style="justify-content:center;">🔌 Charger</button>
-            <button class="tb-btn sm" id="co-type-Inventory" onclick="selectCoType('Inventory')" style="justify-content:center;">📦 Inventory</button>
+          <div style="display:flex;flex-direction:column;gap:5px;min-width:96px;">
+            <button class="asset-type-btn" id="co-type-Bike" onclick="selectCoType('Bike')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1 1v6H8l-3.5-5H4a1 1 0 0 0 0 2h.5l3.5 5H14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1z"/></svg>
+              Bike
+            </button>
+            <button class="asset-type-btn" id="co-type-SIM" onclick="selectCoType('SIM')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              SIM
+            </button>
+            <button class="asset-type-btn" id="co-type-Company" onclick="selectCoType('Company')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              Company
+            </button>
+            <button class="asset-type-btn" id="co-type-Inventory" onclick="selectCoType('Inventory')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              Inventory
+            </button>
           </div>
           <!-- Available items for selected type -->
           <div style="flex:1;min-width:0;">
@@ -1142,7 +1184,9 @@ let state={
   checkinout:[],   // all records from CheckInOut sheet
   bikes:[],        // all bikes
   employees:[],    // all employees/riders
-  log:[]           // local activity log
+  sims:[],         // all SIMs
+  log:[],          // local activity log
+  masterMap:{}     // empId → {bike,sim,company,inventory,status} from cioMaster
 };
 
 // Filtered/paginated
@@ -1156,19 +1200,10 @@ const today=new Date().toISOString().slice(0,10);
 // CONFIG PERSISTENCE
 // ─────────────────────────────────────────────────────────────────
 function loadConfig(){
+  // Config is now hardcoded — no UI inputs needed
   try{const s=localStorage.getItem(CFG_KEY);if(s)config=JSON.parse(s);}catch(e){}
-  document.getElementById('cfg-checkinout-url').value=config.checkinoutUrl||'';
-  document.getElementById('cfg-bikes-url').value=config.bikesUrl||'';
-  document.getElementById('cfg-employees-url').value=config.employeesUrl||'';
-  document.getElementById('cfg-write-url').value=config.writeUrl||'';
 }
 function saveConfig(){
-  config={
-    checkinoutUrl:document.getElementById('cfg-checkinout-url').value.trim(),
-    bikesUrl:document.getElementById('cfg-bikes-url').value.trim(),
-    employeesUrl:document.getElementById('cfg-employees-url').value.trim(),
-    writeUrl:document.getElementById('cfg-write-url').value.trim()
-  };
   try{localStorage.setItem(CFG_KEY,JSON.stringify(config));}catch(e){}
   showToast('Configuration saved!','ok');
   switchView('main');
@@ -1195,147 +1230,356 @@ function setSyncLoading(on){
   ico.style.animation=on?'pulse-spin .7s linear infinite':'none';
 }
 
-const REAL_API_BASE='https://script.google.com/macros/s/AKfycbx3cBEHNnU73qHVNolKFfnMsfbNJ5jxTZHtXdPso684Gu3L3OqqMXHYnVedwxjg3dalnQ/exec';
+// ─── NEW API BASE ───────────────────────────────────────────────
+const API_BASE='https://script.google.com/macros/s/AKfycbxLizuKCu3XP9Q1fhiXkRskhnBus84Obvu00jIVBMuLYkS2yp9qf7EaLHOS7j4nPuQfFw/exec';
+const CIO_LOG_URL='https://script.google.com/macros/s/AKfycbzRbHicxdX8qhAdZr5Rri1APZLCTG8zQ0wOcTcr-H_zA9EXSb1SaDCXhvPhxA7KIDYmEg/exec?type=cioLog';
 
+function apiUrl(type){ return API_BASE+'?type='+type+'&t='+Date.now(); }
+
+// ─── PARSE HELPERS ──────────────────────────────────────────────
+function s(v){ return String(v||'').trim(); }
+
+// Raw array → object mappers for each endpoint
+function parseEmployee(arr){
+  // Apps Script getEmployees() returns:
+  // [0]=Emp ID, [1]=Name, [2]=EID Number, [3]=DOB, [4]=UAE Mobile,
+  // [5]=Emergency Mobile, [6]=Reference, [7]=Timestamp,
+  // [8]=HR_Status, [9]=Checkout_Exception,
+  // [10]=EID Expiry, [11]=License Expiry, [12]=Labour Expiry, [13]=Insurance Expiry
+  const hrStatus = s(arr[8]);
+  return {
+    EmpID: s(arr[0]), EID: s(arr[0]),
+    Name: s(arr[1]),
+    EIDNumber: s(arr[2]),
+    DOB: s(arr[3]),
+    Phone: s(arr[4]),
+    EmergencyPhone: s(arr[5]),
+    Reference: s(arr[6]),
+    HR_Status: hrStatus,
+    Status: (hrStatus === 'Active' || hrStatus === 'ExpActive') ? 'Active' : 'Inactive',
+    EIDExpiry: s(arr[10]),
+    LicenseExpiry: s(arr[11]),
+    LabourExpiry: s(arr[12]),
+    InsuranceExpiry: s(arr[13]),
+    // cioMaster assignment data — populated after loadMasterAssignments()
+    _hasBike: false, _hasSim: false, _hasCompany: false, _hasInventory: false,
+    _raw: arr
+  };
+}
+
+function parseBike(arr){
+  // Bike sheet columns: [0]=Timestamp, [1]=Bike ID, [2]=Plate Number, [3]=Chassis Number,
+  // [4]=Make, [5]=Model, [6]=Emirate, [7]=Mulkiya Expiry, [8]=Passing Expiry,
+  // [9]=Insurance Expiry, [10]=Status
+  const status=s(arr[10]);
+  return {
+    BikeID:s(arr[1]),
+    PlateNo:s(arr[2]),
+    ChassisNo:s(arr[3]),
+    Make:s(arr[4]),
+    Model:s(arr[5])||s(arr[4])||s(arr[1]),
+    Emirate:s(arr[6]),
+    MulkiyaExpiry:s(arr[7]),
+    PassingExpiry:s(arr[8]),
+    InsuranceExpiry:s(arr[9]),
+    Status:(status==='Active'||status==='ExpActive')?'Available':'Inactive',
+    AssignedTo:'', Notes:'', _raw:arr
+  };
+}
+
+function parseSim(arr){
+  // Sim sheet columns: [0]=Timestamp, [1]=Sim ID, [2]=Sim Number, [3]=Company, [4]=Status
+  return {
+    SimID:s(arr[1]), ID:s(arr[1]),
+    Number:s(arr[2]),
+    Network:s(arr[3]),
+    Status:s(arr[4]),
+    AssignedTo:'', _raw:arr
+  };
+}
+
+function parseCioRow(row){
+  // cioLog header: Timestamp | Ref ID | Emp ID | Action | Asset Type | Asset ID
+  if(Array.isArray(row)){
+    return {
+      Timestamp:s(row[0]), RefID:s(row[1]),
+      RiderName:'', EmpID:s(row[2]), EID:s(row[2]),
+      RiderID:'', Company:'',
+      AssetType:s(row[4]), AssetID:s(row[5]),
+      Action:s(row[3]), Condition:'',
+      Notes:'', CheckedBy:''
+    };
+  }
+  // Object form — normalise key names
+  return {
+    Timestamp:s(row.Timestamp||row.timestamp||row.Date||''),
+    RefID:s(row['Ref ID']||row.RefID||row.refId||row.ref_id||''),
+    RiderName:s(row.RiderName||row.Name||row.name||''),
+    EmpID:s(row['Emp ID']||row.EmpID||row.empId||row.EID||row.eid||''),
+    EID:s(row['Emp ID']||row.EmpID||row.empId||row.EID||row.eid||''),
+    RiderID:s(row.RiderID||row.riderId||''),
+    Company:s(row.Company||row.company||''),
+    AssetType:s(row['Asset Type']||row.AssetType||row.assetType||row.Type||''),
+    AssetID:s(row['Asset ID']||row.AssetID||row.assetId||row.ID||''),
+    Action:s(row.Action||row.action||''),
+    Condition:s(row.Condition||row.condition||''),
+    Notes:s(row.Notes||row.notes||''),
+    CheckedBy:s(row.CheckedBy||row.checkedBy||'')
+  };
+}
+
+// Normalise raw API response to an array of objects/arrays
+function toRows(raw){ return Array.isArray(raw)?raw:(raw&&raw.data?raw.data:raw&&raw.values?raw.values:[]); }
+
+// ─── MAIN SYNC ──────────────────────────────────────────────────
 async function syncAll(force=true){
   setSyncLoading(true);
-  const promises=[
-    fetchSheet('bikes',REAL_API_BASE+'?type=bike'),
-    fetchSheet('emp',REAL_API_BASE+'?type=employee'),
-    fetchSheet('sim',REAL_API_BASE+'?type=sim'),
-    fetchSheet('checklog',REAL_API_BASE+'?type=checklog')
-  ];
-  if(config.checkinoutUrl) promises.push(fetchSheet('cio',config.checkinoutUrl));
-  await Promise.allSettled(promises);
+  try{
+    await Promise.allSettled([
+      loadEmployees(),
+      loadBikes(),
+      loadSims(),
+      loadCioHistory()
+    ]);
+    // After employees loaded, derive SIM assignments from employee SIM column
+    applyEmployeeSimAssignments();
+    // Derive bike assignments from cioMaster
+    await loadMasterAssignments();
+  }catch(e){ console.warn('syncAll error:',e); }
   processAll();
   setSyncLoading(false);
   document.getElementById('cio-cache-info').innerHTML='<span class="cache-dot"></span>Synced just now';
 }
 
-async function fetchSheet(type,url){
+async function apiFetch(type){
+  const res=await fetch(apiUrl(type),{cache:'no-store'});
+  return res.json();
+}
+
+async function loadEmployees(){
   try{
-    const res=await fetch(url+'&t='+Date.now(),{cache:'no-store'});
-    const raw=await res.json();
-
-    // Data comes as array of arrays: [[col0,col1,...], ...]
-    let rows=[];
-    if(Array.isArray(raw)&&raw.length&&Array.isArray(raw[0])){
-      if(type==='bikes'){
-        // col B (index 1) = BikeNumber, col K (index 10) = status (Active / ExpActive)
-        rows=raw.filter(arr=>{
-          const status=String(arr[10]||'').trim();
-          return status==='Active'||status==='ExpActive';
-        }).map(arr=>({
-          BikeID:String(arr[1]||'').trim(),
-          Model:String(arr[3]||'').trim()||String(arr[1]||'').trim(),
-          PlateNo:String(arr[2]||'').trim(),
-          Year:String(arr[4]||'').trim(),
-          Color:String(arr[5]||'').trim(),
-          Status:(String(arr[10]||'').trim()==='Active')?'Available':'Available',
-          AssignedTo:'',
-          Notes:'',
-          _raw:arr
-        }));
-      }else if(type==='emp'){
-        // col N (index 8) = Active or ExpActive
-        rows=raw.filter(arr=>{
-          const status=String(arr[8]||'').trim();
-          return status==='Active'||status==='ExpActive';
-        }).map(arr=>({
-          EmpID:String(arr[0]||'').trim(),
-          EID:String(arr[0]||'').trim(),
-          RiderID:String(arr[1]||'').trim(),
-          Name:String(arr[2]||'').trim(),
-          Phone:String(arr[3]||'').trim(),
-          Company:String(arr[4]||'').trim(),
-          JoinDate:String(arr[5]||'').trim(),
-          Status:'Active',
-          Nationality:String(arr[6]||'').trim(),
-          Bike:String(arr[8]||'').trim(),
-          SIM:String(arr[9]||'').trim(),
-          Inventory:String(arr[10]||'').trim(),
-          Notes:String(arr[11]||'').trim(),
-          _raw:arr
-        }));
-      }else if(type==='sim'){
-        // col E (index 4) = Active
-        rows=raw.filter(arr=>{
-          const status=String(arr[4]||'').trim();
-          return status==='Active';
-        }).map(arr=>({
-          SimID:String(arr[0]||'').trim(),
-          ID:String(arr[0]||'').trim(),
-          Network:String(arr[1]||'').trim()||String(arr[2]||'').trim(),
-          Number:String(arr[2]||'').trim(),
-          AssignedTo:'',
-          _raw:arr
-        }));
-      }else if(type==='checklog'){
-        // CheckLog sheet: Timestamp, RefID, RiderName, EmpID, RiderID, Company, AssetType, AssetID, Action, Condition, Notes, CheckedBy
-        rows=raw.map(arr=>({
-          Timestamp:String(arr[0]||'').trim(),
-          RefID:String(arr[1]||'').trim(),
-          RiderName:String(arr[2]||'').trim(),
-          EmpID:String(arr[3]||'').trim(),
-          EID:String(arr[3]||'').trim(),
-          RiderID:String(arr[4]||'').trim(),
-          Company:String(arr[5]||'').trim(),
-          AssetType:String(arr[6]||'').trim(),
-          AssetID:String(arr[7]||'').trim(),
-          Action:String(arr[8]||'').trim(),
-          Condition:String(arr[9]||'').trim(),
-          Notes:String(arr[10]||'').trim(),
-          CheckedBy:String(arr[11]||'').trim(),
-          _raw:arr
-        })).filter(r=>r.RefID||r.EmpID);
-      }else{
-        // cio or fallback
-        const schemas={
-          cio:['RefID','EmpID','Action','AssetType','AssetID']
-        };
-        const cols=schemas[type]||[];
-        rows=raw.map(arr=>{
-          const obj={};
-          cols.forEach((col,i)=>{ obj[col]=arr[i]!==undefined?String(arr[i]):''; });
-          obj._raw=arr;
-          return obj;
-        });
-      }
+    const raw=await apiFetch('employee');
+    const rows=toRows(raw);
+    let parsed=[];
+    if(rows.length&&Array.isArray(rows[0])){
+      // array-of-arrays from Apps Script
+      parsed=rows.filter(arr=>{
+        const st=s(arr[8]);
+        return st==='Active'||st==='ExpActive';
+      }).map(parseEmployee);
     }else{
-      rows=Array.isArray(raw)?raw:(raw.data||raw.values||[]);
+      parsed=rows.map(r=>({
+        EmpID:s(r['Emp ID']||r.EmpID||r.empId||r.ID||''),
+        EID:s(r['Emp ID']||r.EmpID||r.empId||r.ID||''),
+        Name:s(r.Name||r.name||''),
+        EIDNumber:s(r['EID Number']||r.EIDNumber||''),
+        Phone:s(r['UAE Mobile No']||r.Phone||r.phone||''),
+        HR_Status:s(r.HR_Status||r.hrStatus||''),
+        Status:(s(r.HR_Status||r.Status||'Active')==='Active'||s(r.HR_Status||r.Status||'')==='ExpActive')?'Active':'Inactive',
+        EIDExpiry:s(r['EID Expiry']||r.EIDExpiry||''),
+        LicenseExpiry:s(r['License Expiry']||r.LicenseExpiry||''),
+        LabourExpiry:s(r['Laboure Expiry']||r.LabourExpiry||''),
+        InsuranceExpiry:s(r['Insurance Expiry']||r.InsuranceExpiry||''),
+        _hasBike:false,_hasSim:false,_hasCompany:false,_hasInventory:false,
+        _raw:r
+      })).filter(e=>e.Status==='Active');
+    }
+    // Deduplicate by EmpID (keep first occurrence per ID)
+    const seen=new Set();
+    parsed=parsed.filter(e=>{
+      const id=e.EmpID||e.EID;
+      if(!id||seen.has(id))return false;
+      seen.add(id);return true;
+    });
+    state.employees=parsed;
+  }catch(e){ console.error('[loadEmployees]',e); showToast('Failed to load employees','error'); }
+}
+
+async function loadBikes(){
+  try{
+    const raw=await apiFetch('bike');
+    const rows=toRows(raw);
+    let parsed=[];
+    if(rows.length&&Array.isArray(rows[0])){
+      // Filter to Active bikes only (col[10] = Status)
+      parsed=rows.filter(arr=>{ const st=s(arr[10]); return st==='Active'||st==='ExpActive'; }).map(parseBike);
+    }else{
+      parsed=rows.map(r=>({
+        BikeID:s(r['Bike ID']||r.BikeID||r.bikeId||r.ID||''),
+        PlateNo:s(r['Plate Number']||r.PlateNo||r.plateNo||r.Plate||''),
+        ChassisNo:s(r['Chassis Number']||r.ChassisNo||''),
+        Make:s(r.Make||r.make||''),
+        Model:s(r.Model||r.model||r.Make||''),
+        Emirate:s(r.Emirate||r.emirate||''),
+        Status:'Available', AssignedTo:'', Notes:s(r.Notes||r.notes||''),
+        _raw:r
+      })).filter(b=>b.BikeID);
+    }
+    // Deduplicate by BikeID (keep first occurrence)
+    const seen=new Set();
+    parsed=parsed.filter(b=>{ if(seen.has(b.BikeID))return false; seen.add(b.BikeID); return true; });
+    state.bikes=parsed;
+  }catch(e){ console.error('[loadBikes]',e); showToast('Failed to load bikes','error'); }
+}
+
+async function loadSims(){
+  try{
+    const raw=await apiFetch('sim');
+    const rows=toRows(raw);
+    let parsed=[];
+    if(rows.length&&Array.isArray(rows[0])){
+      // Filter to Active SIMs only (col[4] = Status)
+      parsed=rows.filter(arr=>{ const st=s(arr[4]); return st==='Active'; }).map(parseSim);
+    }else{
+      parsed=rows.map(r=>({
+        SimID:s(r['Sim ID']||r.SimID||r.simId||r.ID||''),
+        ID:s(r['Sim ID']||r.SimID||r.simId||r.ID||''),
+        Number:s(r['Sim Number']||r.Number||r.number||''),
+        Network:s(r.Company||r.Network||r.network||r.Operator||''),
+        Status:s(r.Status||r.status||''),
+        AssignedTo:'', _raw:r
+      })).filter(s=>s.SimID&&(s.Status==='Active'||!s.Status));
+    }
+    // Deduplicate by SimID
+    const seen=new Set();
+    parsed=parsed.filter(s=>{ if(seen.has(s.SimID))return false; seen.add(s.SimID); return true; });
+    state.sims=parsed;
+  }catch(e){ console.error('[loadSims]',e); showToast('Failed to load SIMs','error'); }
+}
+
+// Load full check-in/out history from the dedicated cioLog endpoint
+async function loadCioHistory(){
+  try{
+    const res=await fetch(CIO_LOG_URL+'&t='+Date.now(),{cache:'no-store'});
+    const raw=await res.json();
+    const rows=toRows(raw);
+    const allRows=rows.map(parseCioRow).filter(r=>r.RefID||r.EmpID);
+    // Deduplicate by RefID
+    const seen=new Set();
+    const deduped=allRows.filter(r=>{
+      if(!r.RefID) return true;
+      if(seen.has(r.RefID)) return false;
+      seen.add(r.RefID); return true;
+    });
+    deduped.sort((a,b)=>(b.Timestamp||'').localeCompare(a.Timestamp||''));
+    state.checkinout=deduped;
+    // Populate Activity Log from API cioLog data so the Log tab shows real records
+    state.log=deduped.map(r=>{
+      const action=(r.Action||'').toLowerCase();
+      const type=action.includes('out')?'out':action.includes('swap')?'swap':'in';
+      const msg=(action.includes('out')?'Check Out: ':action.includes('swap')?'Swap: ':'Check In: ')+
+        (r.AssetType||'')+(r.AssetID?' '+r.AssetID:'')+
+        (r.RiderName||r.EmpID?' \u2014 '+(r.RiderName||r.EmpID):'');
+      return {type,msg,time:r.Timestamp||'',rec:r};
+    });
+  }catch(e){ console.error('[loadCioHistory]',e); showToast('Failed to load check-in/out log','error'); }
+}
+
+// Load cioMaster to derive current bike & SIM assignments per rider
+async function loadMasterAssignments(){
+  try{
+    const raw=await apiFetch('cioMaster');
+    const rows=toRows(raw);
+    // cioMaster columns: [0]=EmpID, [1]=BikeID, [2]=SimID, [3]=CompanyID, [4]=Inventory, [5]=Status
+    const hasMasterData=rows.length>0;
+
+    if(hasMasterData){
+      // cioMaster has data — use it as the authoritative source for current assignments
+      const bikeMap={};  // bikeID → empID
+      const simMap={};   // simID → empID
+      const empAssignMap={}; // empID → {bike,sim,company,inventory}
+
+      rows.forEach(row=>{
+        let empId, bikeId, simId, companyId, inventory, status;
+        if(Array.isArray(row)){
+          // [EmpID, BikeID, SimID, CompanyID, Inventory, Status]
+          empId=s(row[0]); bikeId=s(row[1]); simId=s(row[2]);
+          companyId=s(row[3]); inventory=s(row[4]); status=s(row[5]);
+        }else{
+          empId=s(row.EmpID||row.empId||'');
+          bikeId=s(row.BikeID||row.bikeId||'');
+          simId=s(row.SimID||row.simId||'');
+          companyId=s(row.CompanyID||row.companyId||'');
+          inventory=s(row.Inventroy||row.Inventory||row.inventory||'');
+          status=s(row.Status||row.status||'');
+        }
+        if(!empId) return;
+        empAssignMap[empId]={bike:bikeId,sim:simId,company:companyId,inventory,status};
+        if(bikeId) bikeMap[bikeId]=empId;
+        if(simId) simMap[simId]=empId;
+      });
+      // Save masterMap for rider detail panel
+      state.masterMap=empAssignMap;
+
+      // Apply to bike state
+      (state.bikes||[]).forEach(b=>{
+        b.AssignedTo=bikeMap[b.BikeID]||'';
+        b.Status=b.AssignedTo?'Assigned':'Available';
+      });
+      // Apply to SIM state
+      (state.sims||[]).forEach(sm=>{
+        sm.AssignedTo=simMap[sm.SimID||sm.ID]||sm.AssignedTo||'';
+      });
+      // Apply to employee assignment flags
+      (state.employees||[]).forEach(emp=>{
+        const eid=emp.EmpID||emp.EID;
+        const a=empAssignMap[eid]||{};
+        emp._hasBike=!!(a.bike&&a.bike.trim());
+        emp._hasSim=!!(a.sim&&a.sim.trim());
+        emp._hasCompany=!!(a.company&&a.company.trim());
+        emp._hasInventory=!!(a.inventory&&a.inventory.trim()&&a.inventory.toLowerCase()!=='no'&&a.inventory!=='0');
+      });
+    }else{
+      // cioMaster is empty — fall back to deriving from cioLog (Check Out minus Check In)
+      const parsedRows=(state.checkinout||[]);
+      const bikeMap={};
+      const simMap={};
+      parsedRows.forEach(r=>{
+        const eid=r.EmpID; const action=(r.Action||'').toLowerCase();
+        const assetType=(r.AssetType||'').toLowerCase(); const assetId=r.AssetID;
+        if(!assetId) return;
+        const isOut=action.includes('out');
+        if(assetType==='bike'){ if(isOut) bikeMap[assetId]=eid; else delete bikeMap[assetId]; }
+        else if(assetType==='sim'){ if(isOut) simMap[assetId]=eid; else delete simMap[assetId]; }
+      });
+      (state.bikes||[]).forEach(b=>{
+        b.AssignedTo=bikeMap[b.BikeID]||'';
+        b.Status=b.AssignedTo?'Assigned':'Available';
+      });
+      (state.sims||[]).forEach(sm=>{ sm.AssignedTo=simMap[sm.SimID||sm.ID]||sm.AssignedTo||''; });
+      // Flag employees based on what's assigned to them
+      (state.employees||[]).forEach(emp=>{
+        const eid=emp.EmpID||emp.EID;
+        emp._hasBike=!!(state.bikes||[]).find(b=>b.AssignedTo===eid);
+        emp._hasSim=!!(state.sims||[]).find(sm=>sm.AssignedTo===eid);
+        emp._hasCompany=false; emp._hasInventory=false;
+      });
     }
 
-    if(type==='cio'){
-      state.checkinout=rows;
-    }else if(type==='checklog'){
-      // Merge CheckLog sheet records into checkinout, deduplicating by RefID
-      const existing=new Set((state.checkinout||[]).map(r=>r.RefID).filter(Boolean));
-      const newRows=rows.filter(r=>!r.RefID||!existing.has(r.RefID));
+    // Merge cioMaster rows into checkinout log if they're object form
+    if(hasMasterData){
+      const parsedMasterRows=rows.map(r=>{
+        if(Array.isArray(r)) return null; // array form has no log shape
+        return parseCioRow(r);
+      }).filter(Boolean).filter(r=>r.EmpID);
+      const existingRefs=new Set((state.checkinout||[]).map(r=>r.RefID).filter(Boolean));
+      const newRows=parsedMasterRows.filter(r=>!r.RefID||!existingRefs.has(r.RefID));
       state.checkinout=[...state.checkinout,...newRows];
-      // Sort by timestamp descending
-      state.checkinout.sort((a,b)=>{
-        const ta=(a.Timestamp||'');const tb=(b.Timestamp||'');
-        return tb.localeCompare(ta);
-      });
-    }else if(type==='bikes'){
-      state.bikes=rows;
-    }else if(type==='emp'){
-      state.employees=rows;
-      // Extract SIM assignments from employee rows
-      state.sims=(rows||[]).filter(e=>e.SIM&&e.SIM.trim()).map(e=>({
-        SimID:e.SIM,ID:e.SIM,Network:'',AssignedTo:e.EmpID
-      }));
-    }else if(type==='sim'){
-      // Merge with existing sims (employee-assigned ones stay)
-      const existing=(state.sims||[]).filter(s=>(s.AssignedTo||'').trim());
-      const existingIds=new Set(existing.map(s=>s.SimID||s.ID));
-      const fresh=rows.filter(s=>!existingIds.has(s.SimID||s.ID));
-      state.sims=[...existing,...fresh];
+      state.checkinout.sort((a,b)=>(b.Timestamp||'').localeCompare(a.Timestamp||''));
     }
-  }catch(e){
-    console.error('[fetchSheet]',type,e);
-    showToast('Failed to load '+type+' data','error');
-  }
+  }catch(e){ console.error('[loadMasterAssignments]',e); }
+}
+
+// Derive SIM assignments from the SIM column in each employee row
+function applyEmployeeSimAssignments(){
+  (state.employees||[]).filter(e=>e.SIM&&e.SIM.trim()).forEach(e=>{
+    let sim=(state.sims||[]).find(s=>s.SimID===e.SIM||s.ID===e.SIM);
+    if(sim){ sim.AssignedTo=sim.AssignedTo||e.EmpID; }
+    else{
+      state.sims=state.sims||[];
+      state.sims.push({SimID:e.SIM,ID:e.SIM,Network:'',Number:e.SIM,AssignedTo:e.EmpID});
+    }
+  });
 }
 
 function processAll(){
@@ -1343,86 +1587,7 @@ function processAll(){
   applyCheckinFilter();
   applyBikeFilter();
   applyEmpFilter();
-  populateCompanyFilter();
   renderLog();
-}
-
-// ─────────────────────────────────────────────────────────────────
-// DEMO DATA
-// ─────────────────────────────────────────────────────────────────
-function loadDemoData(){
-  const names=['Ahmed Al Rashidi','Mohammed Salim','Karim Nasser','Omar Hussain','Youssef Bader','Tariq Khalil','Faisal Rahman','Bilal Sheikh'];
-  const eids=['EID001','EID002','EID003','EID004','EID005','EID006','EID007','EID008'];
-  const companies=['FoodFly','SwiftDash','QuickRun','ExpressGo'];
-  const phones=['+971501234567','+971559876543','+971501112233','+971504445566','+971507778899','+971501020304','+971555060708','+971509988776'];
-
-  state.employees=eids.map((eid,i)=>({
-    EmpID:eid,
-    EID:eid,
-    RiderID:'RDR-'+(1001+i),
-    Name:names[i],
-    Phone:phones[i],
-    Company:companies[i%4],
-    JoinDate:'2024-0'+(i+1)+'-10',
-    Status:i===3?'Inactive':'Active',
-    Nationality:['Emirati','Pakistani','Egyptian','Bangladeshi','Indian','Syrian','Jordanian','Yemeni'][i],
-    Inventory:i%3===0?'Helmet, Jacket':'No',
-    Notes:''
-  }));
-
-  const bikeModels=['Yamaha NMAX 155','Honda PCX 160','Honda ADV 160','Yamaha Aerox 155','Suzuki Burgman'];
-  const bikeColors=['Blue','White','Black','Red','Silver'];
-  state.bikes=Array.from({length:10},(_,i)=>({
-    BikeID:'BIKE-'+(301+i),
-    Model:bikeModels[i%5],
-    PlateNo:'RAK '+String(10000+i*1234).slice(0,5),
-    Year:2022+(i%3),
-    Color:bikeColors[i%5],
-    Status:i<6?'Assigned':'Available',
-    AssignedTo:i<6?eids[i]:'',
-    Notes:''
-  }));
-
-  const simNetworks=['Etisalat','Du','Etisalat','Du','Etisalat','Du','Etisalat','Du'];
-  const sims=Array.from({length:8},(_,i)=>({
-    SimID:'SIM-'+(1042+i),
-    Network:simNetworks[i],
-    AssignedTo:i<6?eids[i]:''
-  }));
-
-  const assetTypes=['Bike','SIM','Bike','SIM','Phone','Charger'];
-  const assetIds=['BIKE-301','SIM-1042','BIKE-302','SIM-1043','PHN-001','CHG-001'];
-  const actions=['Check Out','Check Out','Check In','Check Out','Check Out','Check In'];
-  const conditions=['Good','Good','Good','Fair','Good','Damaged'];
-  const notes=['New assignment','Network: Etisalat','Rider left','Swap SIM','Company phone','Charger broken'];
-  const dates=['2025-05-01','2025-05-03','2025-05-10','2025-05-12','2025-05-15','2025-05-20'];
-
-  state.checkinout=Array.from({length:20},(_,i)=>{
-    const idx=i%6;
-    const eid=eids[i%8];
-    const emp=state.employees.find(e=>e.EmpID===eid)||{};
-    return {
-      Timestamp:dates[idx%dates.length]+' '+(9+i%8).toString().padStart(2,'0')+':30',
-      RefID:'CHK-2025'+(String(i+1).padStart(4,'0')),
-      RiderName:names[i%8],
-      EmpID:eid,
-      EID:eid,
-      RiderID:emp.RiderID||'RDR-'+(1001+(i%8)),
-      Company:emp.Company||companies[i%4],
-      AssetType:assetTypes[idx],
-      AssetID:assetIds[idx],
-      Action:actions[idx],
-      Condition:conditions[idx],
-      Notes:notes[idx],
-      CheckedBy:'Admin'
-    };
-  });
-
-  // Store sims in state for assignment reference
-  state.sims=sims;
-
-  processAll();
-  showToast('Demo data loaded — '+state.checkinout.length+' records','ok');
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1495,7 +1660,7 @@ function renderCheckinTable(){
   const tbody=document.getElementById('cio-tbody');
   document.getElementById('cio-count-badge').textContent=ciFiltered.length+' records';
   if(!ciFiltered.length){
-    tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;display:block;opacity:.3;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No records found</p><small>${state.checkinout.length?'Adjust filters or sync sheets.':'No data yet. Sync sheets or load demo data.'}</small></div></td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;display:block;opacity:.3;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No records found</p><small>${state.checkinout.length?'Adjust filters or sync sheets.':'No data yet. Sync sheets or load demo data.'}</small></div></td></tr>`;
     renderPagination('cio-page-ctrl','cio-page-info',ciFiltered.length,ciPage,ciRpp,'ciGoToPage');
     return;
   }
@@ -1506,25 +1671,23 @@ function renderCheckinTable(){
     const action=r.Action||'';
     const isOut=action.includes('Out');
     const actionBadge=isOut
-      ?`<span class="badge green">↗ Check Out</span>`
-      :`<span class="badge red">↙ Check In</span>`;
-    const condClr=r.Condition==='Good'?'green':r.Condition==='Fair'?'amber':'red';
+      ?`<span class="badge green">↗ Out</span>`
+      :`<span class="badge red">↙ In</span>`;
     const ts=(r.Timestamp||'').slice(0,16);
+    const riderName=r.RiderName||r.Name||'';
     return `<tr class="fade-in">
       <td><span class="mono cs-main" style="font-size:11px;">${esc(r.RefID||'—')}</span></td>
+      <td><span class="mono cs-sub">${esc(r.EID||r.EmpID||'—')}</span></td>
       <td>
         <div style="display:flex;align-items:center;gap:7px;">
-          <div class="avatar-sm" style="background:${strColor(r.RiderName||'')}">${initials(r.RiderName||'?')}</div>
-          <span style="font-size:12.5px;font-weight:600;">${esc(r.RiderName||r.Name||'—')}</span>
+          ${riderName?`<div class="avatar-sm" style="background:${strColor(riderName)}">${initials(riderName)}</div>`:''}
+          <span style="font-size:12px;font-weight:600;">${esc(riderName||'—')}</span>
         </div>
       </td>
-      <td><span class="mono cs-sub">${esc(r.EID||'—')}</span></td>
       <td><span class="badge gray">${esc(r.AssetType||'—')}</span></td>
       <td><span class="mono cs-main">${esc(r.AssetID||'—')}</span></td>
       <td>${actionBadge}</td>
-      <td>${r.Condition?`<span class="badge ${condClr}">${esc(r.Condition)}</span>`:'<span style="color:var(--text3);">—</span>'}</td>
       <td><span class="cs-sub">${ts||'—'}</span></td>
-      <td><span style="font-size:12px;">${esc(r.CheckedBy||'—')}</span></td>
       <td>
         <button class="tb-btn icon-only sm" onclick='openCioDetail(${JSON.stringify(JSON.stringify(r))})' title="View details">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -1566,7 +1729,7 @@ function applyBikeFilter(){
   bikeFiltered=(state.bikes||[]).filter(b=>{
     if(status&&!(b.Status||'').toLowerCase().includes(status))return false;
     if(search){
-      const hay=((b.BikeID||'')+(b.Model||'')+(b.PlateNo||'')+(b.Color||'')+(b.AssignedTo||'')).toLowerCase();
+    const hay=((b.BikeID||'')+(b.PlateNo||'')+(b.ChassisNo||'')+(b.Make||'')+(b.Model||'')+(b.Emirate||'')+(b.AssignedTo||'')).toLowerCase();
       if(!hay.includes(search))return false;
     }
     return true;
@@ -1579,7 +1742,7 @@ function renderBikeTable(){
   const tbody=document.getElementById('bike-tbody');
   document.getElementById('bike-count-badge').textContent=bikeFiltered.length+' bikes';
   if(!bikeFiltered.length){
-    tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><p>No bikes found</p><small>${state.bikes.length?'Try adjusting filters.':'Sync sheets or load demo data.'}</small></div></td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><p>No bikes found</p><small>${state.bikes.length?'Try adjusting filters.':'Sync sheets or load demo data.'}</small></div></td></tr>`;
     renderPagination('bike-page-ctrl','bike-page-info',bikeFiltered.length,bikePage,bikeRpp,'bikeGoToPage');
     return;
   }
@@ -1591,20 +1754,19 @@ function renderBikeTable(){
     const assignedName=(b.AssignedTo)?getEmployeeName(b.AssignedTo):'—';
     return `<tr class="fade-in">
       <td><span class="mono cs-main">${esc(b.BikeID||'—')}</span></td>
-      <td style="font-size:12.5px;font-weight:600;">${esc(b.Model||'—')}</td>
       <td><span class="mono cs-sub">${esc(b.PlateNo||'—')}</span></td>
-      <td>${esc(b.Year||'—')}</td>
-      <td>${esc(b.Color||'—')}</td>
+      <td><span class="mono cs-sub" style="font-size:10.5px;">${esc(b.ChassisNo||'—')}</span></td>
+      <td style="font-size:12px;">${esc(b.Make||'—')}</td>
+      <td style="font-size:12.5px;font-weight:600;">${esc(b.Model||'—')}</td>
+      <td style="font-size:12px;">${esc(b.Emirate||'—')}</td>
       <td>${stBadge}</td>
       <td>
         ${b.AssignedTo?`<div class="cs"><span class="cs-main" style="font-size:11.5px;">${esc(assignedName)}</span><span class="cs-sub">${esc(b.AssignedTo)}</span></div>`:'<span style="color:var(--text3);">—</span>'}
       </td>
       <td>
-        <div class="action-row">
-          <button class="tb-btn sm" onclick='openBikeDetail(${JSON.stringify(JSON.stringify(b))})' title="View">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
+        <button class="tb-btn icon-only sm" onclick='openBikeDetail(${JSON.stringify(JSON.stringify(b))})' title="View">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
       </td>
     </tr>`;
   }).join('');
@@ -1674,20 +1836,22 @@ function populateCompanyFilter(){
 
 function applyEmpFilter(){
   const search=(document.getElementById('emp-search').value||'').toLowerCase().trim();
-  const status=(document.getElementById('emp-status').value||'').toLowerCase();
-  const company=(document.getElementById('emp-company').value||'').toLowerCase();
+  const statusF=(document.getElementById('emp-status').value||'').toLowerCase();
   empFiltered=(state.employees||[]).filter(e=>{
-    if(status&&!(e.Status||'Active').toLowerCase().includes(status))return false;
-    if(company&&!(e.Company||'').toLowerCase().includes(company))return false;
+    if(statusF){
+      const st=(e.Status||'').toLowerCase();
+      const hrSt=(e.HR_Status||'').toLowerCase();
+      if(!st.includes(statusF)&&!hrSt.includes(statusF))return false;
+    }
     if(search){
-      const hay=((e.EID||'')+(e.Name||'')+(e.Phone||'')+(e.Company||'')).toLowerCase();
+      const hay=((e.EmpID||e.EID||'')+(e.Name||'')+(e.Phone||'')+(e.EIDNumber||'')+(e.HR_Status||'')+(e.Reference||'')).toLowerCase();
       if(!hay.includes(search))return false;
     }
     return true;
   });
   empPage=1;renderEmpTable();
 }
-function clearEmpFilter(){document.getElementById('emp-search').value='';document.getElementById('emp-status').value='';document.getElementById('emp-company').value='';applyEmpFilter();}
+function clearEmpFilter(){document.getElementById('emp-search').value='';document.getElementById('emp-status').value='';applyEmpFilter();}
 
 function getAssignedBike(eid){
   return (state.bikes||[]).find(b=>(b.AssignedTo||'')===(eid||''));
@@ -1704,7 +1868,7 @@ function renderEmpTable(){
   const tbody=document.getElementById('emp-tbody');
   document.getElementById('emp-count-badge').textContent=empFiltered.length+' riders';
   if(!empFiltered.length){
-    tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><p>No employees found</p><small>${state.employees.length?'Adjust filters.':'Sync sheets or load demo data.'}</small></div></td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><p>No employees found</p><small>${state.employees.length?'Adjust filters.':'Sync sheets or load demo data.'}</small></div></td></tr>`;
     renderPagination('emp-page-ctrl','emp-page-info',empFiltered.length,empPage,empRpp,'empGoToPage');
     return;
   }
@@ -1712,24 +1876,23 @@ function renderEmpTable(){
   const page=empFiltered.slice(start,start+empRpp);
   tbody.innerHTML=page.map(e=>{
     const st=(e.Status||'Active');
-    const stBadge=st.toLowerCase()==='active'?'<span class="badge green">Active</span>':'<span class="badge gray">Inactive</span>';
+    const hrBadge=st.toLowerCase()==='active'?'<span class="badge green">Active</span>':'<span class="badge gray">Inactive</span>';
     const eid=e.EmpID||e.EID||'';
-    const bike=getAssignedBike(eid);
-    const sim=getAssignedSim(eid);
+    const bike=getAssignedBike(eid)||(e._hasBike?{BikeID:'(assigned)'}:null);
+    const sim=getAssignedSim(eid)||(e._hasSim?{SimID:'(assigned)'}:null);
     return `<tr class="fade-in">
-      <td><span class="mono cs-main">${esc(eid||'—')}</span>${e.RiderID?`<br><span class="cs-sub" style="font-size:9.5px;">${esc(e.RiderID)}</span>`:''}</td>
+      <td><span class="mono cs-main">${esc(eid||'—')}</span></td>
       <td>
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="avatar-sm" style="background:${strColor(e.Name||'')}">${initials(e.Name||'?')}</div>
           <div class="cs">
             <span class="cs-main" style="font-size:12.5px;">${esc(e.Name||'—')}</span>
-            ${e.Nationality?`<span class="cs-sub">${esc(e.Nationality)}</span>`:''}
+            <span class="cs-sub">${esc(e.EIDNumber||'—')}</span>
           </div>
         </div>
       </td>
-      <td><span class="badge blue" style="font-size:10px;">${esc(e.Company||'—')}</span></td>
-      <td><span class="mono cs-sub">${esc(e.Phone||'—')}</span></td>
-      <td>${stBadge}</td>
+      <td><span class="mono cs-sub" style="font-size:11px;">${esc(e.Phone||'—')}</span></td>
+      <td>${hrBadge}</td>
       <td>${bike?`<span class="badge orange" style="font-size:10px;">${esc(bike.BikeID)}</span>`:'<span style="color:var(--text3);font-size:11px;">None</span>'}</td>
       <td>${sim?`<span class="badge purple" style="font-size:10px;">${esc(sim.SimID||sim.ID||'—')}</span>`:'<span style="color:var(--text3);font-size:11px;">None</span>'}</td>
       <td>
@@ -1749,22 +1912,23 @@ function openEmpDetail(eStr){
   const bike=getAssignedBike(e.EmpID||e.EID);
   const sim=getAssignedSim(e.EmpID||e.EID);
   const st=(e.Status||'Active').toLowerCase();
-  const hasInv=e.Inventory&&e.Inventory.trim()&&e.Inventory.toLowerCase()!=='no'&&e.Inventory!=='0';
   document.getElementById('detail-modal-title').innerHTML='Rider Detail — <span style="font-family:var(--mono);">'+esc(e.EmpID||e.EID||'')+'</span>';
   document.getElementById('modal-detail-body').innerHTML=`
     <div class="detail-grid">
       <div class="detail-row"><div class="detail-label">Emp ID</div><div class="detail-value accent mono">${esc(e.EmpID||e.EID||'—')}</div></div>
-      <div class="detail-row"><div class="detail-label">Rider ID</div><div class="detail-value purple mono">${esc(e.RiderID||'—')}</div></div>
+      <div class="detail-row"><div class="detail-label">HR Status</div><div class="detail-value ${st==='active'?'teal':'red'}">${esc(e.HR_Status||e.Status||'—')}</div></div>
       <div class="detail-row"><div class="detail-label">Full Name</div><div class="detail-value">${esc(e.Name||'—')}</div></div>
-      <div class="detail-row"><div class="detail-label">Company</div><div class="detail-value accent">${esc(e.Company||'—')}</div></div>
+      <div class="detail-row"><div class="detail-label">EID Number</div><div class="detail-value mono">${esc(e.EIDNumber||'—')}</div></div>
       <div class="detail-row"><div class="detail-label">Phone</div><div class="detail-value mono">${esc(e.Phone||'—')}</div></div>
-      <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value ${st==='active'?'teal':'red'}">${esc(e.Status||'—')}</div></div>
-      <div class="detail-row"><div class="detail-label">Nationality</div><div class="detail-value">${esc(e.Nationality||'—')}</div></div>
-      <div class="detail-row"><div class="detail-label">Join Date</div><div class="detail-value mono">${esc(e.JoinDate||'—')}</div></div>
-      <div class="detail-row"><div class="detail-label">Assigned Bike</div><div class="detail-value orange">${bike?esc(bike.BikeID)+' · '+esc(bike.Model||''):'None'}</div></div>
-      <div class="detail-row"><div class="detail-label">Assigned SIM</div><div class="detail-value purple">${sim?esc(sim.SimID||sim.ID||'—')+' · '+esc(sim.Network||''):'None'}</div></div>
-      <div class="detail-row full"><div class="detail-label">Inventory</div><div class="detail-value ${hasInv?'teal':''}"> ${hasInv?esc(e.Inventory):'None'}</div></div>
-      ${e.Notes?`<div class="detail-row full"><div class="detail-label">Notes</div><div class="detail-value">${esc(e.Notes)}</div></div>`:''}
+      <div class="detail-row"><div class="detail-label">Emergency</div><div class="detail-value mono">${esc(e.EmergencyPhone||'—')}</div></div>
+      <div class="detail-row"><div class="detail-label">EID Expiry</div><div class="detail-value">${esc(e.EIDExpiry||'—')}</div></div>
+      <div class="detail-row"><div class="detail-label">License Expiry</div><div class="detail-value">${esc(e.LicenseExpiry||'—')}</div></div>
+      <div class="detail-row"><div class="detail-label">Labour Expiry</div><div class="detail-value">${esc(e.LabourExpiry||'—')}</div></div>
+      <div class="detail-row"><div class="detail-label">Insurance Expiry</div><div class="detail-value">${esc(e.InsuranceExpiry||'—')}</div></div>
+      <div class="detail-row"><div class="detail-label">Assigned Bike</div><div class="detail-value orange">${bike?esc(bike.BikeID)+(bike.PlateNo?' · '+esc(bike.PlateNo):'')+(bike.Make?' · '+esc(bike.Make):''): (e._hasBike?'Assigned (sync for details)':'None')}</div></div>
+      <div class="detail-row"><div class="detail-label">Assigned SIM</div><div class="detail-value purple">${sim?esc(sim.SimID||sim.ID||'—')+(sim.Number&&sim.Number!==(sim.SimID||sim.ID)?' · '+esc(sim.Number):'')+(sim.Network?' · '+esc(sim.Network):''): (e._hasSim?'Assigned (sync for details)':'None')}</div></div>
+      <div class="detail-row"><div class="detail-label">Inventory</div><div class="detail-value ${e._hasInventory?'teal':''}">${e._hasInventory?'Yes':'None'}</div></div>
+      <div class="detail-row"><div class="detail-label">Company</div><div class="detail-value ${e._hasCompany?'accent':''}">${e._hasCompany?'Assigned':'None'}</div></div>
     </div>
     ${bike?renderAssetHistoryHTML(bike.BikeID):''}
     ${sim?renderAssetHistoryHTML(sim.SimID||sim.ID):''}`;
@@ -1822,6 +1986,63 @@ function buildGFormPayload(rec){
     [GFORM_FIELDS.assetType]: assetTypeVal,
     [GFORM_FIELDS.assetDetail]: assetDetailVal
   };
+}
+
+// ─────────────────────────────────────────────────────────────────
+// LOAD HISTORY BY TYPE (button-driven)
+// ─────────────────────────────────────────────────────────────────
+let _activeHistType='log';
+async function loadHistoryType(type){
+  _activeHistType=type;
+  // Highlight active button
+  ['log','cioSim','cioBike','cioCompany','cioMaster'].forEach(t=>{
+    const btn=document.getElementById('hist-btn-'+t);
+    if(btn) btn.classList.toggle('primary',t===type);
+  });
+  const loadingEl=document.getElementById('hist-loading');
+  if(loadingEl) loadingEl.style.display='';
+  try{
+    let rows=[];
+    if(type==='log'){
+      // Dedicated cioLog endpoint
+      const res=await fetch(CIO_LOG_URL+'&t='+Date.now(),{cache:'no-store'});
+      const raw=await res.json();
+      rows=toRows(raw).map(parseCioRow).filter(r=>r.RefID||r.EmpID);
+    }else{
+      const raw=await apiFetch(type);
+      rows=toRows(raw).map(parseCioRow).filter(r=>r.RefID||r.EmpID);
+    }
+    const seen=new Set();
+    const deduped=rows.filter(r=>{
+      if(!r.RefID) return true;
+      if(seen.has(r.RefID)) return false;
+      seen.add(r.RefID); return true;
+    });
+    deduped.sort((a,b)=>(b.Timestamp||'').localeCompare(a.Timestamp||''));
+    // Enrich with rider names from employees
+    deduped.forEach(r=>{
+      if(!r.RiderName&&r.EmpID){
+        const emp=(state.employees||[]).find(e=>(e.EmpID||e.EID)===r.EmpID);
+        if(emp) r.RiderName=emp.Name||r.EmpID;
+      }
+    });
+    state.checkinout=deduped;
+    // Keep Activity Log in sync with loaded history data
+    state.log=deduped.map(r=>{
+      const action=(r.Action||'').toLowerCase();
+      const type=action.includes('out')?'out':action.includes('swap')?'swap':'in';
+      const msg=(action.includes('out')?'Check Out: ':action.includes('swap')?'Swap: ':'Check In: ')+
+        (r.AssetType||'')+(r.AssetID?' '+r.AssetID:'')+
+        (r.RiderName||r.EmpID?' \u2014 '+(r.RiderName||r.EmpID):'');
+      return {type,msg,time:r.Timestamp||'',rec:r};
+    });
+    processAll();
+    showToast('Loaded '+deduped.length+' records ('+(type==='log'?'CIO Log':type)+')','ok');
+  }catch(e){
+    console.error('[loadHistoryType]',e);
+    showToast('Failed to load '+type+' history','error');
+  }
+  if(loadingEl) loadingEl.style.display='none';
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1942,12 +2163,13 @@ let _checkinPending=null; // {type, id, assetObj}
 let _swapSelectedOld=null; // {type, id}
 
 function openNewCheckinModal(){
-  // Populate searchable rider dropdown
+  // Populate searchable rider dropdown from Employee sheet (HR_Status=Active)
+  // ALL active riders shown in dropdown — action section handles checkout restrictions
   const riderOptions=(state.employees||[])
     .filter(e=>(e.Status||'Active').toLowerCase()==='active')
     .map(e=>({
-      value:e.EmpID||e.EID,
-      label:(e.RiderID||e.EmpID||e.EID)
+      value: e.EmpID||e.EID,
+      label: (e.Name||(e.EmpID||e.EID)) + (e.EmpID?' ['+e.EmpID+']':'')
     }));
   sdSetOptions('rider',riderOptions);
   document.getElementById('rider-info-panel').classList.remove('visible');
@@ -1966,21 +2188,46 @@ function onRiderSelected(){
   if(!eid){panel.classList.remove('visible');return;}
   const emp=(state.employees||[]).find(e=>(e.EmpID||e.EID)===eid);
   if(!emp){panel.classList.remove('visible');return;}
+
+  // Pull from cioMaster masterMap (authoritative current assignments)
+  const master=(state.masterMap||{})[eid]||{};
   const bike=getAssignedBike(eid);
   const sim=getAssignedSim(eid);
-  const hasInventory=emp.Inventory&&emp.Inventory.trim()&&emp.Inventory.toLowerCase()!=='no'&&emp.Inventory!=='0';
-  document.getElementById('ri-rider-id').textContent=emp.RiderID||'—';
-  document.getElementById('ri-company').textContent=emp.Company||'—';
-  document.getElementById('ri-emp-id').textContent=emp.EmpID||emp.EID||'—';
+
+  // EmpID
+  document.getElementById('ri-rider-id').textContent=eid||'—';
+
+  // BikeID — from masterMap or live bike state
   const bikeEl=document.getElementById('ri-bike');
-  bikeEl.textContent=bike?bike.BikeID:'None';
-  bikeEl.className='ri-value '+(bike?'has-asset':'no-asset');
+  const bikeVal=master.bike||(bike?bike.BikeID:'')||(emp._hasBike?'(assigned)':'');
+  bikeEl.textContent=bikeVal||'None';
+  bikeEl.className='ri-value '+(bikeVal?'has-asset':'no-asset');
+
+  // SimID — from masterMap or live sim state
   const simEl=document.getElementById('ri-sim');
-  simEl.textContent=sim?(sim.SimID||sim.ID):'None';
-  simEl.className='ri-value '+(sim?'has-asset':'no-asset');
+  const simVal=master.sim||(sim?(sim.SimID||sim.ID):'')||(emp._hasSim?'(assigned)':'');
+  simEl.textContent=simVal||'None';
+  simEl.className='ri-value '+(simVal?'has-asset':'no-asset');
+
+  // CompanyID
+  const compEl=document.getElementById('ri-company');
+  const compVal=master.company||(emp._hasCompany?'Yes':'');
+  compEl.textContent=compVal||'None';
+  compEl.className='ri-value '+(compVal?'company':'no-asset');
+
+  // Inventory
   const invEl=document.getElementById('ri-inventory');
-  invEl.textContent=hasInventory?emp.Inventory:'None';
-  invEl.className='ri-value '+(hasInventory?'has-asset':'no-asset');
+  const invVal=master.inventory||(emp._hasInventory?'Yes':'');
+  const hasInv=invVal&&invVal.toLowerCase()!=='no'&&invVal!=='0';
+  invEl.textContent=hasInv?invVal:'None';
+  invEl.className='ri-value '+(hasInv?'has-asset':'no-asset');
+
+  // Status (from cioMaster)
+  const stEl=document.getElementById('ri-master-status');
+  const stVal=master.status||emp.HR_Status||'—';
+  stEl.textContent=stVal;
+  stEl.className='ri-value '+(stVal==='Active'||stVal==='ExpActive'?'company':'no-asset');
+
   panel.classList.add('visible');
   // Re-render the active section for this rider
   const action=document.getElementById('cio-action-select').value;
@@ -2029,22 +2276,50 @@ function renderActionSection(action, eid){
 
 // ── CHECK OUT rendering ──
 function selectCoType(type){
+  // Don't allow clicking disabled buttons
+  const btn=document.getElementById('co-type-'+type);
+  if(btn&&btn.classList.contains('disabled-asset')){
+    showToast(type+' already assigned to this rider. Use Swap or Check In first.','warn');
+    return;
+  }
   _coCurrentType=type;
-  // Highlight selected button
-  ['Bike','SIM','Phone','Charger','Inventory'].forEach(t=>{
-    const btn=document.getElementById('co-type-'+t);
-    if(btn) btn.classList.toggle('success', t===type);
+  // Highlight selected button (using 'selected' class for asset-type-btn)
+  ['Bike','SIM','Company','Inventory'].forEach(t=>{
+    const b=document.getElementById('co-type-'+t);
+    if(b&&!b.classList.contains('disabled-asset')) b.classList.toggle('selected', t===type);
   });
   const eid=document.getElementById('cio-rider-select').value;
   renderCoItemsPanel(type, eid);
 }
 
 function renderCoSection(eid){
-  // Reset type selections
-  ['Bike','SIM','Phone','Charger','Inventory'].forEach(t=>{
-    const btn=document.getElementById('co-type-'+t);
-    if(btn) btn.classList.remove('success');
+  // Use cioMaster masterMap as authoritative source for current assignments
+  const master=(state.masterMap||{})[eid]||{};
+  const emp=eid?(state.employees||[]).find(e=>(e.EmpID||e.EID)===eid):null;
+  const assignedBike=eid?getAssignedBike(eid):null;
+  const assignedSim=eid?getAssignedSim(eid):null;
+
+  // Disable button if cioMaster has a value for that column OR live state shows assignment
+  const hasBike=!!(master.bike&&master.bike.trim())||(assignedBike!=null)||(emp&&emp._hasBike);
+  const hasSim=!!(master.sim&&master.sim.trim())||(assignedSim!=null)||(emp&&emp._hasSim);
+  const hasCompany=!!(master.company&&master.company.trim())||(emp&&emp._hasCompany);
+  const hasInventory=!!(master.inventory&&master.inventory.trim()&&master.inventory.toLowerCase()!=='no'&&master.inventory!=='0')||(emp&&emp._hasInventory);
+
+  // Set disabled state on type buttons
+  const typeChecks={Bike:hasBike, SIM:hasSim, Company:hasCompany, Inventory:hasInventory};
+  ['Bike','SIM','Company','Inventory'].forEach(t=>{
+    const b=document.getElementById('co-type-'+t);
+    if(!b) return;
+    b.classList.remove('selected');
+    if(typeChecks[t]){
+      b.classList.add('disabled-asset');
+      b.title=t+' already assigned to this rider';
+    }else{
+      b.classList.remove('disabled-asset');
+      b.title='';
+    }
   });
+
   document.getElementById('co-items-panel').style.display='none';
   document.getElementById('co-items-empty').style.display='';
   document.getElementById('co-locked-notice').style.display='none';
@@ -2071,22 +2346,26 @@ function renderCoItemsPanel(type, eid){
     hasLocked=locked.length>0;
     options=available.map(b=>({
       value:b.BikeID,
-      label:b.BikeID
+      label:b.BikeID+(b.PlateNo?' · '+b.PlateNo:'')+(b.Make?' · '+b.Make:'')+(b.Model&&b.Model!==b.Make?' '+b.Model:'')
     }));
   }else if(type==='SIM'){
-    const available=(state.sims||[]).filter(s=>{
-      const isAvail=!(s.AssignedTo||'').trim();
-      const alreadyInCart=_coSelectedItems.some(i=>i.type==='SIM'&&i.id===(s.SimID||s.ID));
+    // Show Sim Number · Network for easy identification
+    const available=(state.sims||[]).filter(sm=>{
+      const isAvail=!(sm.AssignedTo||'').trim();
+      const alreadyInCart=_coSelectedItems.some(i=>i.type==='SIM'&&i.id===(sm.SimID||sm.ID));
       return isAvail&&!alreadyInCart;
     });
-    const locked=(state.sims||[]).filter(s=>(s.AssignedTo||'').trim()&&(s.AssignedTo||'')!==eid);
+    const locked=(state.sims||[]).filter(sm=>(sm.AssignedTo||'').trim()&&(sm.AssignedTo||'')!==eid);
     hasLocked=locked.length>0;
-    options=available.map(s=>({
-      value:s.SimID||s.ID,
-      label:(s.SimID||s.ID)
+    options=available.map(sm=>({
+      value:sm.SimID||sm.ID,
+      label:(sm.SimID||sm.ID)+(sm.Number&&sm.Number!==(sm.SimID||sm.ID)?' · '+sm.Number:'')+(sm.Network?' · '+sm.Network:'')
     }));
+  }else if(type==='Company'){
+    // Show EIDNumber or Phone as reference, no company field in new schema
+    options=[{value:'Company',label:'Assign to Company'}];
   }else{
-    options=[{value:'__manual__',label:'Enter ID manually in Notes'}];
+    options=[{value:'Inventory',label:'Inventory Item — describe in Notes'}];
   }
 
   sdSetOptions('coitem',options);
@@ -2155,15 +2434,23 @@ function renderCiSection(eid){
   const list=document.getElementById('checkin-items-list');
   document.getElementById('checkin-confirm-box').style.display='none';
   _checkinPending=null;
-  // Get all items assigned to this rider
+  // Get all items assigned to this rider — use cioMaster as authoritative source
+  const master=(state.masterMap||{})[eid]||{};
   const bike=getAssignedBike(eid);
   const sim=getAssignedSim(eid);
   const emp=(state.employees||[]).find(e=>(e.EmpID||e.EID)===eid);
-  const hasInv=emp&&emp.Inventory&&emp.Inventory.trim()&&emp.Inventory.toLowerCase()!=='no'&&emp.Inventory!=='0';
+  // Use masterMap values if available, else fall back to live state
+  const bikeId=master.bike||(bike?bike.BikeID:'');
+  const simId=master.sim||(sim?(sim.SimID||sim.ID):'');
+  const companyId=master.company||'';
+  const invVal=master.inventory||(emp&&emp.Inventory?emp.Inventory:'');
+  const hasInv=invVal&&invVal.toLowerCase()!=='no'&&invVal!=='0';
+  const hasCompany=companyId&&companyId.trim();
   const items=[];
-  if(bike) items.push({type:'Bike',id:bike.BikeID,meta:bike.Model||'',obj:bike});
-  if(sim) items.push({type:'SIM',id:sim.SimID||sim.ID,meta:sim.Network||'',obj:sim});
-  if(hasInv) items.push({type:'Inventory',id:'INV',meta:emp.Inventory,obj:null});
+  if(bikeId){const b=(state.bikes||[]).find(x=>x.BikeID===bikeId)||{BikeID:bikeId,Model:''};items.push({type:'Bike',id:bikeId,meta:b.Model||'',obj:b});}
+  if(simId){const sm=(state.sims||[]).find(x=>(x.SimID||x.ID)===simId)||{SimID:simId,Network:''};items.push({type:'SIM',id:simId,meta:sm.Network||'',obj:sm});}
+  if(hasCompany) items.push({type:'Company',id:companyId,meta:'',obj:null});
+  if(hasInv) items.push({type:'Inventory',id:invVal,meta:'',obj:null});
   if(!items.length){
     list.innerHTML='<div style="text-align:center;padding:20px 0;color:var(--text3);font-size:13px;">No items currently assigned to this rider.</div>';
     return;
@@ -2294,7 +2581,7 @@ function selectSwapOld(idx){
       .map(b=>({value:b.BikeID,label:b.BikeID}));
   }else if(_swapSelectedOld.type==='SIM'){
     replOptions=(state.sims||[]).filter(s=>!(s.AssignedTo||'').trim()&&(s.SimID||s.ID)!==_swapSelectedOld.id)
-      .map(s=>({value:s.SimID||s.ID,label:(s.SimID||s.ID)}));
+      .map(s=>({value:s.SimID||s.ID,label:(s.Number||s.SimID||s.ID)+(s.Network?' · '+s.Network:'')}));
   }
   sdSetOptions('swapnew',replOptions);
   document.getElementById('swap-new-section').style.display='';
@@ -2415,9 +2702,9 @@ async function submitCheckin(){
 }
 
 async function postRecord(rec){
-  if(!config.writeUrl)return;
-  try{await fetch(config.writeUrl,{method:'POST',body:JSON.stringify(rec),headers:{'Content-Type':'application/json'}});}
-  catch(e){console.warn('Write failed (CORS):',e);}
+  try{
+    await fetch(API_BASE,{method:'POST',body:JSON.stringify(rec),headers:{'Content-Type':'application/json'}});
+  }catch(e){console.warn('Write failed (CORS expected):',e);}
 }
 
 // Legacy stubs (no longer used but kept to avoid reference errors)
@@ -2609,8 +2896,10 @@ function strColor(s){let h=0;for(let c of s)h=(h*31+c.charCodeAt(0))%COLORS.leng
 // ─────────────────────────────────────────────────────────────────
 function switchTab(tab){
   ['checkinout','bikes','employees','log'].forEach(t=>{
-    document.getElementById('tab-panel-'+t).style.display=t===tab?'block':'none';
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    const panel=document.getElementById('tab-panel-'+t);
+    const btn=document.getElementById('tab-'+t);
+    if(panel) panel.style.display=t===tab?'block':'none';
+    if(btn) btn.classList.toggle('active',t===tab);
   });
 }
 
@@ -2660,6 +2949,13 @@ function applyTheme(t){
     :`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
 }
 
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')||'dark';
+  const next=cur==='dark'?'light':'dark';
+  applyTheme(next);
+  try{localStorage.setItem('ram_theme',next);}catch(e){}
+}
+
 // ─────────────────────────────────────────────────────────────────
 // SCROLL TOP
 // ─────────────────────────────────────────────────────────────────
@@ -2679,6 +2975,9 @@ function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
   // Initial render
   switchTab('checkinout');
   switchView('main');
+  // Highlight default history button
+  const defBtn=document.getElementById('hist-btn-log');
+  if(defBtn) defBtn.classList.add('primary');
   // Auto-sync real API data
   syncAll(true).catch(e=>console.warn('Auto-sync error:',e));
 })();
