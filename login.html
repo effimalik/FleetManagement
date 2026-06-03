@@ -511,6 +511,13 @@ async function startGoogleLogin(){
   }));
 
   await sleep(400);
+  // Warm the cache in background while redirect navigates.
+  // dataLayer.js may not be loaded on login page, so guard it.
+  try {
+    if (window.AdminPro && typeof AdminPro.warmCache === 'function') {
+      AdminPro.warmCache(); // fire-and-forget intentionally
+    }
+  } catch(_) {}
   handleLoginRedirect();
 }
 
