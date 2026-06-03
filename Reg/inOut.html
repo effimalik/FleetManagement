@@ -1231,8 +1231,8 @@ function setSyncLoading(on){
 }
 
 // ─── NEW API BASE ───────────────────────────────────────────────
-const API_BASE='https://script.google.com/macros/s/AKfycbxLizuKCu3XP9Q1fhiXkRskhnBus84Obvu00jIVBMuLYkS2yp9qf7EaLHOS7j4nPuQfFw/exec';
-const CIO_LOG_URL='https://script.google.com/macros/s/AKfycbzRbHicxdX8qhAdZr5Rri1APZLCTG8zQ0wOcTcr-H_zA9EXSb1SaDCXhvPhxA7KIDYmEg/exec?type=cioLog';
+  
+const CIO_LOG_URL = API_BASE + '?type=cioLog';
 
 function apiUrl(type){ return API_BASE+'?type='+type+'&t='+Date.now(); }
 
