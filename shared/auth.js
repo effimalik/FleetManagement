@@ -131,16 +131,16 @@ window.handleLoginRedirect = function () {
   }
 };
 
-/* ═════════ SECURITY BLOCKS ═════════ */
-document.addEventListener('contextmenu', e => e.preventDefault());
+// /* ═════════ SECURITY BLOCKS ═════════ */
+// document.addEventListener('contextmenu', e => e.preventDefault());
 
-document.addEventListener('keydown', function (e) {
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && ['I', 'J'].includes(e.key)) ||
-    (e.ctrlKey && e.key === 'U')
-  ) {
-    e.preventDefault();
-  }
-});
+// document.addEventListener('keydown', function (e) {
+//   if (
+//     e.key === 'F12' ||
+//     (e.ctrlKey && e.shiftKey && ['I', 'J'].includes(e.key)) ||
+//     (e.ctrlKey && e.key === 'U')
+//   ) {
+//     e.preventDefault();
+//   }
+// });
 
