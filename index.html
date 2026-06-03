@@ -192,9 +192,9 @@ html,body{
 
 /* Cache tooltip (shows on hover) */
 .cache-tooltip{
-  position:absolute;
-  top:calc(100% + 8px);
-  right:0;
+  position:fixed;
+  /* top/left set by JS on mouseenter */
+  top:0; left:0;
   background:var(--surface2);
   border:1px solid var(--border2);
   border-radius:10px;
@@ -955,7 +955,22 @@ function updateCacheTooltip() {
   }).join('');
 }
 
-/* Refresh tooltip every 30s while page is open */
+/* Position the fixed tooltip below the button on hover */
+(function initCacheTooltipPosition() {
+  const btn     = document.getElementById('cache-reload-btn');
+  const tooltip = document.getElementById('cache-tooltip');
+  if (!btn || !tooltip) return;
+
+  btn.addEventListener('mouseenter', () => {
+    updateCacheTooltip();                        // refresh ages on every hover
+    const r = btn.getBoundingClientRect();
+    tooltip.style.top  = (r.bottom + 6) + 'px';
+    // align right edge of tooltip to right edge of button
+    tooltip.style.left = 'auto';
+    tooltip.style.right = (window.innerWidth - r.right) + 'px';
+  });
+})();
+
 setInterval(updateCacheTooltip, 30_000);
 
 
