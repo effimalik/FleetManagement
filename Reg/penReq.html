@@ -8,8 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <script src="https://unpkg.com/@tabler/icons@3.31.0/icons-react/dist/index.umd.min.js"></script>
 <script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
-<!-- line 10 (after the auth.js script tag) -->
-<script src="https://effimalik.github.io/FleetManagement/shared/dataLayer.js"></script>
+  
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -549,7 +548,16 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 <button id="scroll-top" onclick="scrollToTop()" title="Scroll to top">
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
 </button>
+
 <script>
+const MASTER_API = API_BASE + '?type=master';
+const GOOGLE_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfPkgYXjfSLC9HdQVHVQ1NEWpQ99LqST36ekWqh323kx_BrzQ/formResponse';
+const CACHE_KEY = 'masterReq_cache_v3';
+const CACHE_TTL = 5 * 60 * 1000;
+
+function saveCache(data){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data}));}catch(e){}}
+function loadCache(){try{const r=localStorage.getItem(CACHE_KEY);if(!r)return null;const o=JSON.parse(r);if(Date.now()-o.ts>CACHE_TTL)return null;return{data:o.data,age:Math.round((Date.now()-o.ts)/1000)};}catch(e){return null;}}
+function clearCache(){try{localStorage.removeItem(CACHE_KEY);}catch(e){}}
 
 let allRequests=[],filteredList=[],currentPage=1,rowsPerPage=20;
 let selectedRefs=new Set(),pendingAcceptRef=null,detailRef=null;
@@ -642,7 +650,7 @@ async function loadData(forceRefresh=false){
     if(cached){processFetchedData(cached.data);setSyncLoading(false);updateCacheInfo(cached.age,false);return;}
   }
   try{
-    const res = await AdminPro.fetch('master', { force: forceRefresh });
+    const res=await fetch(MASTER_API+'&t='+Date.now(),{cache:'no-store'});
     const data=await res.json();
     const rows=Array.isArray(data)?data:(data.data||[]);
     saveCache(rows);processFetchedData(rows);updateCacheInfo(0,true);
@@ -852,7 +860,7 @@ function decide(ref,verdict,skipForm){
   const req=allRequests.find(r=>r.ref===ref);if(!req)return;
   req.status=verdict==='approved'?'approved':'rejected';
   if(!skipForm)submitDecisionToGoogleForm(req.ref,req.empId,req.empName,verdict==='approved'?'Approved':'Rejected',verdict==='approved'?req.reqAmount:0,verdict==='approved'?req.months:0,verdict==='approved'?buildReturnMonths(req.months):'0');
-  AdminPro.cache.clear('master');
+  clearCache();
   const row=document.querySelector(`[data-ref="${ref}"]`);
   if(row){row.style.transition='opacity .3s';row.style.opacity='0.3';setTimeout(()=>applyFilters(),320);}else applyFilters();
   showToast((verdict==='approved'?'Accepted — ':'Rejected — ')+ref, verdict==='approved'?'ok':'warn');
@@ -950,7 +958,7 @@ function setSyncLoading(on){
   btn.disabled=on;lbl.textContent=on?'Syncing…':'Sync Sheets';
   document.getElementById('sync-icon-wrap').style.animation=on?'pulse-spin .7s linear infinite':'none';
 }
-async function syncSheets(){AdminPro.cache.clear('master');await loadData(true);showToast('Synced from Master Sheet','ok');}
+async function syncSheets(){clearCache();await loadData(true);showToast('Synced from Master Sheet','ok');}
 
 // SCROLL TOP
 window.addEventListener('scroll',()=>{document.getElementById('scroll-top').classList.toggle('show',window.scrollY>300);});

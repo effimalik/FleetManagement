@@ -7,8 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
-<!-- line 10 (after the auth.js script tag) -->
-<script src="https://effimalik.github.io/FleetManagement/shared/dataLayer.js"></script>
+  
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root,[data-theme="dark"]{
@@ -1169,59 +1168,59 @@ html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var
 </button>
 
 <script>
-
 // ─────────────────────────────────────────────────────────────────
 // CONFIG & STATE
 // ─────────────────────────────────────────────────────────────────
 const CFG_KEY='ram_config_v1';
+const CACHE_KEY='ram_cache_v1';
+const CACHE_TTL=5*60*1000;
 
+let config={
+  checkinoutUrl:'',
+  bikesUrl:'',
+  employeesUrl:'',
+  writeUrl:''
+};
 
+let state={
+  checkinout:[],   // all records from CheckInOut sheet
+  bikes:[],        // all bikes
+  employees:[],    // all employees/riders
+  sims:[],         // all SIMs
+  log:[],          // local activity log
+  masterMap:{}     // empId → {bike,sim,company,inventory,status} from cioMaster
+};
 
+// Filtered/paginated
+let ciFiltered=[],ciPage=1,ciRpp=25;
+let bikeFiltered=[],bikePage=1,bikeRpp=25;
+let empFiltered=[],empPage=1,empRpp=25;
 
+const today=new Date().toISOString().slice(0,10);
 
+// ─────────────────────────────────────────────────────────────────
+// CONFIG PERSISTENCE
+// ─────────────────────────────────────────────────────────────────
+function loadConfig(){
+  // Config is now hardcoded — no UI inputs needed
+  try{const s=localStorage.getItem(CFG_KEY);if(s)config=JSON.parse(s);}catch(e){}
+}
+function saveConfig(){
+  try{localStorage.setItem(CFG_KEY,JSON.stringify(config));}catch(e){}
+  showToast('Configuration saved!','ok');
+  switchView('main');
+  syncAll();
+}
 
+// ─────────────────────────────────────────────────────────────────
+// CACHE
+// ─────────────────────────────────────────────────────────────────
+function getCache(key){
+  try{const r=sessionStorage.getItem(key);if(!r)return null;const o=JSON.parse(r);if(Date.now()-o.ts>CACHE_TTL)return null;return o.data;}catch(e){return null;}
+}
+function setCache(key,data){try{sessionStorage.setItem(key,JSON.stringify({ts:Date.now(),data}));}catch(e){}}
+function clearAllCache(){try{[CACHE_KEY+'_cio',CACHE_KEY+'_bikes',CACHE_KEY+'_emp'].forEach(k=>sessionStorage.removeItem(k));}catch(e){}}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 // ─────────────────────────────────────────────────────────────────
 // SYNC
 // ─────────────────────────────────────────────────────────────────
@@ -1236,8 +1235,8 @@ function setSyncLoading(on){
 // ─── NEW API BASE ───────────────────────────────────────────────
 const CIO_LOG_URL= API_BASE + '?type=cioLog';
 
-// line 1238 — remove the whole apiUrl() function, use:
-const res = await AdminPro.fetch(type, { force: true });
+function apiUrl(type){ return API_BASE+'?type='+type+'&t='+Date.now(); }
+
 // ─── PARSE HELPERS ──────────────────────────────────────────────
 function s(v){ return String(v||'').trim(); }
 
@@ -1354,7 +1353,7 @@ async function syncAll(force=true){
 }
 
 async function apiFetch(type){
-  const res=await AdminPro.fetch(type);
+  const res=await fetch(apiUrl(type),{cache:'no-store'});
   return res.json();
 }
 
@@ -1399,7 +1398,7 @@ async function loadEmployees(){
 
 async function loadBikes(){
   try{
-    const raw=await AdminPro.fetch(type);
+    const raw=await apiFetch('bike');
     const rows=toRows(raw);
     let parsed=[];
     if(rows.length&&Array.isArray(rows[0])){
@@ -1426,7 +1425,7 @@ async function loadBikes(){
 
 async function loadSims(){
   try{
-    const raw=await AdminPro.fetch(type);
+    const raw=await apiFetch('sim');
     const rows=toRows(raw);
     let parsed=[];
     if(rows.length&&Array.isArray(rows[0])){
@@ -1452,7 +1451,7 @@ async function loadSims(){
 // Load full check-in/out history from the dedicated cioLog endpoint
 async function loadCioHistory(){
   try{
-    const res=await fetch AdminPro.fetch(type);
+    const res=await fetch(CIO_LOG_URL+'&t='+Date.now(),{cache:'no-store'});
     const raw=await res.json();
     const rows=toRows(raw);
     const allRows=rows.map(parseCioRow).filter(r=>r.RefID||r.EmpID);
@@ -1480,7 +1479,7 @@ async function loadCioHistory(){
 // Load cioMaster to derive current bike & SIM assignments per rider
 async function loadMasterAssignments(){
   try{
-    const raw=await AdminPro.fetch(type);
+    const raw=await apiFetch('cioMaster');
     const rows=toRows(raw);
     // cioMaster columns: [0]=EmpID, [1]=BikeID, [2]=SimID, [3]=CompanyID, [4]=Inventory, [5]=Status
     const hasMasterData=rows.length>0;
@@ -2705,7 +2704,7 @@ async function submitCheckin(){
 
 async function postRecord(rec){
   try{
-    await AdminPro.post('recordCio', rec);;
+    await fetch(API_BASE,{method:'POST',body:JSON.stringify(rec),headers:{'Content-Type':'application/json'}});
   }catch(e){console.warn('Write failed (CORS expected):',e);}
 }
 
