@@ -1,3 +1,6 @@
+const API_BASE =
+  'https://script.google.com/macros/s/AKfycbxLizuKCu3XP9Q1fhiXkRskhnBus84Obvu00jIVBMuLYkS2yp9qf7EaLHOS7j4nPuQfFw/exec';
+
 /* ═══════════════════════════════════════════════════════════════
    dataLayer.js — AdminPro UAE
    Centralized API, Cache, and Data-Fetching Architecture
