@@ -9,8 +9,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 <script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
   <script src="https://effimalik.github.io/FleetManagement/shared/code.js"></script>
-  <!-- line 10 (after the auth.js script tag) -->
-<script src="https://effimalik.github.io/FleetManagement/shared/dataLayer.js"></script>
 <style>
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -494,9 +492,9 @@ select option { background: var(--surface2); color: var(--text); }
 'use strict';
 
 /* ═══════════ CONSTANTS ═══════════ */
+
   
-const EMP_SHEET_URL = API_BASE + '?type=employee';
-const SHEET_POST_URL = API_BASE
+
 const WARN_DAYS = 60;
 
 const AV_FG  = ['#58a6ff','#3fb950','#e3b341','#d2a8ff','#ffa198','#22d3ee'];
@@ -581,13 +579,13 @@ function parseRows(raw) {
   return rows;
 }
 
-/* ═══════════ CACHE ═══════════ */
-const EMP_CACHE_KEY = 'emp_cache_v1';
-const EMP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
-function empCacheSave(rows) { try { localStorage.setItem(EMP_CACHE_KEY, JSON.stringify({ ts: Date.now(), rows })); } catch(e) {} }
-function empCacheLoad() { try { const raw = localStorage.getItem(EMP_CACHE_KEY); if (!raw) return null; const { ts, rows } = JSON.parse(raw); if (Date.now() - ts > EMP_CACHE_TTL) return null; return rows; } catch(e) { return null; } }
-function empCacheClear() { localStorage.removeItem(EMP_CACHE_KEY); }
+
+
+
+
+
+
 
 function showCacheBanner(show) {
   let banner = document.getElementById('emp-cache-banner');
@@ -648,7 +646,7 @@ async function loadEmployees() {
   showCacheBanner(true);
 
   try {
-    const res  = await fetch(EMP_SHEET_URL + '&nocache=' + Date.now());
+    const res = await AdminPro.fetch('employee', { force: true });
     const raw  = await res.json();
     const rows = parseRows(raw);
     // ── Column inspector: logs first 2 data rows so you can verify column mapping ──
@@ -679,7 +677,7 @@ async function loadEmployees() {
 
 // Force-refresh: clears cache, shows spinner in banner but keeps table rows visible
 async function forceRefreshEmployees() {
-  empCacheClear();
+  AdminPro.cache.clear('employee');
   showCacheBanner(true); // spinner in banner, table stays
   try {
     const res  = await fetch(EMP_SHEET_URL + '&nocache=' + Date.now());
@@ -1060,7 +1058,7 @@ async function _dpSave() {
 
   const payload = { action:'updateEmployee', empId:String(emp.id), name:emp.name, eid:emp.eid, mobile:emp.mobile, mobilePak:emp.mobilePak||'', reference:emp.ref||'', eidExpiry:vals.eidExp||'', licExpiry:vals.licExpiry||'', labourExpiry:vals.labourExpiry||'', insExpiry:vals.insExpiry||'' };
   try {
-    await fetch(SHEET_POST_URL, { method:'POST', mode:'no-cors', body: new URLSearchParams(payload) });
+    await AdminPro.post('submitForm', payload);   // keep mode:'no-cors' if GForms; this only applies to Apps Script POSTs
     toast('Employee saved to sheet.');
   } catch(err) { toast('Sheet save failed: ' + err.message, 'error'); }
 
