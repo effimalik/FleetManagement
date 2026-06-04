@@ -1,3 +1,23 @@
+(function _boot() {
+  if (window.location.pathname.includes('login.html')) return;
+
+  // DEBUG — log exactly what's in sessionStorage
+  const raw = sessionStorage.getItem('ap_session');
+  console.log('[Auth] Raw session on boot:', raw);
+
+  const s = _readSession();
+  console.log('[Auth] Parsed session:', JSON.stringify(s));
+  console.log('[Auth] _isClientValid:', _isClientValid(s));
+
+  if (s) {
+    console.log('[Auth] sessionId:', s.sessionId ? 'present' : 'MISSING');
+    console.log('[Auth] token:', s.token ? 'present' : 'MISSING');
+    console.log('[Auth] email:', s.email ? 'present' : 'MISSING');
+    console.log('[Auth] loginAt:', s.loginAt ? 'present' : 'MISSING');
+    console.log('[Auth] age (ms):', Date.now() - s.loginAt);
+  }
+  
+  // ... rest of _boot
 /* ═══════════════════════════════════════════════════════════════
    auth.js — AdminPro UAE
    v2.0 — Server-validated sessions, token-gated API credentials,
