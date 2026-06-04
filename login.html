@@ -586,8 +586,8 @@ function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 })();
 
 /* ── Post-login redirect ── */
-const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement';
-const DEFAULT_PAGE   = ALLOWED_ORIGIN + '/index.html';
+const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement/';
+const DEFAULT_PAGE   = ALLOWED_ORIGIN + 'index.html';
 
 function handleLoginRedirect() {
   try {
