@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
-<script src="https://effimalik.github.io/FleetManagement/shared/auth.js?v=3"></script>
+<script src="https://effimalik.github.io/FleetManagement/shared/auth.js?v=4"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
@@ -35,7 +35,6 @@ html,body{
   overflow:hidden;
 }
 
-/* ══ BACKGROUND GRID ══ */
 body::before{
   content:'';
   position:fixed;inset:0;
@@ -53,7 +52,6 @@ body::after{
   pointer-events:none;z-index:0;
 }
 
-/* ══ TOPBAR ══ */
 .topbar{
   position:fixed;top:0;left:0;right:0;
   height:52px;
@@ -90,7 +88,6 @@ body::after{
 .tb-sep{width:1px;height:12px;background:var(--border2);}
 .tb-date{font-size:10.5px;color:var(--text2);}
 
-/* ══ PAGE ══ */
 .page{
   position:fixed;inset:0;
   display:flex;align-items:center;justify-content:center;
@@ -98,7 +95,6 @@ body::after{
   z-index:10;
 }
 
-/* ══ CARD ══ */
 .card{
   width:100%;max-width:420px;
   background:var(--bg2);
@@ -142,7 +138,6 @@ body::after{
 .info-box p{font-size:12px;color:var(--text2);line-height:1.55;}
 .info-box strong{color:var(--text);font-weight:600;}
 
-/* Google button */
 .btn-google{
   width:100%;height:44px;
   display:flex;align-items:center;justify-content:center;gap:11px;
@@ -167,7 +162,6 @@ body::after{
 
 .g-icon{width:20px;height:20px;flex-shrink:0;}
 
-/* status panel */
 .status{
   margin-top:18px;border-radius:10px;overflow:hidden;
   border:1px solid var(--border);display:none;
@@ -190,7 +184,6 @@ body::after{
 
 @keyframes spin{to{transform:rotate(360deg);}}
 
-/* step dots */
 .steps{display:flex;flex-direction:column;gap:7px;margin-top:4px;}
 .step{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--text3);transition:color .2s;}
 .step.active{color:var(--text);}
@@ -209,7 +202,6 @@ body::after{
 .card-footer i{font-size:13px;color:var(--text3);}
 .card-footer p{font-size:11px;color:var(--text3);line-height:1.5;}
 
-/* error overlay */
 .error-overlay{
   position:fixed;inset:0;
   display:none;align-items:center;justify-content:center;
@@ -335,67 +327,134 @@ body::after{
 'use strict';
 
 /* ════════════════════════════════════════════════════
-   ⚙  CONFIGURATION
+   CONFIGURATION — single source of truth
    ════════════════════════════════════════════════════ */
 const CONFIG = {
-  API_BASE : 'https://script.google.com/macros/s/AKfycbzsPwqnFdEbWL7UXsibx2l6XAzyi2wKtHqSVtR8m6_jz4PDC4-3MGt7qOZK6RPMC5KPAg/exec',
-  GOOGLE_CLIENT_ID: '743775120253-lr54jgst59jqr5s61vc3i4o3rnfn596a.apps.googleusercontent.com',
-  REDIRECT_URL: 'index.html',
+  API_BASE         : 'https://script.google.com/macros/s/AKfycbzsPwqnFdEbWL7UXsibx2l6XAzyi2wKtHqSVtR8m6_jz4PDC4-3MGt7qOZK6RPMC5KPAg/exec',
+  GOOGLE_CLIENT_ID : '743775120253-lr54jgst59jqr5s61vc3i4o3rnfn596a.apps.googleusercontent.com',
 };
+
+const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement/';
+const DEFAULT_PAGE   = ALLOWED_ORIGIN + 'index.html';
 
 /* ── Clock ── */
 (function tick(){
   const now = new Date();
-  const p = n => String(n).padStart(2,'0');
-  const t = document.getElementById('tb-time');
-  const d = document.getElementById('tb-date');
+  const p   = n => String(n).padStart(2,'0');
+  const t   = document.getElementById('tb-time');
+  const d   = document.getElementById('tb-date');
   if(t) t.textContent = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
   if(d){
-    const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    d.textContent=`${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    const days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    d.textContent = `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
   }
-  setTimeout(tick,1000);
+  setTimeout(tick, 1000);
 })();
+
+/* ── Skip login if already have a valid session ── */
+(function checkExistingSession(){
+  try {
+    if (window.Auth && window.Auth.getCredentials && window.Auth.getCredentials()) {
+      handleLoginRedirect();
+    }
+  } catch(e) {}
+})();
+
+/* ── Post-login redirect — only within our own origin ── */
+function handleLoginRedirect() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const next   = decodeURIComponent(params.get('next') || '');
+    if (next && next.startsWith(ALLOWED_ORIGIN)) {
+      window.location.replace(next);
+    } else {
+      window.location.replace(DEFAULT_PAGE);
+    }
+  } catch(e) {
+    window.location.replace(DEFAULT_PAGE);
+  }
+}
 
 /* ── GSI loader ── */
 function loadGSI(){
-  return new Promise((resolve, reject)=>{
-    if(window.google && window.google.accounts){ resolve(); return; }
-    const s = document.createElement('script');
-    s.src = 'https://accounts.google.com/gsi/client';
-    s.onload = resolve;
-    s.onerror = ()=> reject(new Error('Failed to load Google Sign-In library.'));
+  return new Promise((resolve, reject) => {
+    if (window.google && window.google.accounts) { resolve(); return; }
+    const s   = document.createElement('script');
+    s.src     = 'https://accounts.google.com/gsi/client';
+    s.onload  = resolve;
+    s.onerror = () => reject(new Error('Failed to load Google Sign-In library.'));
     document.head.appendChild(s);
   });
 }
 
+/* ── Google ID token — settled flag prevents race condition ── */
+function getGoogleIdToken(){
+  return new Promise((resolve, reject) => {
+    let settled = false;
+
+    google.accounts.id.initialize({
+      client_id            : CONFIG.GOOGLE_CLIENT_ID,
+      callback             : (response) => {
+        if (settled) return;
+        settled = true;
+        if (response.credential) {
+          resolve(response.credential);
+        } else {
+          reject({ type: 'auth_error', message: 'Google did not return credentials.' });
+        }
+      },
+      ux_mode              : 'popup',
+      use_fedcm_for_prompt : true,
+      use_fedcm_for_button : true,
+    });
+
+    google.accounts.id.prompt((notification) => {
+      if (notification.isDismissedMoment() && !settled) {
+        settled = true;
+        reject({ type: 'user_cancel', message: 'Sign-in was dismissed.' });
+      }
+    });
+  });
+}
+
+/* ── Send Google token to Apps Script for verification ── */
+// Content-Type: text/plain intentionally avoids CORS preflight
+async function verifyWithAppsScript(idToken){
+  const res = await fetch(CONFIG.API_BASE, {
+    method  : 'POST',
+    headers : { 'Content-Type': 'text/plain' },
+    body    : JSON.stringify({ type: 'login', token: idToken }),
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
 /* ── UI helpers ── */
 function setStep(n, state){
-  const el = document.getElementById('step-'+n);
-  if(el) el.className = 'step ' + state;
+  const el = document.getElementById('step-' + n);
+  if (el) el.className = 'step ' + state;
 }
 function showStatus(type, titleText, iconClass){
   const panel = document.getElementById('status-panel');
   const title = document.getElementById('status-title');
   const icon  = document.getElementById('status-icon');
-  panel.className = 'status show ' + type;
+  panel.className  = 'status show ' + type;
   title.textContent = titleText;
-  icon.className = 'ti ' + iconClass;
+  icon.className   = 'ti ' + iconClass;
 }
 function showMsg(msg){
   const el = document.getElementById('status-msg');
   el.style.display = 'block';
-  el.textContent = msg;
+  el.textContent   = msg;
 }
 function hideMsg(){
   document.getElementById('status-msg').style.display = 'none';
 }
 function resetSteps(){
-  for(let i=1;i<=5;i++) setStep(i,'');
+  for (let i = 1; i <= 5; i++) setStep(i, '');
   hideMsg();
 }
-
 function showDenied(email, msg, title, iconClass, iconColor, isError){
   const overlay   = document.getElementById('error-overlay');
   const errIcon   = document.getElementById('err-icon');
@@ -405,27 +464,23 @@ function showDenied(email, msg, title, iconClass, iconColor, isError){
   const errEmailW = document.getElementById('err-email-wrap');
   const errEmail  = document.getElementById('err-email');
 
-  errIconI.className = 'ti ' + iconClass;
-  errIcon.style.background   = isError ? 'var(--red-dim)'  : 'var(--amber-dim)';
-  errIcon.style.borderColor  = isError ? 'rgba(248,81,73,.3)' : 'rgba(227,179,65,.3)';
-  errIconI.style.color       = isError ? 'var(--red)' : 'var(--amber)';
-  errTitle.textContent = title || 'Access Denied';
-  errMsg.textContent   = msg;
-  if(email){
-    errEmail.textContent = email;
-    errEmailW.style.display = 'block';
-  } else {
-    errEmailW.style.display = 'none';
-  }
-  overlay.className = 'error-overlay show';
+  errIconI.className          = 'ti ' + iconClass;
+  errIcon.style.background    = isError ? 'var(--red-dim)'         : 'var(--amber-dim)';
+  errIcon.style.borderColor   = isError ? 'rgba(248,81,73,.3)'     : 'rgba(227,179,65,.3)';
+  errIconI.style.color        = isError ? 'var(--red)'             : 'var(--amber)';
+  errTitle.textContent        = title || 'Access Denied';
+  errMsg.textContent          = msg;
+  errEmailW.style.display     = email ? 'block' : 'none';
+  if (email) errEmail.textContent = email;
+  overlay.className           = 'error-overlay show';
 }
-
 function resetLogin(){
   document.getElementById('error-overlay').className = 'error-overlay';
   document.getElementById('status-panel').className  = 'status';
-  document.getElementById('btn-google').disabled = false;
+  document.getElementById('btn-google').disabled     = false;
   resetSteps();
 }
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
 /* ── Main login flow ── */
 async function startGoogleLogin(){
@@ -434,57 +489,52 @@ async function startGoogleLogin(){
   resetSteps();
 
   // Step 1 — load GSI
-  setStep(1,'active');
-  showStatus('loading','Connecting to Google','ti-loader-2');
-  try{
+  setStep(1, 'active');
+  showStatus('loading', 'Connecting to Google', 'ti-loader-2');
+  try {
     await loadGSI();
-  } catch(e){
-    setStep(1,'fail');
-    showStatus('error','Connection Failed','ti-alert-circle');
+  } catch(e) {
+    setStep(1, 'fail');
+    showStatus('error', 'Connection Failed', 'ti-alert-circle');
     showMsg('Could not load Google Sign-In. Check your internet connection and try again.');
     btn.disabled = false;
     return;
   }
 
   // Step 2 — get ID token
-  setStep(1,'done'); setStep(2,'active');
-
+  setStep(1, 'done'); setStep(2, 'active');
   let idToken = null;
-  try{
+  try {
     idToken = await getGoogleIdToken();
-  } catch(e){
-    if(e.type === 'user_cancel'){
-      resetLogin();
-      return;
-    }
-    setStep(2,'fail');
-    showStatus('error','Sign-In Failed','ti-alert-circle');
+  } catch(e) {
+    if (e.type === 'user_cancel') { resetLogin(); return; }
+    setStep(2, 'fail');
+    showStatus('error', 'Sign-In Failed', 'ti-alert-circle');
     showMsg(e.message || 'Google sign-in was cancelled or failed.');
     btn.disabled = false;
     return;
   }
 
   // Step 3 — verify with Apps Script
-  setStep(2,'done'); setStep(3,'active');
-
+  setStep(2, 'done'); setStep(3, 'active');
   let result = null;
-  try{
+  try {
     result = await verifyWithAppsScript(idToken);
-  } catch(e){
-    setStep(3,'fail');
-    showStatus('error','Server Error','ti-alert-circle');
+  } catch(e) {
+    setStep(3, 'fail');
+    showStatus('error', 'Server Error', 'ti-alert-circle');
     showMsg('Could not reach the verification server. Please try again.');
     btn.disabled = false;
     return;
   }
 
   // Step 4 — check result
-  setStep(3,'done'); setStep(4,'active');
+  setStep(3, 'done'); setStep(4, 'active');
   await sleep(350);
 
-  if(!result.allowed){
-    setStep(4,'fail');
-    showStatus('error','Access Denied','ti-shield-x');
+  if (!result.allowed) {
+    setStep(4, 'fail');
+    showStatus('error', 'Access Denied', 'ti-shield-x');
     await sleep(400);
     showDenied(
       result.email  || null,
@@ -497,19 +547,18 @@ async function startGoogleLogin(){
     return;
   }
 
-  // Step 5 — redirect
-  setStep(4,'done'); setStep(5,'active');
-  showStatus('success','Access Granted — Opening App','ti-check');
+  // Step 5 — create session and redirect
+  setStep(4, 'done'); setStep(5, 'active');
+  showStatus('success', 'Access Granted — Opening App', 'ti-check');
   await sleep(700);
-  setStep(5,'done');
+  setStep(5, 'done');
 
-  // Auth.createSession writes the correct 'ap_session' key that auth.js reads on every page
-  const ok = Auth.createSession({
+  const ok = window.Auth.createSession({
     sessionId : result.sessionId,
     token     : result.token,
     email     : result.email,
-    name      : result.name || result.email,
-    role      : result.role || 'User',
+    name      : result.name  || result.email,
+    role      : result.role  || 'User',
   });
 
   if (!ok) {
@@ -524,95 +573,6 @@ async function startGoogleLogin(){
   handleLoginRedirect();
 }
 
-/* ── FIX: getGoogleIdToken with settled flag to prevent race condition ── */
-function getGoogleIdToken(){
-  return new Promise((resolve, reject) => {
-    // 'settled' flag ensures the Promise resolves/rejects only ONCE.
-    // Without this, isDismissedMoment() fires after a successful credential
-    // is returned (FedCM closes the prompt), causing a spurious rejection
-    // that cancels a login that actually succeeded.
-    let settled = false;
-
-    google.accounts.id.initialize({
-      client_id: CONFIG.GOOGLE_CLIENT_ID,
-      callback: (response) => {
-        if(settled) return;           // already resolved/rejected — ignore
-        settled = true;
-        if(response.credential){
-          resolve(response.credential);
-        } else {
-          reject({type:'auth_error', message:'Google did not return credentials.'});
-        }
-      },
-      ux_mode: 'popup',
-      use_fedcm_for_prompt: true,
-      use_fedcm_for_button: true,
-    });
-
-    google.accounts.id.prompt((notification) => {
-      // isDismissedMoment() fires even on successful sign-in under FedCM.
-      // Only treat it as a cancellation if we haven't already settled.
-      if(notification.isDismissedMoment() && !settled){
-        settled = true;
-        reject({type:'user_cancel', message:'Sign-in was dismissed.'});
-      }
-    });
-  });
-}
-
-/* ── Verify token with Apps Script via POST ── */
-// Content-Type: text/plain avoids CORS preflight — intentional.
-async function verifyWithAppsScript(idToken){
-  const res = await fetch(CONFIG.API_BASE, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body:    JSON.stringify({ token: idToken }),
-  });
-  if(!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
-}
-
-function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-/* ── Skip login if valid session exists ── */
-(function checkExistingSession(){
-  try{
-    // Use Auth.isAuthenticated so we check ap_session (not the old ap_user key)
-    if(window.Auth && window.Auth.getCredentials && window.Auth.getCredentials()){
-      handleLoginRedirect();
-    }
-  } catch(e){}
-})();
-
-/* ── Post-login redirect ── */
-const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement/';
-const DEFAULT_PAGE   = ALLOWED_ORIGIN + 'index.html';
-
-function handleLoginRedirect() {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const next   = decodeURIComponent(params.get('next') || '');
-    // Only redirect within our own app — prevents open-redirect attacks
-    if (next && next.startsWith(ALLOWED_ORIGIN)) {
-      window.location.replace(next);
-    } else {
-      window.location.replace(DEFAULT_PAGE);
-    }
-  } catch (e) {
-    window.location.replace(DEFAULT_PAGE);
-  }
-}
-
-async function verifyWithAppsScript(idToken){
-  const res = await fetch(CONFIG.API_BASE, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body:    JSON.stringify({ type: 'login', token: idToken }),  // ← add type: 'login'
-  });
-  if(!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
-}
-  
 </script>
 </body>
 </html>
