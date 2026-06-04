@@ -16,7 +16,7 @@
   const ABSOLUTE_TTL     = 8  * 60 * 60 * 1000;   // 8 hr hard limit regardless of activity
   const SERVER_CHECK_INT = 5  * 60 * 1000;         // re-validate with server every 5 min
   const ALLOWED_ORIGIN   = 'https://effimalik.github.io/FleetManagement/';
-  const API_BASE         = 'https://script.google.com/macros/s/AKfycbxLizuKCu3XP9Q1fhiXkRskhnBus84Obvu00jIVBMuLYkS2yp9qf7EaLHOS7j4nPuQfFw/exec';
+  const API_BASE         = 'https://script.google.com/macros/s/AKfycbwf9okRBvVM4PtZtcHv67_JAbdDF4zwPG4GA6LedFuAjgrJfX0l25J2-1zgqrqwN_XDWw/exec';
 
   /* ─────────────────────────────────────────
      INTERNAL HELPERS
