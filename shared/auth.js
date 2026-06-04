@@ -127,13 +127,10 @@
     _idleTimer = setTimeout(() => _redirectToLogin('inactivity timeout'), INACTIVITY_TTL);
   }
 
-  /* ─────────────────────────────────────────
-     BOOT — runs immediately when script loads
-  ───────────────────────────────────────── */
- (function _boot() {
+  (function _boot() {
   if (window.location.pathname.includes('login.html')) return;
 
-  // DEBUG — log exactly what's in sessionStorage
+  // DEBUG
   const raw = sessionStorage.getItem('ap_session');
   console.log('[Auth] Raw session on boot:', raw);
 
@@ -148,34 +145,24 @@
     console.log('[Auth] loginAt:', s.loginAt ? 'present' : 'MISSING');
     console.log('[Auth] age (ms):', Date.now() - s.loginAt);
   }
-    /* Skip guard on login page itself — no session exists yet */
-    if (window.location.pathname.includes('login.html')) return;
 
-    const s = _readSession();
+  /* Fast client-side gate */
+  if (!_isClientValid(s)) {
+    _redirectToLogin('client validation failed on boot');
+    return;
+  }
 
-    /* Fast client-side gate — hide page instantly if obviously invalid */
-    if (!_isClientValid(s)) {
-      _redirectToLogin('client validation failed on boot');
-      return;
-    }
+  /* Page is safe to show */
+  document.documentElement.style.visibility = '';
+  _startIdleWatcher();
+  _validateWithServer();
 
-    /* Page is safe to show — reveal it */
-    document.documentElement.style.visibility = '';
-
-    /* Start activity watcher */
-    _startIdleWatcher();
-
-    /* Kick off server validation (async — page loads optimistically) */
-    _validateWithServer();
-
-    /* Populate UI chip once DOM is ready */
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', _populateUserChip);
-    } else {
-      _populateUserChip();
-    }
-  })();
-
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _populateUserChip);
+  } else {
+    _populateUserChip();
+  }
+})();
   /* ─────────────────────────────────────────
      USER CHIP RENDERER
   ───────────────────────────────────────── */
