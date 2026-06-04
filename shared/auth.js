@@ -330,3 +330,26 @@
   };
 
 })();
+async function _validateWithServer() {
+  const s = _readSession();
+  if (!_isClientValid(s)) { _redirectToLogin('client check failed before server call'); return; }
+
+  try {
+    const url = `${API_BASE}?type=validateSession&sessionId=${encodeURIComponent(s.sessionId)}&token=${encodeURIComponent(s.token)}&t=${Date.now()}`;
+    console.log('[Auth] Sending to validateSession — sessionId:', s.sessionId.substring(0,8) + '...');
+    
+    const res  = await fetch(url, { cache: 'no-store' });
+    const data = await res.json();
+    console.log('[Auth] validateSession response:', JSON.stringify(data));
+
+    if (!data.valid) {
+      _redirectToLogin('server rejected: ' + (data.reason || 'unknown'));
+      return;
+    }
+    s.lastActive = Date.now();
+    _writeSession(s);
+  } catch (e) {
+    console.warn('[Auth] Server validation network error (kept session):', e.message);
+  }
+  _scheduleServerCheck();
+}
