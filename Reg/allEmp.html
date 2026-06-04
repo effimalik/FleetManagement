@@ -579,14 +579,6 @@ function parseRows(raw) {
   return rows;
 }
 
-/* ═══════════ CACHE ═══════════ */
-const EMP_CACHE_KEY = 'emp_cache_v1';
-const EMP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
-
-function empCacheSave(rows) { try { localStorage.setItem(EMP_CACHE_KEY, JSON.stringify({ ts: Date.now(), rows })); } catch(e) {} }
-function empCacheLoad() { try { const raw = localStorage.getItem(EMP_CACHE_KEY); if (!raw) return null; const { ts, rows } = JSON.parse(raw); if (Date.now() - ts > EMP_CACHE_TTL) return null; return rows; } catch(e) { return null; } }
-function empCacheClear() { localStorage.removeItem(EMP_CACHE_KEY); }
-
 function showCacheBanner(show) {
   let banner = document.getElementById('emp-cache-banner');
   if (!banner) {
@@ -626,17 +618,9 @@ function toggleCacheSub() {
 
 /* ═══════════ LOAD ═══════════ */
 async function loadEmployees() {
-  // Always show whatever we have from cache immediately — table is never blank during refresh
-  const cached = empCacheLoad();
-  if (cached && cached.length) {
-    employees = cached.map((r, i) => normaliseRow(r, i)).filter(Boolean);
-    renderEmpTable(employees);
-    showCacheBanner(false);
-    return; // Cache is fresh (within 6h), no network call needed
-  }
-
-  // No valid cache — show loading row only on first-ever load
   const tbody = document.getElementById('emp-tbody');
+
+  // Show loading skeleton only on first-ever load (no data yet)
   if (!employees.length) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;">
       <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-flex;font-size:26px;color:var(--text3);"></i>
@@ -646,8 +630,8 @@ async function loadEmployees() {
   showCacheBanner(true);
 
   try {
-    const res = await fetch(API_BASE + '?type=employee&nocache=' + Date.now());
-    const raw  = await res.json();
+    // DataLayer handles fleet_cache_v1 reads/writes and TTL — no local cache logic needed here
+    const raw  = await DataLayer.getEmployees();
     const rows = parseRows(raw);
     // ── Column inspector: logs first 2 data rows so you can verify column mapping ──
     if (rows.length && Array.isArray(rows[0])) {
@@ -660,7 +644,6 @@ async function loadEmployees() {
       });
       console.groupEnd();
     }
-    empCacheSave(rows);
     employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
     showCacheBanner(false);
@@ -675,13 +658,12 @@ async function loadEmployees() {
   }
 }
 
-// Force-refresh: clears cache, shows spinner in banner but keeps table rows visible
+// Force-refresh: bypasses DataLayer cache, shows spinner in banner but keeps table rows visible
 async function forceRefreshEmployees() {
-  empCacheClear();
   showCacheBanner(true); // spinner in banner, table stays
   try {
-    const res = await fetch(API_BASE + '?type=employee&nocache=' + Date.now());
-    const raw  = await res.json();
+    // forceRefresh: true tells DataLayer to skip fleet_cache_v1 and re-fetch from the sheet
+    const raw  = await DataLayer.getEmployees({ forceRefresh: true });
     const rows = parseRows(raw);
     // ── Column inspector ──
     if (rows.length && Array.isArray(rows[0])) {
@@ -694,7 +676,6 @@ async function forceRefreshEmployees() {
       });
       console.groupEnd();
     }
-    empCacheSave(rows);
     employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
     showCacheBanner(false);
@@ -1053,7 +1034,9 @@ async function _dpSave() {
   if (vals.labourExpiry !== undefined) emp.expiry.labour = computeExpiry(vals.labourExpiry);
   if (vals.insExpiry !== undefined) emp.expiry.insurance = computeExpiry(vals.insExpiry);
 
-  renderEmpTable(employees); empCacheClear();
+  renderEmpTable(employees);
+  // Bust the centralized cache so next load reflects the edit
+  if (typeof DataLayer !== 'undefined' && DataLayer.invalidateEmployees) DataLayer.invalidateEmployees();
   _dpResetButtons(); _renderEmpDetail(emp, emp.expiry || {});
 
   const payload = { action:'updateEmployee', empId:String(emp.id), name:emp.name, eid:emp.eid, mobile:emp.mobile, mobilePak:emp.mobilePak||'', reference:emp.ref||'', eidExpiry:vals.eidExp||'', licExpiry:vals.licExpiry||'', labourExpiry:vals.labourExpiry||'', insExpiry:vals.insExpiry||'' };
