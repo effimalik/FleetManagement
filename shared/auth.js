@@ -146,13 +146,11 @@
     console.log('[Auth] age (ms):', Date.now() - s.loginAt);
   }
 
-  /* Fast client-side gate */
   if (!_isClientValid(s)) {
     _redirectToLogin('client validation failed on boot');
     return;
   }
 
-  /* Page is safe to show */
   document.documentElement.style.visibility = '';
   _startIdleWatcher();
   _validateWithServer();
