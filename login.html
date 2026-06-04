@@ -331,6 +331,7 @@ body::after{
   </div>
 </div>
 
+<script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
 <script>
 'use strict';
 
@@ -503,13 +504,22 @@ async function startGoogleLogin(){
   await sleep(700);
   setStep(5,'done');
 
-  sessionStorage.setItem('ap_user', JSON.stringify({
-    email:    result.email,
-    name:     result.name  || result.email,
-    role:     result.role  || 'User',
-    initials: (result.name||result.email).split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(),
-    lastActive: Date.now(),
-  }));
+  // Auth.createSession writes the correct 'ap_session' key that auth.js reads on every page
+  const ok = Auth.createSession({
+    sessionId : result.sessionId,
+    token     : result.token,
+    email     : result.email,
+    name      : result.name || result.email,
+    role      : result.role || 'User',
+  });
+
+  if (!ok) {
+    setStep(5, 'fail');
+    showStatus('error', 'Session Error', 'ti-alert-circle');
+    showMsg('Session could not be created — missing sessionId or token from server.');
+    btn.disabled = false;
+    return;
+  }
 
   await sleep(400);
   handleLoginRedirect();
@@ -568,10 +578,9 @@ function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 /* ── Skip login if valid session exists ── */
 (function checkExistingSession(){
   try{
-    const s = sessionStorage.getItem('ap_user');
-    if(s){
-      const u = JSON.parse(s);
-      if(u && u.email) handleLoginRedirect();
+    // Use Auth.isAuthenticated so we check ap_session (not the old ap_user key)
+    if(window.Auth && window.Auth.getCredentials && window.Auth.getCredentials()){
+      handleLoginRedirect();
     }
   } catch(e){}
 })();
