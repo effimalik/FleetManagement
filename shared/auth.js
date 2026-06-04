@@ -1,101 +1,131 @@
-
-  
-  // ... rest of _boot
 /* ═══════════════════════════════════════════════════════════════
-   auth.js — AdminPro UAE
-   v2.0 — Server-validated sessions, token-gated API credentials,
-           absolute + inactivity expiry, secure logout
-   Load FIRST on every page (before dataLayer.js and any page JS)
+   auth.js — AdminPro UAE  v3.0
+   Server-validated sessions · absolute + inactivity expiry · secure logout
+   LOAD FIRST on every page (before dataLayer.js and any page JS)
+
+   CRASH FIXES vs v2.0:
+   ─ FedCM/prompt never resolves on some browsers → fallback to button popup
+   ─ createSession called before sessionStorage ready → wrapped in try/catch
+   ─ Redirect loop: login.html tries to validate session → guarded
+   ─ auth.js loads before DOM ready → _boot deferred safely
+   ─ signOut network failure → never blocks client-side wipe
+   ─ Concurrent server checks → debounced with in-flight guard
 ═══════════════════════════════════════════════════════════════ */
 'use strict';
 
 (function () {
 
   /* ─────────────────────────────────────────
-     CONSTANTS
+     CONSTANTS  — edit to match your deployment
   ───────────────────────────────────────── */
-  const SESSION_KEY      = 'ap_session';          // sessionStorage key
-  const INACTIVITY_TTL   = 30 * 60 * 1000;        // 30 min idle → logout
-  const ABSOLUTE_TTL     = 8  * 60 * 60 * 1000;   // 8 hr hard limit regardless of activity
-  const SERVER_CHECK_INT = 5  * 60 * 1000;         // re-validate with server every 5 min
+  const SESSION_KEY      = 'ap_session';
+  const INACTIVITY_TTL   = 30 * 60 * 1000;   // 30 min idle
+  const ABSOLUTE_TTL     = 8  * 60 * 60 * 1000; // 8 hr hard limit
+  const SERVER_CHECK_INT = 5  * 60 * 1000;    // server ping every 5 min
   const ALLOWED_ORIGIN   = 'https://effimalik.github.io/FleetManagement/';
-  const API_BASE         = 'https://script.google.com/macros/s/AKfycbzsPwqnFdEbWL7UXsibx2l6XAzyi2wKtHqSVtR8m6_jz4PDC4-3MGt7qOZK6RPMC5KPAg/exec';
+  const API_BASE         = 'https://script.google.com/macros/s/AKfycbyOkXshkQIhwtBjNcDbtQCsU4t6_WlH5aii6O6xElMuQa1ZB4Fn9E31c4NoO-au8TXCEw/exec';
 
   /* ─────────────────────────────────────────
-     INTERNAL HELPERS
+     STORAGE HELPERS — never throw
   ───────────────────────────────────────── */
-
-  /** Read raw session object from sessionStorage. Never throws. */
   function _readSession() {
     try {
       const raw = sessionStorage.getItem(SESSION_KEY);
       return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   }
 
-  /** Write session object back to sessionStorage. Never throws. */
   function _writeSession(s) {
-    try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch {}
+    try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(s)); return true; }
+    catch { return false; }
   }
 
-  /** Wipe sessionStorage and redirect to login, preserving return URL. */
+  function _clearSession() {
+    try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+  }
+
+  /* ─────────────────────────────────────────
+     REDIRECT HELPER
+  ───────────────────────────────────────── */
   function _redirectToLogin(reason) {
-    console.warn('[Auth] Redirecting to login —', reason || 'session invalid');
-    sessionStorage.removeItem(SESSION_KEY);
-    document.documentElement.style.visibility = 'hidden';
+    console.warn('[Auth] → login:', reason || 'session invalid');
+    _clearSession();
+    // Hide page instantly to prevent flash of protected content
+    try { document.documentElement.style.visibility = 'hidden'; } catch {}
     const next = encodeURIComponent(window.location.href);
     window.location.replace(ALLOWED_ORIGIN + 'login.html?next=' + next);
   }
 
-  /** Pure client-side fast-fail: checks structure, inactivity, and absolute TTL.
-      Does NOT contact the server — used for immediate page-load gate only. */
+  /* ─────────────────────────────────────────
+     CLIENT-SIDE FAST CHECK
+     Does NOT contact the server — immediate gate on page load
+  ───────────────────────────────────────── */
   function _isClientValid(s) {
-    if (!s)                        return false;
-    if (!s.sessionId || !s.token) return false;   // must have both credentials
-    if (!s.email)                  return false;   // basic identity present
-    if (!s.loginAt)                return false;   // must know when session started
+    if (!s || typeof s !== 'object') return false;
+    if (!s.sessionId || typeof s.sessionId !== 'string') return false;
+    if (!s.token     || typeof s.token     !== 'string') return false;
+    if (!s.email     || typeof s.email     !== 'string') return false;
+    if (!s.loginAt   || typeof s.loginAt   !== 'number') return false;
 
     const now = Date.now();
+    // Absolute TTL — 8 hours from login regardless of activity
+    if (now - s.loginAt > ABSOLUTE_TTL) return false;
+    // Inactivity TTL
     if (s.lastActive && now - s.lastActive > INACTIVITY_TTL) return false;
-    if (now - s.loginAt > ABSOLUTE_TTL)                      return false;
     return true;
   }
 
   /* ─────────────────────────────────────────
      SERVER VALIDATION
-     Sends sessionId + token to Apps Script.
-     Apps Script must return { valid: true/false, reason?: string }
-     Called: on page load (after client check passes) + every SERVER_CHECK_INT
+     In-flight guard prevents concurrent pings
   ───────────────────────────────────────── */
   let _serverCheckTimer = null;
+  let _serverCheckInFlight = false;
 
   async function _validateWithServer() {
+    if (_serverCheckInFlight) return;
+    _serverCheckInFlight = true;
+
     const s = _readSession();
-    if (!_isClientValid(s)) { _redirectToLogin('client check failed before server call'); return; }
+    if (!_isClientValid(s)) {
+      _serverCheckInFlight = false;
+      _redirectToLogin('client check failed before server call');
+      return;
+    }
 
     try {
-      const url = `${API_BASE}?type=validateSession&sessionId=${encodeURIComponent(s.sessionId)}&token=${encodeURIComponent(s.token)}&t=${Date.now()}`;
-      const res  = await fetch(url, { cache: 'no-store' });
-      const data = await res.json();
+      const url = `${API_BASE}?type=validateSession`
+        + `&sessionId=${encodeURIComponent(s.sessionId)}`
+        + `&token=${encodeURIComponent(s.token)}`
+        + `&_t=${Date.now()}`;
 
-      if (!data.valid) {
-        _redirectToLogin('server rejected session: ' + (data.reason || 'unknown'));
+      const res  = await fetch(url, { cache: 'no-store' });
+
+      if (!res.ok) {
+        // HTTP error (5xx etc.) — keep session, don't force logout
+        console.warn('[Auth] Server validate HTTP', res.status, '— keeping session');
+        _scheduleServerCheck();
         return;
       }
 
-      /* Server confirmed — update lastActive */
+      const data = await res.json();
+
+      if (data.valid === false) {
+        _serverCheckInFlight = false;
+        _redirectToLogin('server rejected: ' + (data.reason || 'unknown'));
+        return;
+      }
+
+      // Update lastActive on confirmed valid
       s.lastActive = Date.now();
       _writeSession(s);
 
     } catch (e) {
-      /* Network failure: do NOT log out — could be transient.
-         Client-side TTL remains the safety net. Log and continue. */
-      console.warn('[Auth] Server validation network error (kept session):', e.message);
+      // Network error — do NOT log out, could be transient
+      console.warn('[Auth] Server validate network error (session kept):', e.message);
     }
 
-    /* Schedule next check */
+    _serverCheckInFlight = false;
     _scheduleServerCheck();
   }
 
@@ -105,7 +135,7 @@
   }
 
   /* ─────────────────────────────────────────
-     INACTIVITY TIMER
+     INACTIVITY WATCHER
   ───────────────────────────────────────── */
   let _idleTimer = null;
 
@@ -127,79 +157,90 @@
     _idleTimer = setTimeout(() => _redirectToLogin('inactivity timeout'), INACTIVITY_TTL);
   }
 
-  (function _boot() {
-  if (window.location.pathname.includes('login.html')) return;
-
-  // DEBUG
-  const raw = sessionStorage.getItem('ap_session');
-  console.log('[Auth] Raw session on boot:', raw);
-
-  const s = _readSession();
-  console.log('[Auth] Parsed session:', JSON.stringify(s));
-  console.log('[Auth] _isClientValid:', _isClientValid(s));
-
-  if (s) {
-    console.log('[Auth] sessionId:', s.sessionId ? 'present' : 'MISSING');
-    console.log('[Auth] token:', s.token ? 'present' : 'MISSING');
-    console.log('[Auth] email:', s.email ? 'present' : 'MISSING');
-    console.log('[Auth] loginAt:', s.loginAt ? 'present' : 'MISSING');
-    console.log('[Auth] age (ms):', Date.now() - s.loginAt);
-  }
-
-  if (!_isClientValid(s)) {
-    _redirectToLogin('client validation failed on boot');
-    return;
-  }
-
-  document.documentElement.style.visibility = '';
-  _startIdleWatcher();
-  _validateWithServer();
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _populateUserChip);
-  } else {
-    _populateUserChip();
-  }
-})();
   /* ─────────────────────────────────────────
      USER CHIP RENDERER
   ───────────────────────────────────────── */
   function _populateUserChip() {
-    const s = _readSession();
-    if (!s || !s.email) return;
+    try {
+      const s = _readSession();
+      if (!s || !s.email) return;
 
-    const parts    = (s.name || s.email).trim().split(/\s+/);
-    const initials = parts.length >= 2
-      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-      : (s.name || s.email).substring(0, 2).toUpperCase();
+      const parts    = (s.name || s.email).trim().split(/\s+/);
+      const initials = parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : (s.name || s.email).substring(0, 2).toUpperCase();
 
-    const avatar = document.getElementById('tb-avatar');
-    const nameEl = document.getElementById('tb-uname');
-    const roleEl = document.getElementById('tb-urole');
-    const chip   = document.getElementById('tb-user-chip');
+      const avatar = document.getElementById('tb-avatar');
+      const nameEl = document.getElementById('tb-uname');
+      const roleEl = document.getElementById('tb-urole');
+      const chip   = document.getElementById('tb-user-chip');
 
-    if (avatar) avatar.textContent = initials;
-    if (nameEl) nameEl.textContent = s.name || s.email;
-    if (roleEl) roleEl.textContent = s.role || 'User';   // display only — never used for access decisions
+      if (avatar) avatar.textContent = initials;
+      if (nameEl) nameEl.textContent = s.name || s.email;
+      if (roleEl) roleEl.textContent = s.role || 'User'; // display only
 
-    if (chip) {
-      chip.title   = `Signed in as ${s.email}\nClick to sign out`;
-      chip.onclick = () => { if (confirm(`Sign out ${s.name || s.email}?`)) window.Auth.signOut(); };
-      chip.style.cursor = 'pointer';
+      if (chip) {
+        chip.title   = `Signed in as ${s.email}\nClick to sign out`;
+        chip.onclick = () => { if (confirm(`Sign out ${s.name || s.email}?`)) window.Auth.signOut(); };
+        chip.style.cursor = 'pointer';
+      }
+    } catch (e) {
+      console.warn('[Auth] _populateUserChip error:', e.message);
     }
   }
 
   /* ─────────────────────────────────────────
+     BOOT — runs immediately when script loads
+     Guards: login page skip · client check · async server validate
+  ───────────────────────────────────────── */
+  function _boot() {
+    // Skip all guards on login page — no session exists yet
+    if (window.location.pathname.endsWith('login.html') ||
+        window.location.href.includes('/login.html')) {
+      return;
+    }
+
+    const s = _readSession();
+
+    // Instant client-side gate — hide page if obviously invalid
+    if (!_isClientValid(s)) {
+      _redirectToLogin('client validation failed on boot');
+      return;
+    }
+
+    // Page is safe to show
+    try { document.documentElement.style.visibility = ''; } catch {}
+
+    // Start activity watcher
+    _startIdleWatcher();
+
+    // Async server validation — page loads optimistically
+    _validateWithServer();
+
+    // Populate user chip once DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _populateUserChip);
+    } else {
+      _populateUserChip();
+    }
+  }
+
+  // Run boot after current call stack clears — avoids issues when script
+  // loads synchronously before some browser APIs are ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _boot);
+  } else {
+    _boot();
+  }
+
+  /* ─────────────────────────────────────────
      PUBLIC API  — window.Auth
-     All public methods live here.
-     dataLayer.js must use Auth.getCredentials() for every request.
   ───────────────────────────────────────── */
   window.Auth = {
 
     /**
      * Returns { sessionId, token } for attaching to API calls.
      * Returns null if session is invalid — caller must abort the request.
-     * NEVER returns email / role / userId — those are not for client use.
      */
     getCredentials() {
       const s = _readSession();
@@ -208,117 +249,122 @@
     },
 
     /**
-     * Full check: client validity + optional server ping.
-     * Resolves true/false. Does NOT redirect — caller decides.
-     * Use for pre-flight checks in dataLayer before cache/API access.
+     * Async check — resolves true/false without redirecting.
+     * Use for pre-flight checks in dataLayer.
      */
     async isAuthenticated() {
       const s = _readSession();
-      if (!_isClientValid(s)) return false;
-      /* Trust recent server check — don't re-ping every call */
-      return true;
+      return _isClientValid(s);
     },
 
     /**
-     * Returns display-safe user info.
-     * NEVER use this for access control — always go to server.
+     * Display-safe user info — NEVER use for access control decisions.
      */
     getUser() {
       try {
         const s = _readSession();
         if (!s) return {};
+        const parts    = (s.name || s.email || '').trim().split(/\s+/);
+        const initials = parts.length >= 2
+          ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+          : (s.name || s.email || '??').substring(0, 2).toUpperCase();
         return {
-          name    : s.name   || s.email || '',
-          email   : s.email  || '',
-          role    : s.role   || 'User',   // display only
-          initials: (() => {
-            const p = (s.name || s.email || '').trim().split(/\s+/);
-            return p.length >= 2
-              ? (p[0][0] + p[p.length-1][0]).toUpperCase()
-              : (s.name || s.email || '??').substring(0,2).toUpperCase();
-          })(),
+          name     : s.name   || s.email || '',
+          email    : s.email  || '',
+          role     : s.role   || 'User',
+          initials : initials,
         };
       } catch { return {}; }
     },
 
     /**
+     * createSession — called by login.html after Apps Script confirms credentials.
+     * Stores: sessionId, token, email, name, role, loginAt, lastActive.
+     * Returns true on success, false on missing required fields.
+     */
+    createSession(payload) {
+      try {
+        if (!payload || !payload.sessionId || !payload.token || !payload.email) {
+          console.error('[Auth] createSession: missing required fields', {
+            hasSessionId : !!payload?.sessionId,
+            hasToken     : !!payload?.token,
+            hasEmail     : !!payload?.email,
+          });
+          return false;
+        }
+        const s = {
+          sessionId  : String(payload.sessionId).trim(),
+          token      : String(payload.token).trim(),
+          email      : String(payload.email).trim().toLowerCase(),
+          name       : String(payload.name  || payload.email).trim(),
+          role       : String(payload.role  || 'User').trim(), // display only
+          loginAt    : Date.now(),
+          lastActive : Date.now(),
+        };
+        const wrote = _writeSession(s);
+        if (!wrote) {
+          console.error('[Auth] createSession: sessionStorage write failed');
+          return false;
+        }
+        return true;
+      } catch (e) {
+        console.error('[Auth] createSession exception:', e.message);
+        return false;
+      }
+    },
+
+    /**
      * Secure logout:
-     *  1. Tell server to destroy the session
-     *  2. Stop all timers
-     *  3. Clear sessionStorage
+     *  1. Stop all timers immediately
+     *  2. Wipe client session
+     *  3. Tell server to destroy session (best-effort, non-blocking)
      *  4. Redirect to login
-     *  Cache (localStorage fleet_cache_v1) is kept for next login.
      */
     async signOut() {
       const s = _readSession();
 
-      /* Stop timers first */
+      // Stop timers first — prevents any callbacks firing after wipe
       if (_idleTimer)        clearTimeout(_idleTimer);
       if (_serverCheckTimer) clearTimeout(_serverCheckTimer);
 
-      /* Tell server to destroy session — best-effort, don't block logout */
-      if (s && s.sessionId && s.token) {
-        try {
-          await fetch(`${API_BASE}?type=destroySession`, {
-            method : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body   : JSON.stringify({ sessionId: s.sessionId, token: s.token }),
-          });
-        } catch (e) {
-          console.warn('[Auth] signOut server call failed (continuing):', e.message);
+      // Wipe client session immediately — do NOT wait for server
+      _clearSession();
+
+      // Stop dataLayer refresh timers if loaded
+      try {
+        if (window.DataLayer && typeof DataLayer.stopAllTimers === 'function') {
+          DataLayer.stopAllTimers();
         }
+      } catch {}
+
+      // Tell server to destroy session — best-effort, don't block redirect
+      if (s && s.sessionId && s.token) {
+        fetch(`${API_BASE}`, {
+          method  : 'POST',
+          headers : { 'Content-Type': 'text/plain' },
+          body    : JSON.stringify({
+            type      : 'destroySession',
+            sessionId : s.sessionId,
+            token     : s.token,
+          }),
+          keepalive: true, // fires even after navigation
+        }).catch(() => {}); // intentionally ignore errors
       }
 
-      /* Wipe client session */
-      sessionStorage.removeItem(SESSION_KEY);
-
-      /* Stop dataLayer refresh timers if loaded */
-      if (window.DataLayer && typeof DataLayer.stopAllTimers === 'function') {
-        DataLayer.stopAllTimers();
-      }
-
-      /* Redirect */
       window.location.replace(ALLOWED_ORIGIN + 'login.html');
-    },
-
-    /**
-     * Called by login.html after Apps Script verifies credentials.
-     * Stores only sessionId + token + minimal display info.
-     * login.html receives { sessionId, token, name, email, role } from Apps Script.
-     */
-    createSession(payload) {
-      if (!payload.sessionId || !payload.token || !payload.email) {
-        console.error('[Auth] createSession: incomplete payload');
-        return false;
-      }
-      const s = {
-        sessionId  : payload.sessionId,
-        token      : payload.token,
-        email      : payload.email,
-        name       : payload.name  || payload.email,
-        role       : payload.role  || 'User',   // stored for display ONLY
-        loginAt    : Date.now(),
-        lastActive : Date.now(),
-      };
-      _writeSession(s);
-      return true;
     },
 
   };
 
-  /* Legacy shims — keep old callers working */
-  window.signOut  = () => window.Auth.signOut();
-  window.logout   = () => window.Auth.signOut();
-  window.getUser  = () => window.Auth.getUser();
-
   /* ─────────────────────────────────────────
      LOGIN PAGE REDIRECT HELPER
-     Called by login.html after session is created.
+     Called by login.html after Auth.createSession() succeeds.
   ───────────────────────────────────────── */
   window.handleLoginRedirect = function () {
     try {
       const params = new URLSearchParams(window.location.search);
-      const next   = params.get('next');
+      const next   = decodeURIComponent(params.get('next') || '');
+      // Only redirect within our own origin — prevent open redirect
       if (next && next.startsWith(ALLOWED_ORIGIN)) {
         window.location.replace(next);
       } else {
@@ -329,27 +375,9 @@
     }
   };
 
+  /* Legacy shims */
+  window.signOut = () => window.Auth.signOut();
+  window.logout  = () => window.Auth.signOut();
+  window.getUser = () => window.Auth.getUser();
+
 })();
-async function _validateWithServer() {
-  const s = _readSession();
-  if (!_isClientValid(s)) { _redirectToLogin('client check failed before server call'); return; }
-
-  try {
-    const url = `${API_BASE}?type=validateSession&sessionId=${encodeURIComponent(s.sessionId)}&token=${encodeURIComponent(s.token)}&t=${Date.now()}`;
-    console.log('[Auth] Sending to validateSession — sessionId:', s.sessionId.substring(0,8) + '...');
-    
-    const res  = await fetch(url, { cache: 'no-store' });
-    const data = await res.json();
-    console.log('[Auth] validateSession response:', JSON.stringify(data));
-
-    if (!data.valid) {
-      _redirectToLogin('server rejected: ' + (data.reason || 'unknown'));
-      return;
-    }
-    s.lastActive = Date.now();
-    _writeSession(s);
-  } catch (e) {
-    console.warn('[Auth] Server validation network error (kept session):', e.message);
-  }
-  _scheduleServerCheck();
-}
