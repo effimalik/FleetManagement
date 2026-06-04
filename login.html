@@ -572,7 +572,29 @@ async function startGoogleLogin(){
   await sleep(800);
   handleLoginRedirect();
 }
+const ok = window.Auth.createSession({
+    sessionId : result.sessionId,
+    token     : result.token,
+    email     : result.email,
+    name      : result.name  || result.email,
+    role      : result.role  || 'User',
+  });
 
+  // DEBUG — log exactly what server returned and what got stored
+  console.log('Server returned:', JSON.stringify({
+    sessionId : result.sessionId,
+    token     : result.token,
+    email     : result.email,
+  }));
+  const stored = JSON.parse(sessionStorage.getItem('ap_session'));
+  console.log('Stored in sessionStorage:', JSON.stringify({
+    sessionId : stored.sessionId,
+    token     : stored.token,
+    email     : stored.email,
+  }));
+
+  await sleep(800);
+  handleLoginRedirect();
 </script>
 </body>
 </html>
