@@ -128,6 +128,9 @@
      BOOT — runs immediately when script loads
   ───────────────────────────────────────── */
   (function _boot() {
+    /* Skip guard on login page itself — no session exists yet */
+    if (window.location.pathname.includes('login.html')) return;
+
     const s = _readSession();
 
     /* Fast client-side gate — hide page instantly if obviously invalid */
