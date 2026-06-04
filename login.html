@@ -603,6 +603,16 @@ function handleLoginRedirect() {
     window.location.replace(DEFAULT_PAGE);
   }
 }
+
+async function verifyWithAppsScript(idToken){
+  const res = await fetch(CONFIG.API_BASE, {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body:    JSON.stringify({ type: 'login', token: idToken }),  // ← add type: 'login'
+  });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
   
 </script>
 </body>
