@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
-<script src="https://effimalik.github.io/FleetManagement/shared/auth.js"></script>
+<script src="https://effimalik.github.io/FleetManagement/shared/auth.js?v=5"></script>
 
 	
 <style>
@@ -1052,60 +1052,69 @@ function closeThemeDropdown() {
 })();
 
 /* ══ SESSION GUARD ══
-   Redirect to login.html if no valid session exists.
-   Session is set by login.html after Apps Script verification. */
-(function sessionGuard(){
-  try{
-    const raw = sessionStorage.getItem('ap_user');
-    if(!raw){ window.location.href = 'https://effimalik.github.io/FleetManagement/login.html'; return; }
-    const u = JSON.parse(raw);
-    if(!u || !u.email){ window.location.href = 'https://effimalik.github.io/FleetManagement/login.html'; return; }
-  } catch(e){
-    window.location.href = 'https://effimalik.github.io/FleetManagement/login.html';
+   auth.js (loaded in <head>) already runs _boot() on DOMContentLoaded
+   and redirects to login.html if the session is invalid or expired.
+   This guard is a secondary safety net in case auth.js failed to load. */
+(function sessionGuard() {
+  try {
+    // If auth.js loaded correctly, it already handled the guard — trust it.
+    if (window.Auth && typeof window.Auth.getCredentials === 'function') {
+      // auth.js is present — it will have already redirected if invalid.
+      // We don't double-redirect here.
+      return;
+    }
+    // auth.js didn't load (CDN failure?) — fall back to old key check
+    const raw = sessionStorage.getItem('ap_session');
+    if (!raw) {
+      console.warn('[index] auth.js not loaded and no session found — redirecting');
+      window.location.replace('https://effimalik.github.io/FleetManagement/login.html');
+      return;
+    }
+    const s = JSON.parse(raw);
+    if (!s || !s.sessionId || !s.token || !s.email) {
+      window.location.replace('https://effimalik.github.io/FleetManagement/login.html');
+    }
+  } catch (e) {
+    console.error('[sessionGuard] Error — redirecting to be safe:', e);
+    window.location.replace('https://effimalik.github.io/FleetManagement/login.html');
   }
 })();
 
-/* ── Sign out ── */
-function signOut(){
-  sessionStorage.removeItem('ap_user');
-  // Revoke Google session hint so they must re-authenticate
-  if(window.google && window.google.accounts && window.google.accounts.id){
-    google.accounts.id.disableAutoSelect();
+/* ── Sign out — delegates to Auth.signOut() which handles server + client ── */
+function signOut() {
+  if (window.Auth && typeof window.Auth.signOut === 'function') {
+    window.Auth.signOut();
+  } else {
+    // Fallback if auth.js failed to load
+    sessionStorage.removeItem('ap_session');
+    window.location.replace('https://effimalik.github.io/FleetManagement/login.html');
   }
-  window.location.href = 'login.html';
 }
 
-/* ── Populate user chip from session ── */
-function populateUserChip(){
-  try{
-    const u = JSON.parse(sessionStorage.getItem('ap_user') || '{}');
-    if(!u || !u.email) return;
+/* ── Populate user chip — auth.js does this automatically,
+   but this is called again on DOMContentLoaded for safety ── */
+function populateUserChip() {
+  try {
+    // Prefer auth.js getUser() — it reads from the correct session key
+    if (window.Auth && typeof window.Auth.getUser === 'function') {
+      const u = window.Auth.getUser();
+      if (!u || !u.email) return;
 
-    // Build initials from full name (e.g. "Afan Haidar" → "AH")
-    const nameParts = (u.name || u.email).trim().split(/\s+/);
-    const initials  = nameParts.length >= 2
-      ? (nameParts[0][0] + nameParts[nameParts.length-1][0]).toUpperCase()
-      : (u.name || u.email).substring(0,2).toUpperCase();
+      const avatarEl = document.getElementById('tb-avatar');
+      const nameEl   = document.getElementById('tb-uname');
+      const roleEl   = document.getElementById('tb-urole');
+      const chip     = document.getElementById('tb-user-chip');
 
-    // Full name (e.g. "Afan Haidar")
-    const fullName = u.name || u.email;
-
-    // Role exactly as stored in sheet (e.g. "HR Manager")
-    const role = u.role || 'User';
-
-    const avatarEl = document.getElementById('tb-avatar');
-    const nameEl   = document.getElementById('tb-uname');
-    const roleEl   = document.getElementById('tb-urole');
-    const chip     = document.getElementById('tb-user-chip');
-
-    if(avatarEl) avatarEl.textContent = initials;
-    if(nameEl)   nameEl.textContent   = fullName;
-    if(roleEl)   roleEl.textContent   = role;
-    if(chip){
-      chip.title   = `Signed in as ${u.email}\nClick to sign out`;
-      chip.onclick = ()=>{ if(confirm(`Sign out ${fullName}?`)) signOut(); };
+      if (avatarEl) avatarEl.textContent = u.initials || '--';
+      if (nameEl)   nameEl.textContent   = u.name     || u.email;
+      if (roleEl)   roleEl.textContent   = u.role     || 'User';
+      if (chip) {
+        chip.title   = `Signed in as ${u.email}\nClick to sign out`;
+        chip.onclick = () => { if (confirm(`Sign out ${u.name || u.email}?`)) window.Auth.signOut(); };
+        chip.style.cursor = 'pointer';
+      }
     }
-  } catch(e){ console.error('populateUserChip:', e); }
+  } catch (e) { console.error('[populateUserChip]:', e); }
 }
 
 /* ── Init ── */
