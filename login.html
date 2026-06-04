@@ -339,7 +339,7 @@ body::after{
    ⚙  CONFIGURATION
    ════════════════════════════════════════════════════ */
 const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwHdmallgjar-vav6rklU6VO0TR9bfMJ7S2Nyp6OL1Q_fwW2uYqboG2LgZ-T03Ga3a-zQ/exec',
+  API_BASE : 'https://script.google.com/macros/s/AKfycbwHdmallgjar-vav6rklU6VO0TR9bfMJ7S2Nyp6OL1Q_fwW2uYqboG2LgZ-T03Ga3a-zQ/exec',
   GOOGLE_CLIENT_ID: '743775120253-lr54jgst59jqr5s61vc3i4o3rnfn596a.apps.googleusercontent.com',
   REDIRECT_URL: 'index.html',
 };
@@ -564,7 +564,7 @@ function getGoogleIdToken(){
 /* ── Verify token with Apps Script via POST ── */
 // Content-Type: text/plain avoids CORS preflight — intentional.
 async function verifyWithAppsScript(idToken){
-  const res = await fetch(CONFIG.APPS_SCRIPT_URL, {
+  const res = await fetch(CONFIG.API_BASE, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify({ token: idToken }),
