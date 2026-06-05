@@ -51,7 +51,7 @@
     },
     employee: {
       label    : 'Employees',
-      apiType  : 'getEmployees',
+      apiType  : 'employees',
       ttlMs    : 10 * 60 * 1000,        // 10 min
     },
     master: {
