@@ -619,6 +619,136 @@ html,body{
 }
 .cp-footer-note{display:flex;align-items:center;gap:5px;}
 .cp-footer-note i{font-size:11px;color:var(--text3);}
+
+/* ══ CACHE MISS CHECKER PANEL ══ */
+.cm-panel{
+  position:fixed;bottom:14px;right:14px;
+  width:320px;max-height:260px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  z-index:9000;
+  display:none;flex-direction:column;overflow:hidden;
+  font-family:var(--font);
+}
+.cm-panel.open{display:flex;}
+.cm-header{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;background:var(--bg3);border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.cm-title{font-size:11px;font-weight:700;color:var(--text);flex:1;display:flex;align-items:center;gap:6px;}
+.cm-title i{color:var(--amber);font-size:13px;}
+.cm-close{width:20px;height:20px;border-radius:4px;border:none;background:none;color:var(--text3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;}
+.cm-close:hover{background:var(--surface2);color:var(--text);}
+.cm-body{flex:1;overflow-y:auto;padding:8px;scrollbar-width:none;}
+.cm-body::-webkit-scrollbar{display:none;}
+.cm-row{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 8px;border-radius:var(--radius);margin-bottom:3px;
+  font-size:11px;background:var(--bg2);border:1px solid var(--border);
+}
+.cm-row.miss{border-color:rgba(248,81,73,.3);background:var(--red-dim);}
+.cm-row.error{border-color:rgba(248,81,73,.5);background:var(--red-dim);}
+.cm-row.ok{border-color:rgba(57,211,83,.25);background:var(--teal-dim);}
+.cm-row-name{flex:1;color:var(--text);font-weight:600;}
+.cm-row-info{color:var(--text3);font-size:10px;}
+.cm-row-badge{
+  font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;
+  text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;
+}
+.cm-row-badge.miss{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,.3);}
+.cm-row-badge.error{background:var(--red-dim);color:var(--red);}
+.cm-row-badge.ok{background:var(--teal-dim);color:var(--teal);}
+.cm-row-badge.stale{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(227,179,65,.3);}
+.cm-row-btn{
+  width:22px;height:22px;border-radius:4px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;padding:0;flex-shrink:0;
+}
+.cm-row-btn:hover{color:var(--accent);border-color:rgba(88,166,255,.4);background:var(--accent-dim);}
+.cm-row-btn.spin i{animation:spin 1s linear infinite;}
+.cm-footer-strip{
+  padding:7px 12px;background:var(--bg3);border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;color:var(--text3);flex-shrink:0;
+}
+.cm-footer-strip button{
+  font-size:10px;padding:3px 8px;border-radius:4px;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text2);cursor:pointer;font-family:var(--font);
+  display:flex;align-items:center;gap:4px;transition:all .15s;
+}
+.cm-footer-strip button:hover{color:var(--accent);border-color:rgba(88,166,255,.3);}
+/* miss badge on cache btn */
+.cache-miss-badge{
+  position:absolute;top:-4px;right:-4px;
+  min-width:14px;height:14px;border-radius:7px;
+  background:var(--red);color:#fff;
+  font-size:8px;font-weight:700;font-family:var(--font);
+  display:none;align-items:center;justify-content:center;
+  padding:0 3px;border:1.5px solid var(--bg2);
+}
+.cache-miss-badge.show{display:flex;}
+
+/* ══ EVENT LISTENER MONITOR ══ */
+.el-panel{
+  position:fixed;top:70px;right:14px;
+  width:310px;max-height:340px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);
+  z-index:9001;display:none;flex-direction:column;overflow:hidden;
+  font-family:var(--font);
+}
+.el-panel.open{display:flex;}
+.el-header{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;background:var(--bg3);border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.el-title{font-size:11px;font-weight:700;color:var(--text);flex:1;display:flex;align-items:center;gap:6px;}
+.el-title i{color:var(--purple);font-size:13px;}
+.el-close{width:20px;height:20px;border-radius:4px;border:none;background:none;color:var(--text3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;}
+.el-close:hover{background:var(--surface2);color:var(--text);}
+.el-body{flex:1;overflow-y:auto;padding:8px;scrollbar-width:none;}
+.el-body::-webkit-scrollbar{display:none;}
+.el-event{
+  display:flex;align-items:flex-start;gap:7px;
+  padding:6px 8px;border-radius:var(--radius);margin-bottom:3px;
+  font-size:10.5px;background:var(--bg2);border:1px solid var(--border);
+  animation:elIn .2s ease;
+}
+@keyframes elIn{from{opacity:0;transform:translateX(8px);}to{opacity:1;transform:translateX(0);}}
+.el-event-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.el-event-dot.theme{background:var(--purple);}
+.el-event-dot.cache{background:var(--accent);}
+.el-event-dot.miss{background:var(--red);}
+.el-event-dot.refresh{background:var(--teal);}
+.el-event-dot.delete{background:var(--amber);}
+.el-event-dot.storage{background:var(--orange);}
+.el-event-msg{flex:1;color:var(--text2);line-height:1.4;}
+.el-event-msg strong{color:var(--text);font-weight:600;}
+.el-event-ts{color:var(--text3);font-size:9.5px;flex-shrink:0;font-family:var(--mono);}
+.el-footer-strip{
+  padding:7px 12px;background:var(--bg3);border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;color:var(--text3);flex-shrink:0;
+}
+.el-footer-strip button{
+  font-size:10px;padding:3px 8px;border-radius:4px;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text2);cursor:pointer;font-family:var(--font);
+  display:flex;align-items:center;gap:4px;transition:all .15s;
+}
+.el-footer-strip button:hover{color:var(--red);border-color:rgba(248,81,73,.3);}
+/* ib btn for event monitor */
+.ib-btn-el-badge{
+  position:absolute;top:2px;right:2px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--purple);display:none;
+}
+.ib-btn-el-badge.show{display:block;}
 </style>
 </head>
 <body>
@@ -681,10 +811,11 @@ html,body{
       <div class="tb-gap"></div>
 
       <!-- Cache Status Button -->
-      <button class="tb-cache-btn" id="cache-status-btn" onclick="toggleCachePanel(event)" title="Cache Status">
+      <button class="tb-cache-btn" id="cache-status-btn" onclick="toggleCachePanel(event)" title="Cache Status" style="position:relative;">
         <i class="ti ti-database"></i>
         <span class="cache-label">Cache</span>
         <span class="cache-dot" id="cache-health-dot"></span>
+        <span class="cache-miss-badge" id="cache-miss-badge"></span>
       </button>
 
       <div class="tb-vsep"></div>
@@ -766,6 +897,10 @@ html,body{
       </button>
       <div class="ib-spacer"></div>
       <div class="ib-divider"></div>
+      <button class="ib-btn" id="ib-evmon" onclick="toggleEventMonitor()" title="Event Monitor" style="position:relative;">
+        <i class="ti ti-activity"></i><span class="ib-tip">Event Monitor</span>
+        <span class="ib-btn-el-badge" id="el-badge"></span>
+      </button>
     </nav>
 
     <!-- SUB BAR -->
@@ -795,6 +930,9 @@ html,body{
       Cache Status
     </div>
     <div class="cp-actions">
+      <button class="cp-action-btn" onclick="toggleMissChecker()" title="Cache miss checker" style="color:var(--amber);">
+        <i class="ti ti-alert-triangle"></i> Checker
+      </button>
       <button class="cp-action-btn" onclick="refreshAllCache()" title="Hard refresh all datasets">
         <i class="ti ti-refresh"></i> Refresh All
       </button>
@@ -825,8 +963,258 @@ html,body{
     <span id="cp-last-check">—</span>
   </div>
 </div>
+<!-- ══ CACHE MISS CHECKER PANEL ══ -->
+<div class="cm-panel" id="cm-panel">
+  <div class="cm-header">
+    <div class="cm-title"><i class="ti ti-alert-triangle"></i>Cache Checker</div>
+    <span id="cm-last-scan" style="font-size:9.5px;color:var(--text3);margin-right:6px;"></span>
+    <button class="cm-close" onclick="closeMissPanel()" title="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="cm-body" id="cm-body">
+    <div style="text-align:center;color:var(--text3);padding:20px;font-size:11px;">Scanning…</div>
+  </div>
+  <div class="cm-footer-strip">
+    <span id="cm-summary">—</span>
+    <button onclick="cmScanAll()"><i class="ti ti-refresh"></i> Re-scan</button>
+  </div>
+</div>
+
+<!-- ══ EVENT LISTENER MONITOR ══ -->
+<div class="el-panel" id="el-panel">
+  <div class="el-header">
+    <div class="el-title"><i class="ti ti-activity"></i>Event Monitor</div>
+    <button class="el-close" onclick="closeEventMonitor()" title="Close"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="el-body" id="el-body">
+    <div style="text-align:center;color:var(--text3);padding:20px;font-size:11px;">Listening for events…</div>
+  </div>
+  <div class="el-footer-strip">
+    <span id="el-count" style="font-family:var(--mono);">0 events</span>
+    <button onclick="clearEventLog()"><i class="ti ti-trash"></i> Clear</button>
+  </div>
+</div>
+
 <script>
-'use strict';
+
+/* ════════════════════════════════════════════
+   EVENT LOG — shared bus for all monitors
+   ════════════════════════════════════════════ */
+const _evLog = [];
+let _evMonOpen = false;
+
+function _logEvent(type, msg, extra) {
+  const now = new Date();
+  const ts = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  _evLog.unshift({ type, msg, extra: extra||'', ts });
+  if (_evLog.length > 80) _evLog.length = 80;
+  const badge = document.getElementById('el-badge');
+  if (badge && !_evMonOpen) badge.classList.add('show');
+  const cnt = document.getElementById('el-count');
+  if (cnt) cnt.textContent = _evLog.length + ' event' + (_evLog.length===1?'':'s');
+  if (_evMonOpen) _renderEventLog();
+}
+
+function _renderEventLog() {
+  const body = document.getElementById('el-body');
+  if (!body) return;
+  if (!_evLog.length) {
+    body.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;font-size:11px;">No events yet.</div>';
+    return;
+  }
+  body.innerHTML = _evLog.map(e => `
+    <div class="el-event">
+      <span class="el-event-dot ${e.type}"></span>
+      <span class="el-event-msg">${e.msg}${e.extra ? ' <span style="color:var(--accent);font-weight:600;">'+e.extra+'</span>' : ''}</span>
+      <span class="el-event-ts">${e.ts}</span>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════════
+   CACHE MISS CHECKER
+   ════════════════════════════════════════════ */
+let _cmPanelOpen = false;
+let _cmAutoHideTimer = null;
+
+function toggleMissChecker() {
+  _cmPanelOpen = !_cmPanelOpen;
+  const p = document.getElementById('cm-panel');
+  if (_cmPanelOpen) {
+    p.classList.add('open');
+    cmScanAll();
+    _resetCmAutoHide();
+    p.addEventListener('mousemove', _resetCmAutoHide);
+    p.addEventListener('mouseenter', _resetCmAutoHide);
+  } else {
+    closeMissPanel();
+  }
+}
+
+function closeMissPanel() {
+  _cmPanelOpen = false;
+  document.getElementById('cm-panel')?.classList.remove('open');
+  if (_cmAutoHideTimer) { clearTimeout(_cmAutoHideTimer); _cmAutoHideTimer = null; }
+}
+
+function _resetCmAutoHide() {
+  if (_cmAutoHideTimer) clearTimeout(_cmAutoHideTimer);
+  _cmAutoHideTimer = setTimeout(closeMissPanel, 3000);
+}
+
+function cmScanAll() {
+  const body = document.getElementById('cm-body');
+  const summary = document.getElementById('cm-summary');
+  const lastScan = document.getElementById('cm-last-scan');
+  if (!body) return;
+
+  const now = new Date();
+  if (lastScan) lastScan.textContent = 'Scanned ' + now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+  const results = Object.entries(DS_META).map(([key, meta]) => {
+    const ageMs = getCacheAge(key);
+    const hasData = (() => { try { const d = getCacheData(key); return Array.isArray(d) ? d.length > 0 : d != null; } catch(_){ return false; } })();
+    const fresh = ageMs < meta.ttlMs;
+    const status = !hasData ? 'miss' : !fresh ? 'stale' : 'ok';
+    return { key, label: meta.label, status, meta, ageMs };
+  });
+
+  const misses = results.filter(r => r.status === 'miss').length;
+  const stales = results.filter(r => r.status === 'stale').length;
+  if (summary) {
+    if (misses === 0 && stales === 0) summary.textContent = 'All ' + results.length + ' healthy';
+    else summary.textContent = (misses ? misses + ' miss' : '') + (misses && stales ? ', ' : '') + (stales ? stales + ' stale' : '');
+  }
+
+  const missTotal = misses + stales;
+  const badge = document.getElementById('cache-miss-badge');
+  if (badge) {
+    badge.textContent = missTotal || '';
+    badge.classList.toggle('show', missTotal > 0);
+  }
+
+  body.innerHTML = results.map(r => {
+    const badgeCls = r.status === 'miss' ? 'miss' : r.status === 'stale' ? 'stale' : 'ok';
+    const badgeTxt = r.status === 'miss' ? 'MISS' : r.status === 'stale' ? 'STALE' : 'OK';
+    const ageStr = r.ageMs === Infinity ? 'Never loaded' : r.ageMs < 60000 ? Math.floor(r.ageMs/1000)+'s ago' : Math.floor(r.ageMs/60000)+'m ago';
+    return `<div class="cm-row ${r.status !== 'ok' ? r.status : ''}">
+      <span class="cm-row-name">${r.label}</span>
+      <span class="cm-row-info">${ageStr}</span>
+      <span class="cm-row-badge ${badgeCls}">${badgeTxt}</span>
+      <button class="cm-row-btn" id="cmbtn-${r.key}" onclick="cmRefresh('${r.key}',this)" title="Force refresh">
+        <i class="ti ti-refresh"></i>
+      </button>
+    </div>`;
+  }).join('');
+
+  _resetCmAutoHide();
+}
+
+async function cmRefresh(key, btn) {
+  btn.classList.add('spin');
+  btn.disabled = true;
+  _logEvent('refresh', 'Cache refresh triggered:', key);
+  try {
+    if (window.AdminPro && AdminPro.forceRefresh) {
+      await AdminPro.forceRefresh(key);
+    } else {
+      localStorage.removeItem('ap2_' + key);
+    }
+    setTimeout(() => { cmScanAll(); renderCacheTable(); updateCacheHealthDot(); }, 300);
+  } catch(e) {
+    _logEvent('miss', 'Refresh error:', key);
+  } finally {
+    btn.classList.remove('spin');
+    btn.disabled = false;
+  }
+}
+
+/* localStorage 1-second mutation watcher — detect delete/set/update */
+(function _watchStorage() {
+  let _prevSnap = {};
+  function _snap() {
+    const s = {};
+    Object.keys(localStorage).filter(k => k.startsWith('ap2_')).forEach(k => { s[k] = localStorage.getItem(k); });
+    return s;
+  }
+  _prevSnap = _snap();
+
+  setInterval(async () => {
+    const cur = _snap();
+    const allKeys = new Set([...Object.keys(_prevSnap), ...Object.keys(cur)]);
+    let changed = false;
+    for (const k of allKeys) {
+      const dsKey = k.replace('ap2_', '');
+      if (_prevSnap[k] !== undefined && cur[k] === undefined) {
+        _logEvent('delete', 'Cache deleted:', dsKey);
+        changed = true;
+        // Auto-refresh within 1s of deletion
+        setTimeout(async () => {
+          if (window.AdminPro && AdminPro.forceRefresh) {
+            try {
+              await AdminPro.forceRefresh(dsKey);
+              _logEvent('refresh', 'Auto-refreshed after delete:', dsKey);
+            } catch(_) {}
+          }
+          updateCacheHealthDot();
+          renderCacheTable();
+          if (_cmPanelOpen) cmScanAll();
+        }, 200);
+      } else if (_prevSnap[k] === undefined && cur[k] !== undefined) {
+        _logEvent('cache', 'Cache set:', dsKey);
+        changed = true;
+      } else if (_prevSnap[k] !== cur[k]) {
+        _logEvent('storage', 'Cache updated:', dsKey);
+        changed = true;
+      }
+    }
+    if (changed) {
+      updateCacheHealthDot();
+      if (_cmPanelOpen) cmScanAll();
+    }
+    _prevSnap = cur;
+  }, 1000);
+})();
+
+/* ════════════════════════════════════════════
+   EVENT MONITOR PANEL
+   ════════════════════════════════════════════ */
+let _elAutoHideTimer = null;
+
+function toggleEventMonitor() {
+  _evMonOpen = !_evMonOpen;
+  const p = document.getElementById('el-panel');
+  const ibBtn = document.getElementById('ib-evmon');
+  if (_evMonOpen) {
+    p.classList.add('open');
+    ibBtn?.classList.add('active');
+    document.getElementById('el-badge')?.classList.remove('show');
+    _renderEventLog();
+    _resetElAutoHide();
+    p.addEventListener('mousemove', _resetElAutoHide);
+    p.addEventListener('mouseenter', _resetElAutoHide);
+  } else {
+    closeEventMonitor();
+  }
+}
+
+function closeEventMonitor() {
+  _evMonOpen = false;
+  document.getElementById('el-panel')?.classList.remove('open');
+  document.getElementById('ib-evmon')?.classList.remove('active');
+  if (_elAutoHideTimer) { clearTimeout(_elAutoHideTimer); _elAutoHideTimer = null; }
+}
+
+function _resetElAutoHide() {
+  if (_elAutoHideTimer) clearTimeout(_elAutoHideTimer);
+  _elAutoHideTimer = setTimeout(closeEventMonitor, 3000);
+}
+
+function clearEventLog() {
+  _evLog.length = 0;
+  const cnt = document.getElementById('el-count');
+  if (cnt) cnt.textContent = '0 events';
+  _renderEventLog();
+  _resetElAutoHide();
+}
 
 /* ══ SECTION MAP ══ */
 const SECTIONS = {
@@ -1004,13 +1392,23 @@ function setTheme(mode) {
   // Update day/night icon
   updateDayNightIcon(mode);
 
-  // Broadcast to child iframe so theme applies immediately there too
+  // Broadcast to child iframe (postMessage)
   try {
     const frame = document.getElementById('main-frame');
     if (frame && frame.contentWindow) {
       frame.contentWindow.postMessage({ type: 'ap-theme', theme: mode }, '*');
     }
   } catch(_) {}
+
+  // Broadcast via BroadcastChannel so ALL child pages pick it up (even non-iframe tabs)
+  try {
+    const bc = new BroadcastChannel('ap-theme');
+    bc.postMessage({ type: 'ap-theme', theme: mode });
+    bc.close();
+  } catch(_) {}
+
+  // Log to event monitor
+  _logEvent('theme', 'Theme changed:', labelMap[mode] || mode);
 
   closeThemeDropdown();
 }
@@ -1168,11 +1566,79 @@ window.addEventListener('DOMContentLoaded', () => {
     sb.addEventListener('mousemove', () => { if (subOpen) startSubHideTimer(); });
     sb.addEventListener('touchstart', () => { if (subOpen) startSubHideTimer(); }, { passive: true });
   }
+
+  // BroadcastChannel — listen for theme changes from other tabs/windows
+  try {
+    const _bc = new BroadcastChannel('ap-theme');
+    _bc.onmessage = (evt) => {
+      if (evt.data && evt.data.type === 'ap-theme' && evt.data.theme) {
+        // Only apply if different to avoid loop
+        const cur = document.documentElement.getAttribute('data-theme');
+        if (cur !== evt.data.theme) setTheme(evt.data.theme);
+      }
+    };
+  } catch(_) {}
+
+  // Log postMessage events from child frame
+  window.addEventListener('message', (evt) => {
+    if (!evt.data) return;
+    if (evt.data.type === 'ap-cache-request') {
+      _logEvent('cache', 'Child requested cache:', evt.data.key || '');
+    } else if (evt.data.type === 'ap-cache-ready') {
+      _logEvent('cache', 'Cache ready sent to child:', evt.data.key || '');
+    }
+  });
+
+  // Periodic miss check (every 60s) — keeps badge updated
+  setInterval(() => { cmScanAll(); }, 60000);
 });
 
 /* ══ CACHE PANEL ══ */
 let cachePanelOpen = false;
 let cachePanelTimer = null;
+let _cpAutoHideTimer = null;
+
+function _resetCpAutoHide() {
+  if (_cpAutoHideTimer) clearTimeout(_cpAutoHideTimer);
+  _cpAutoHideTimer = setTimeout(closeCachePanel, 3000);
+}
+
+function toggleCachePanel(e) {
+  e.stopPropagation();
+  cachePanelOpen = !cachePanelOpen;
+  const panel = document.getElementById('cache-panel');
+  const btn   = document.getElementById('cache-status-btn');
+  if (cachePanelOpen) {
+    panel.classList.add('open');
+    btn.classList.add('active');
+    renderCacheTable();
+    cmScanAll();
+    // Tick every second so "remaining" counts down live
+    cachePanelTimer = setInterval(renderCacheTable, 1000);
+    setTimeout(() => document.addEventListener('click', closePanelOutside, { once: true }), 0);
+    _resetCpAutoHide();
+    panel.addEventListener('mousemove', _resetCpAutoHide);
+    panel.addEventListener('mouseenter', _resetCpAutoHide);
+  } else {
+    closeCachePanel();
+  }
+}
+
+function closePanelOutside(e) {
+  const panel = document.getElementById('cache-panel');
+  const btn   = document.getElementById('cache-status-btn');
+  if (panel && !panel.contains(e.target) && btn && !btn.contains(e.target)) {
+    closeCachePanel();
+  }
+}
+
+function closeCachePanel() {
+  document.getElementById('cache-panel')?.classList.remove('open');
+  document.getElementById('cache-status-btn')?.classList.remove('active');
+  cachePanelOpen = false;
+  if (cachePanelTimer) { clearInterval(cachePanelTimer); cachePanelTimer = null; }
+  if (_cpAutoHideTimer) { clearTimeout(_cpAutoHideTimer); _cpAutoHideTimer = null; }
+}
 
 const DS_META = {
   bike:          { label:'Bikes',            icon:'ti-motorbike', color:'var(--teal)',   colorDim:'var(--teal-dim)',   ttlMs: 15*60*1000 },
@@ -1254,7 +1720,7 @@ function renderCacheTable() {
         let lastSync = null;
         if (ageMs !== Infinity) {
           const d = new Date(Date.now() - ageMs);
-          lastSync = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) + ', ' + d.toLocaleDateString([],{day:'2-digit',month:'short'});
+          lastSync = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
         }
         return { key, label: meta.label, ageMs, ageLabel, fresh, hasData, lastSync, ttl };
       });
@@ -1320,7 +1786,7 @@ function renderCacheTable() {
     </tr>`;
   }).join('');
 
-  if (footer) footer.textContent = 'Updated ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  if (footer) footer.textContent = 'Updated ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 }
 
 function getCacheAge(key) {
@@ -1343,6 +1809,7 @@ function getCacheData(key) {
 async function hardRefreshDataset(key, btn) {
   btn.classList.add('spin');
   btn.disabled = true;
+  _logEvent('refresh', 'Hard refresh triggered:', key);
   try {
     if (window.AdminPro && AdminPro.forceRefresh) {
       await AdminPro.forceRefresh(key);
@@ -1350,9 +1817,10 @@ async function hardRefreshDataset(key, btn) {
       // fallback: just clear the key
       localStorage.removeItem('ap2_' + key);
     }
-    setTimeout(() => { renderCacheTable(); updateCacheHealthDot(); }, 300);
+    setTimeout(() => { renderCacheTable(); updateCacheHealthDot(); cmScanAll(); }, 300);
   } catch(e) {
     console.warn('refresh failed', key, e);
+    _logEvent('miss', 'Refresh error:', key);
   } finally {
     btn.classList.remove('spin');
     btn.disabled = false;
@@ -1360,6 +1828,7 @@ async function hardRefreshDataset(key, btn) {
 }
 
 function deleteCacheDataset(key, btn) {
+  _logEvent('delete', 'Cache row deleted:', key);
   if (window.AdminPro && AdminPro.cache) {
     AdminPro.cache.clear(key);
   } else {
@@ -1367,10 +1836,12 @@ function deleteCacheDataset(key, btn) {
   }
   renderCacheTable();
   updateCacheHealthDot();
+  setTimeout(() => cmScanAll(), 250);
 }
 
 async function refreshAllCache() {
   const btn = document.querySelector('.cp-action-btn');
+  _logEvent('refresh', 'Refresh all cache triggered', '');
   if (btn) { btn.innerHTML = '<i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i> Refreshing…'; btn.disabled = true; }
   try {
     if (window.AdminPro && AdminPro.warmCache) {
@@ -1378,6 +1849,7 @@ async function refreshAllCache() {
     }
     renderCacheTable();
     updateCacheHealthDot();
+    cmScanAll();
   } finally {
     if (btn) { btn.innerHTML = '<i class="ti ti-refresh"></i> Refresh All'; btn.disabled = false; }
   }
@@ -1385,6 +1857,7 @@ async function refreshAllCache() {
 
 function deleteAllCache() {
   if (!confirm('Clear the entire fleet_cache? All datasets will need to be re-downloaded.')) return;
+  _logEvent('delete', 'ALL cache cleared', '');
   if (window.AdminPro && AdminPro.cache) {
     AdminPro.cache.clearAll();
   } else {
@@ -1392,6 +1865,7 @@ function deleteAllCache() {
   }
   renderCacheTable();
   updateCacheHealthDot();
+  setTimeout(() => cmScanAll(), 250);
 }
 
 function updateCacheHealthDot() {
