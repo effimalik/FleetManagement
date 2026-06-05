@@ -772,11 +772,16 @@ async function startGoogleLogin() {
     return;
   }
 
-  setStep(5, 'done');
-  await sleep(700);
-  // warm all datasets before redirect (non-blocking, best-effort)
-  if (window.AdminPro) { try { await AdminPro.warmIfEmpty(); } catch(_){} }
-  doRedirect();
+     setStep(5, 'done');
+     showStatus('loading', 'Pre-loading data…', 'ti-loader-2');
+     await sleep(400);
+ 
+     // Warm all datasets in background — non-blocking, best-effort
+     if (window.AdminPro && typeof window.AdminPro.warmIfEmpty === 'function') {
+       try { await AdminPro.warmIfEmpty(); } catch (_) {}
+     }
+ 
+     doRedirect();
 }
 </script>
 </body>
