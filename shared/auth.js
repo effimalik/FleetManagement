@@ -23,7 +23,9 @@
   const ABSOLUTE_TTL     = 8  * 60 * 60 * 1000; // 8 hr hard limit
   const SERVER_CHECK_INT = 5  * 60 * 1000;    // server ping every 5 min
   const ALLOWED_ORIGIN   = 'https://effimalik.github.io/FleetManagement/';
-  const API_BASE         = 'https://script.google.com/macros/s/AKfycbyOkXshkQIhwtBjNcDbtQCsU4t6_WlH5aii6O6xElMuQa1ZB4Fn9E31c4NoO-au8TXCEw/exec';
+  const API_BASE         = 'https://script.google.com/macros/s/AKfycbzDk9vOmUL39H4LF-CbHpqJfkHOXEEtNlQIANaQIIHKYAH50mAg92N7Qlsv6cKCFdFBzA/exec';
+     
+     // 'https://script.google.com/macros/s/AKfycbyOkXshkQIhwtBjNcDbtQCsU4t6_WlH5aii6O6xElMuQa1ZB4Fn9E31c4NoO-au8TXCEw/exec';
 
   /* ─────────────────────────────────────────
      STORAGE HELPERS — never throw
