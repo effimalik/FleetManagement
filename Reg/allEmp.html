@@ -533,61 +533,58 @@ function computeExpiry(dateStr) {
 
 function normaliseRow(r, i) {
   if (!r) return null;
-  if (Array.isArray(r)) {
-    const [id, name, eid, dob, mobile, emergency, reference, timestamp, hrStatus, checkoutException, eidDate, licenseDate, labourDate, insuranceDate] = r;
-    // DEBUG — remove after confirming columns: uncomment next line temporarily
-    // if (i < 3) console.log(`Row[${i}] raw:`, JSON.stringify(r));
-    if ((id === undefined || id === null || id === '') && (name === undefined || name === null || name === '')) return null;
+
+  // CACHE OBJECT FORMAT
+  if (!Array.isArray(r) && r["Name"] !== undefined) {
+
     return {
-      id:   (id !== undefined && id !== null && id !== '') ? id : (i + 1),
-      name: (name !== undefined && name !== null) ? String(name) : '',
-      eid:  (eid  !== undefined && eid  !== null) ? String(eid)  : '',
-      dob:  dob       ? String(dob)       : '',
-      mobile:    mobile     ? String(mobile)    : '',
-      emergency: emergency  ? String(emergency) : '',
-      reference: reference  ? String(reference) : '',
-      timestamp: timestamp  ? String(timestamp) : '',
-      hrStatus:  hrStatus   ? String(hrStatus)  : '',
-      checkoutException: checkoutException ? String(checkoutException) : '',
+      id: r["Emp ID"] || (i + 1),
+      name: r["Name"] || "",
+      eid: String(r["EID Number"] || ""),
+      dob: r["Date of Birth"] || "",
+      mobile: r["UAE Mobile No"] || "",
+      emergency: r["Emergency Mobile No"] || "",
+      reference: r["Reference"] || "",
+      timestamp: r["Timestamp"] || "",
+      hrStatus: r["HR_Status"] || "",
+      checkoutException: r["Checkout_Exception"] || "",
+
       expiry: {
-        eid:      computeExpiry(eidDate),
-        license:  computeExpiry(licenseDate),
-        labour:   computeExpiry(labourDate),
-        insurance:computeExpiry(insuranceDate),
+        eid: computeExpiry(r["EID Expiry"]),
+        license: computeExpiry(r["License Expiry"]),
+        labour: computeExpiry(r["Laboure Expiry"]),
+        insurance: computeExpiry(r["Insurance Expiry"])
       }
     };
   }
-  const rehydrate = (o) => {
-    if (!o || typeof o !== 'object') return computeExpiry(null);
-    if (o.status) return o;
-    return computeExpiry(o.date || null);
-  };
-  const rawExpiry = r.expiry || {};
-  return {
-    id: r.id || (i + 1), name: r.name || '', eid: r.eid || '',
-    dob: r.dob || '', mobile: r.mobile || '', emergency: r.emergency || '',
-    reference: r.reference || '', timestamp: r.timestamp || '',
-    hrStatus: r.hrStatus || '', checkoutException: r.checkoutException || '',
-    expiry: {
-      eid:      rehydrate(rawExpiry.eid),
-      license:  rehydrate(rawExpiry.license),
-      labour:   rehydrate(rawExpiry.labour),
-      insurance:rehydrate(rawExpiry.insurance),
-    }
-  };
-}
+
+  // existing code continues...
 
 function parseRows(raw) {
-  let rows = Array.isArray(raw) ? raw
-    : Array.isArray(raw.data)   ? raw.data
-    : Array.isArray(raw.values) ? raw.values
-    : Array.isArray(raw.rows)   ? raw.rows : [];
-  // Only skip a row if first cell is an exact known header keyword (case-insensitive)
-  const HEADER_KEYWORDS = /^(id|emp[\s_]?id|employee[\s_]?id|name|employee|sl[\s_]?no|no|#)$/i;
-  if (rows.length > 0 && Array.isArray(rows[0]) && typeof rows[0][0] === 'string' && HEADER_KEYWORDS.test(String(rows[0][0]).trim())) {
-    rows = rows.slice(1);
+
+  // NEW CACHE FORMAT
+  if (raw?.employees?.data && Array.isArray(raw.employees.data)) {
+    return raw.employees.data;
   }
-  return rows;
+
+  // OLD FORMATS
+  if (Array.isArray(raw)) {
+    return raw;
+  }
+
+  if (Array.isArray(raw?.data)) {
+    return raw.data;
+  }
+
+  if (Array.isArray(raw?.values)) {
+    return raw.values;
+  }
+
+  if (Array.isArray(raw?.rows)) {
+    return raw.rows;
+  }
+
+  return [];
 }
 
 function showCacheBanner(show) {
