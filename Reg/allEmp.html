@@ -534,6 +534,7 @@ function computeExpiry(dateStr) {
 function normaliseRow(r, i) {
   if (!r) return null;
 
+  /* ── Object format (named keys from DataLayer / old cache) ── */
   if (!Array.isArray(r) && r["Name"] !== undefined) {
     return {
       id: r["Emp ID"] || (i + 1),
@@ -551,6 +552,80 @@ function normaliseRow(r, i) {
         license: computeExpiry(r["License Expiry"]),
         labour: computeExpiry(r["Laboure Expiry"]),
         insurance: computeExpiry(r["Insurance Expiry"])
+      }
+    };
+  }
+
+  /* ── Array format from ap2_employees cache / Apps Script API ──
+   *  Column layout (0-based):
+   *  [0]  Timestamp
+   *  [1]  Emp ID
+   *  [2]  Name
+   *  [3]  EID Number
+   *  [4]  Date of Birth  (may be missing / shifted in older rows)
+   *  [5]  UAE Mobile No
+   *  [6]  Emergency Mobile No
+   *  [7]  Reference / Visa type / HR dept
+   *  [8]  EID Expiry
+   *  [9]  License Expiry
+   *  [10] Labour Expiry
+   *  [11] Insurance Expiry
+   *  [12] Checkout_Exception / HR_Status / Probation tag
+   *  [13] Status (Active / Inactive)
+   * ─────────────────────────────────────────────────────────── */
+  if (Array.isArray(r)) {
+    const _str = v => (v !== null && v !== undefined && v !== 0 && v !== false) ? String(v).trim() : '';
+
+    /* Detect whether col[4] looks like a date (DOB present) or a phone number */
+    const col4 = _str(r[4]);
+    const col4IsDate = col4 && (col4.includes('T') || col4.includes('-') || col4.includes('/'));
+    let dob, mobile, emergency, reference, eidExp, licExp, labExp, insExp, coExc;
+
+    if (col4IsDate) {
+      /* Standard 14-column layout */
+      dob       = col4;
+      mobile    = _str(r[5]);
+      emergency = _str(r[6]);
+      reference = _str(r[7]);
+      eidExp    = _str(r[8]);
+      licExp    = _str(r[9]);
+      labExp    = _str(r[10]);
+      insExp    = _str(r[11]);
+      coExc     = _str(r[12]);
+    } else {
+      /* 13-column layout (no DOB column) */
+      dob       = '';
+      mobile    = _str(r[4]);
+      emergency = _str(r[5]);
+      reference = _str(r[6]);
+      eidExp    = _str(r[7]);
+      licExp    = _str(r[8]);
+      labExp    = _str(r[9]);
+      insExp    = _str(r[10]);
+      coExc     = _str(r[11]);
+    }
+
+    const rawId   = r[1];
+    const empId   = (rawId !== null && rawId !== undefined && rawId !== '') ? rawId : (i + 1);
+    const empName = _str(r[2]);
+    if (!empName) return null; // skip blank rows
+
+    return {
+      id:                empId,
+      name:              empName,
+      eid:               _str(r[3]),
+      dob:               dob,
+      mobile:            mobile,
+      emergency:         emergency,
+      reference:         reference,
+      timestamp:         _str(r[0]),
+      hrStatus:          '',          // not separately encoded in array format
+      checkoutException: coExc,
+      expiry: {
+        eid:       computeExpiry(eidExp),
+        license:   computeExpiry(licExp),
+        labour:    computeExpiry(labExp),
+        insurance: computeExpiry(insExp),
       }
     };
   }
@@ -627,27 +702,85 @@ function toggleCacheSub() {
 /* ═══════════ SHARED-CACHE CONSTANTS ═══════════ */
 // Must match index.html DS_META values exactly
 const _EMP_CACHE_KEY = 'fleet_cache_v1';
-const _EMP_CACHE_TTL = 10 * 60 * 1000; // 10 min — mirrors index.html DS_META.employee.ttlMs
+const _AP2_CACHE_KEY = 'ap2_employees';          // Apps Script array cache
+const _EMP_CACHE_TTL = 10 * 60 * 1000;           // 10 min
+
+/* ── Read ap2_employees cache (plain JSON array from Apps Script) ── */
+function _readAp2Cache() {
+  try {
+    const raw = localStorage.getItem(_AP2_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Accept plain array OR { data:[...], ts? } wrapper
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return { data: parsed, ts: Date.now() };
+    }
+    if (parsed && Array.isArray(parsed.data) && parsed.data.length > 0) {
+      const age = typeof parsed.ts === 'number' ? Date.now() - parsed.ts : 0;
+      if (age > _EMP_CACHE_TTL) return null;
+      return parsed;
+    }
+    return null;
+  } catch (e) { return null; }
+}
 
 /* ── Secure cache reader: validates structure before trusting data ── */
 function _readEmpCache() {
+  // 1. Prefer ap2_employees (array format, set by Apps Script bridge)
+  const ap2 = _readAp2Cache();
+  if (ap2) return ap2;
+
+  // 2. Fall back to fleet_cache_v1 (DataLayer object format)
   try {
     const raw = localStorage.getItem(_EMP_CACHE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    // Integrity checks: must have ts (number) and data (non-empty array)
     if (
       !parsed ||
       typeof parsed.ts !== 'number' ||
       !Array.isArray(parsed.data) ||
       parsed.data.length === 0 ||
-      Date.now() - parsed.ts > _EMP_CACHE_TTL   // honour TTL
+      Date.now() - parsed.ts > _EMP_CACHE_TTL
     ) return null;
     return parsed;
   } catch (e) {
-    return null; // malformed JSON — ignore silently
+    return null;
   }
 }
+
+/* ── Watch ap2_employees for live updates (cross-tab + same-tab poll) ── */
+(function _watchAp2Cache() {
+  function _applyAp2(parsed) {
+    const arr = Array.isArray(parsed) ? parsed
+              : Array.isArray(parsed?.data) ? parsed.data : null;
+    if (!arr || !arr.length) return;
+    const rows = parseRows(arr);
+    const fresh = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+    if (!fresh.length) return;
+    employees = fresh;
+    renderEmpTable(employees);
+    showCacheBanner(false);
+    console.log('[ap2_employees] table refreshed, rows:', employees.length);
+  }
+
+  // Cross-tab: fires when another tab writes localStorage
+  window.addEventListener('storage', function(e) {
+    if (e.key === _AP2_CACHE_KEY && e.newValue) {
+      try { _applyAp2(JSON.parse(e.newValue)); } catch(e) {}
+    }
+  });
+
+  // Same-tab poll every 30 s to catch writes from shared scripts
+  let _lastHash = null;
+  setInterval(function() {
+    try {
+      const raw = localStorage.getItem(_AP2_CACHE_KEY);
+      if (!raw || raw === _lastHash) return;
+      _lastHash = raw;
+      _applyAp2(JSON.parse(raw));
+    } catch(e) {}
+  }, 30000);
+})();
 
 /* ═══════════ LOAD ═══════════ */
 async function loadEmployees() {
@@ -721,6 +854,12 @@ async function forceRefreshEmployees() {
     renderEmpTable(employees);
     showCacheBanner(false);
     toast('Data refreshed successfully.');
+
+    // ── Write fresh data back to ap2_employees so other pages see it ──
+    try {
+      const payload = JSON.stringify({ data: rows.map(r => r), ts: Date.now() });
+      localStorage.setItem(_AP2_CACHE_KEY, payload);
+    } catch(e) { /* storage full or denied — no-op */ }
 
     // ── Notify other open tabs (index.html cache panel) that data changed ──
     try {
