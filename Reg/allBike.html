@@ -333,7 +333,7 @@ th, td { border-left: none !important; border-right: none !important; }
     <div class="page-header-left">
       <div class="ph-icon"><i class="ti ti-motorbike"></i></div>
       <div>
-        <div class="ph-title">Bike . Fleet</div>
+        <div class="ph-title">Bike Fleet</div>
         <div class="ph-sub">UAE fleet compliance &amp; document tracking</div>
       </div>
     </div>
@@ -569,13 +569,15 @@ function bikeAv(i) {
 }
 
 /* ═══  CACHE  ═══ */
-function bikeCacheSave(rows) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),rows})); } catch {} }
+function bikeCacheSave(rows) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),data:rows})); } catch {} }
 function bikeCacheLoad() {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw) return null;
-    const {ts,rows} = JSON.parse(raw);
-    return rows; // no TTL — always use cache as source of truth
+    const parsed = JSON.parse(raw);
+    const ts = parsed.ts;
+    const rows = parsed.data || parsed.rows || parsed; // support {data:[...]}, {rows:[...]}, or raw array
+    return Array.isArray(rows) ? rows : null;
   } catch { return null; }
 }
 function bikeCacheClear() { try { localStorage.removeItem(CACHE_KEY); } catch {} }
@@ -649,7 +651,7 @@ function loadBikes() {
   if (cached && cached.length) {
     bikes = cached.map((r,i) => normaliseRow(r,i)).filter(Boolean);
     renderAll();
-    const {ts} = JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');
+    const _c = JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); const ts = _c.ts;
     setCacheBar('synced', ts || Date.now());
   } else {
     setCacheBar('error');
@@ -666,7 +668,9 @@ window.addEventListener('storage', function(e) {
   if (e.key !== CACHE_KEY) return;
   if (!e.newValue) return; // cache was cleared, do nothing
   try {
-    const {ts, rows} = JSON.parse(e.newValue);
+    const parsed = JSON.parse(e.newValue);
+    const ts = parsed.ts;
+    const rows = parsed.data || parsed.rows || parsed;
     if (!rows || !rows.length) return;
     const updated = rows.map((r,i) => normaliseRow(r,i)).filter(Boolean);
     if (!updated.length) return;
