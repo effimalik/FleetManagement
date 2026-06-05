@@ -47,12 +47,12 @@
     bike: {
       label    : 'Bikes',
       apiType  : 'bikes',            // ?type=getBikes sent to Apps Script
-      ttlMs    : 15 * 60 * 1000,        // 15 min
+      ttlMs    : 1 * 60 * 1000,        // 15 min
     },
     employee: {
       label    : 'Employees',
       apiType  : 'employees',
-      ttlMs    : 10 * 60 * 1000,        // 10 min
+      ttlMs    : 1 * 60 * 1000,        // 10 min
     },
     master: {
       label    : 'Master Sheet',
