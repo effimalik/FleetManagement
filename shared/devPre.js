@@ -1,4 +1,4 @@
-<script>
+
   // 1. Disable Right-Click Context Menu
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
@@ -56,4 +56,4 @@
          await AdminPro.forceRefresh('employee');
          loadEmployees();
        }
-     </script>
+
