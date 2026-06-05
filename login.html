@@ -774,6 +774,8 @@ async function startGoogleLogin() {
 
   setStep(5, 'done');
   await sleep(700);
+  // warm all datasets before redirect (non-blocking, best-effort)
+  if (window.AdminPro) { try { await AdminPro.warmIfEmpty(); } catch(_){} }
   doRedirect();
 }
 </script>
