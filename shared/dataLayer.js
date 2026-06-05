@@ -46,7 +46,7 @@
   const DATASETS = {
     bike: {
       label    : 'Bikes',
-      apiType  : 'getBikes',            // ?type=getBikes sent to Apps Script
+      apiType  : 'bikes',            // ?type=getBikes sent to Apps Script
       ttlMs    : 15 * 60 * 1000,        // 15 min
     },
     employee: {
