@@ -49,7 +49,7 @@
       apiType  : 'bikes',            // ?type=getBikes sent to Apps Script
       ttlMs    : 15 * 60 * 1000,        // 15 min
     },
-    employee: {
+    employees: {
       label    : 'Employees',
       apiType  : 'employees',
       ttlMs    : 10 * 60 * 1000,        // 10 min
