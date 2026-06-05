@@ -466,10 +466,6 @@ th, td { border-left: none !important; border-right: none !important; }
 
 <script>
 'use strict';
-/* ═══════════════════════════════════════
-   CONFIG — update API_BASE to your deployed Apps Script URL
-═══════════════════════════════════════ */
-
 const WARN_DAYS = 60;
 const CACHE_KEY = 'ap2_bike';
 const CACHE_TTL = 5 * 60 * 1000;
@@ -603,7 +599,7 @@ function setCacheBar(state, ts) {
   }
 }
 
-async function forceFresh() { bikeCacheClear(); await loadBikes(); }
+async function forceFresh() { bikeCacheClear(); loadBikes(); }
 
 /* ═══  NORMALISE ROW  ═══ */
 function normaliseRow(r, i) {
@@ -646,34 +642,38 @@ function normaliseRow(r, i) {
 }
 
 /* ═══  LOAD  ═══ */
-async function loadBikes() {
-  setCacheBar('loading');
+function loadBikes() {
   const tbody = document.getElementById('bike-tbody');
   const cached = bikeCacheLoad();
   if (cached && cached.length) {
     bikes = cached.map((r,i) => normaliseRow(r,i)).filter(Boolean);
     renderAll();
+    const {ts} = JSON.parse(localStorage.getItem(CACHE_KEY)||'{}');
+    setCacheBar('synced', ts || Date.now());
   } else {
-    if(tbody) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;font-size:22px;color:var(--text3);"></i><div style="margin-top:8px;color:var(--text3);font-size:13px;">Loading bikes…</div></td></tr>`;
-  }
-  try {
-    const res  = await fetch(API_BASE + '?type=bike&t=' + Date.now());
-    const raw  = await res.json();
-    const rows = Array.isArray(raw) ? raw : (raw.data||raw.values||raw.rows||[]);
-    const clean = (rows.length && Array.isArray(rows[0]) && typeof rows[0][0]==='string' && /timestamp|date/i.test(rows[0][0])) ? rows.slice(1) : rows;
-    bikeCacheSave(clean);
-    bikes = clean.map((r,i) => normaliseRow(r,i)).filter(Boolean);
-    renderAll();
-    setCacheBar('synced', Date.now());
-  } catch(e) {
-    console.error('loadBikes:', e);
-    if (cached && cached.length) { setCacheBar('error'); }
-    else {
-      setCacheBar('error');
-      if (tbody && !bikes.length) tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--red);">Failed to load. Check API_BASE.</td></tr>`;
-    }
+    setCacheBar('error');
+    if (tbody) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text3);">
+      <i class="ti ti-database-off" style="font-size:22px;display:block;margin-bottom:8px;"></i>
+      No data in cache yet. Data will appear automatically once the cache (<code style="font-size:11px;background:var(--bg3);padding:1px 5px;border-radius:4px;">ap2_bike</code>) is populated.
+    </td></tr>`;
   }
 }
+
+/* ═══  BACKGROUND CACHE WATCHER  ═══ */
+/* Listens for any tab/window writing to ap2_bike and silently refreshes */
+window.addEventListener('storage', function(e) {
+  if (e.key !== CACHE_KEY) return;
+  if (!e.newValue) return; // cache was cleared, do nothing
+  try {
+    const {ts, rows} = JSON.parse(e.newValue);
+    if (!rows || !rows.length) return;
+    const updated = rows.map((r,i) => normaliseRow(r,i)).filter(Boolean);
+    if (!updated.length) return;
+    bikes = updated;
+    renderAll();
+    setCacheBar('synced', ts || Date.now());
+  } catch {}
+});
 
 /* ═══  STATS  ═══ */
 function renderStats() {
@@ -954,7 +954,7 @@ function enterEditMode() {
   const ftr = document.getElementById('dp-ftr');
   ftr.innerHTML = `
     <button class="dp-btn dp-btn-discard" onclick="renderViewMode(bikes.find(x=>x.bikeId===_panelId))"><i class="ti ti-arrow-back"></i> Discard</button>
-    <button class="dp-btn dp-btn-save" onclick="saveEdit()"><i class="ti ti-device-floppy"></i> Save to Sheet</button>`;
+    <button class="dp-btn dp-btn-save" onclick="saveEdit()"><i class="ti ti-device-floppy"></i> Save</button>`;
 }
 
 async function saveEdit() {
@@ -978,32 +978,8 @@ async function saveEdit() {
   document.getElementById('dp-saving').classList.add('show');
 
   try {
-    const payload = {
-      action:   'updateRow',
-      rowIndex: b._rowIndex,
-      row: [
-        updated.timestamp,
-        updated.bikeId,
-        updated.plate,
-        updated.chassis,
-        updated.make,
-        updated.model,
-        updated.emirate,
-        updated.mulkiyaExp,
-        updated.passingExp,
-        updated.insExp,
-        updated.status,
-      ]
-    };
-    const res = await fetch(API_BASE, {
-      method:'POST',
-      body: JSON.stringify(payload),
-      headers:{'Content-Type':'application/json'}
-    });
-    const result = await res.json();
-    if (result.success !== true && result.status !== 'ok') throw new Error(result.error||'Unknown error');
-
     Object.assign(b, updated);
+    bikeCacheSave(bikes);
     document.getElementById('dp-name').textContent=`${b.make} ${b.model}`;
     document.getElementById('dp-sub').textContent=b.plate;
 
@@ -1021,8 +997,7 @@ async function saveEdit() {
     document.getElementById('dp-saving').classList.remove('show');
     renderViewMode(b);
     renderAll();
-    bikeCacheClear();
-    toast('Saved to Google Sheet ✓');
+    toast('Saved ✓');
   } catch(e) {
     document.getElementById('dp-saving').classList.remove('show');
     toast('Save failed: '+e.message,'error');
@@ -1177,21 +1152,8 @@ async function confirmUpload() {
         insExp:     r.insExp     || '',
         status:     r.status     || 'active',
       };
-      try {
-        const res = await fetch(API_BASE,{
-          method:'POST',
-          body:JSON.stringify({action:'appendRow', row:[
-            newBike.timestamp, newBike.bikeId, newBike.plate, newBike.chassis,
-            newBike.make, newBike.model, newBike.emirate,
-            newBike.mulkiyaExp, newBike.passingExp, newBike.insExp, newBike.status
-          ]}),
-          headers:{'Content-Type':'application/json'}
-        });
-        const result = await res.json();
-        if (result.success!==true && result.status!=='ok') throw new Error('Sheet error');
-        bikes.push(newBike);
-        added++;
-      } catch { errors++; }
+      bikes.push(newBike);
+      added++;
     }
   } else {
     // UPDATE MODE — merge only non-empty fields
@@ -1205,27 +1167,14 @@ async function confirmUpload() {
         if (r._csvFields.includes(f) && r[f]) merged[f] = r[f];
       }
 
-      try {
-        const res = await fetch(API_BASE,{
-          method:'POST',
-          body:JSON.stringify({action:'updateRow', rowIndex:existing._rowIndex, row:[
-            merged.timestamp, merged.bikeId, merged.plate, merged.chassis,
-            merged.make, merged.model, merged.emirate,
-            merged.mulkiyaExp, merged.passingExp, merged.insExp, merged.status
-          ]}),
-          headers:{'Content-Type':'application/json'}
-        });
-        const result = await res.json();
-        if (result.success!==true && result.status!=='ok') throw new Error('Sheet error');
-        Object.assign(existing, merged);
-        updated++;
-      } catch { errors++; }
+      Object.assign(existing, merged);
+      updated++;
     }
   }
 
   closeUploadModal();
+  bikeCacheSave(bikes);
   renderAll();
-  bikeCacheClear();
 
   let msg = _upMode==='add'
     ? `Added ${added} bike${added!==1?'s':''}${skipped>0?' ('+skipped+' duplicate'+(skipped>1?'s':'')+' skipped)':''}${errors>0?' | '+errors+' error(s)':''}.`
