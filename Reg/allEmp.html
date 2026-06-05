@@ -596,6 +596,13 @@ function normaliseRow(r, i) {
     const empName = _str(r[2]);
     if (!empName) return null; // skip blank rows
 
+    const statusRaw = _str(r[col4IsDate ? 13 : 12]);
+    // col[12]: tag field — "Checkout_Exception" goes to checkout badge,
+    //          anything else (e.g. "Probation") goes to HR status badge
+    const isCoExc   = coExc.toLowerCase().replace(/[^a-z]/g,'').includes('checkout');
+    const hrTag     = isCoExc ? '' : coExc;
+    const coExcTag  = isCoExc ? coExc : '';
+
     return {
       id:                empId,
       name:              empName,
@@ -605,8 +612,9 @@ function normaliseRow(r, i) {
       emergency:         emergency,
       reference:         reference,
       timestamp:         _str(r[0]),
-      hrStatus:          '',          // not separately encoded in array format
-      checkoutException: coExc,
+      status:            statusRaw || 'Active',
+      hrStatus:          hrTag,
+      checkoutException: coExcTag,
       expiry: {
         eid:       computeExpiry(eidExp),
         license:   computeExpiry(licExp),
