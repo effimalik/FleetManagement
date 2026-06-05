@@ -249,6 +249,12 @@ html,body{
 .tb-time{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);letter-spacing:.04em;}
 .tb-clock-sep{width:1px;height:12px;background:var(--border2);}
 .tb-date-txt{font-size:10.5px;color:var(--text2);white-space:nowrap;}
+/* Mobile: time only — hide icon, sep, date */
+@media(max-width:640px){
+  .tb-clock .ti-clock,.tb-clock-sep,.tb-date-txt{display:none;}
+  .tb-clock{padding:0 7px;gap:0;background:transparent;border-color:transparent;}
+  .tb-time{font-size:13px;}
+}
 
 /* ══ THEME DROPDOWN ══
    The button sits inside .topbar (z:300).
@@ -483,13 +489,22 @@ html,body{
 }
 .tb-cache-btn .cache-dot.stale{background:var(--amber);box-shadow:0 0 5px rgba(227,179,65,.4);}
 .tb-cache-btn .cache-dot.error{background:var(--red);box-shadow:0 0 5px rgba(248,81,73,.4);}
+@media(max-width:700px){
+  .tb-cache-btn .cache-label{display:none;}
+  .tb-cache-btn{padding:0 8px;gap:4px;}
+}
+@media(max-height:450px){
+  .tb-cache-btn .cache-label{display:none;}
+  .tb-cache-btn{padding:0 8px;gap:4px;}
+}
 
 /* ══ CACHE PANEL ══ */
 .cache-panel{
   position:fixed;
   top:calc(var(--topbar-h) + 8px);
   right:180px;
-  width:560px;
+  width:min(560px, calc(100vw - 16px));
+  max-height:calc(100vh - var(--topbar-h) - 24px);
   background:var(--surface);
   border:1px solid var(--border2);
   border-radius:12px;
@@ -498,8 +513,10 @@ html,body{
   display:none;
   overflow:hidden;
   animation:cpIn .18s ease;
+  flex-direction:column;
 }
-.cache-panel.open{display:block;}
+.cache-panel.open{display:flex;}
+.cp-scroll{overflow-y:auto;flex:1;}
 @keyframes cpIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
 
 .cp-header{
@@ -542,11 +559,22 @@ html,body{
 .cp-ds-name{
   display:flex;align-items:center;gap:8px;
   font-weight:600;color:var(--text);font-size:12px;
+  min-width:0;
+}
+.cp-ds-name-text{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+  max-width:110px;
 }
 .cp-ds-icon{
   width:26px;height:26px;border-radius:6px;
   display:flex;align-items:center;justify-content:center;
   font-size:13px;flex-shrink:0;
+}
+/* Mobile: hide TTL + LastSync cols, shrink */
+@media(max-width:480px){
+  .cache-panel{right:8px;left:8px;width:auto;}
+  .cp-col-ttl,.cp-col-sync{display:none;}
+  .cp-ds-name-text{max-width:75px;}
 }
 
 .cp-status-pill{
@@ -612,12 +640,11 @@ html,body{
         <div class="tb-app-name">AdminPro UAE</div>
         <div class="tb-app-sub">HR &amp; Fleet Management</div>
       </div>
-      <!-- Day/Night pill toggle -->
+      <!-- Day/Night pill toggle — icon only -->
       <button class="tb-daynight" id="daynight-btn"
         onclick="quickToggleDarkLight()"
         title="Toggle dark / light mode">
         <i class="ti ti-moon" id="daynight-icon"></i>
-        <span id="daynight-label">Dark</span>
       </button>
     </div>
 
@@ -656,7 +683,7 @@ html,body{
       <!-- Cache Status Button -->
       <button class="tb-cache-btn" id="cache-status-btn" onclick="toggleCachePanel(event)" title="Cache Status">
         <i class="ti ti-database"></i>
-        <span>Cache</span>
+        <span class="cache-label">Cache</span>
         <span class="cache-dot" id="cache-health-dot"></span>
       </button>
 
@@ -776,12 +803,13 @@ html,body{
       </button>
     </div>
   </div>
+  <div class="cp-scroll">
   <table class="cp-table">
     <thead>
       <tr>
         <th>Dataset</th>
-        <th>TTL</th>
-        <th>Last Sync</th>
+        <th class="cp-col-ttl">TTL</th>
+        <th class="cp-col-sync">Last Sync</th>
         <th>Remaining</th>
         <th>Status</th>
         <th>Actions</th>
@@ -791,6 +819,7 @@ html,body{
       <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px;">Loading cache info…</td></tr>
     </tbody>
   </table>
+  </div>
   <div class="cp-footer">
     <span class="cp-footer-note"><i class="ti ti-info-circle"></i> Cache persists across pages · Session-validated on every read</span>
     <span id="cp-last-check">—</span>
@@ -936,7 +965,7 @@ function startSubHideTimer() {
       sb.classList.remove('subitems-hiding');
       subOpen = false;
     }, 450);
-  }, 50000);
+  }, 15000);
 }
 
 /* ── Page context ── */
@@ -975,23 +1004,29 @@ function setTheme(mode) {
   // Update day/night icon
   updateDayNightIcon(mode);
 
+  // Broadcast to child iframe so theme applies immediately there too
+  try {
+    const frame = document.getElementById('main-frame');
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.postMessage({ type: 'ap-theme', theme: mode }, '*');
+    }
+  } catch(_) {}
+
   closeThemeDropdown();
 }
 
 function updateDayNightIcon(mode) {
   const icon  = document.getElementById('daynight-icon');
-  const label = document.getElementById('daynight-label');
   if (!icon) return;
   const map = {
-    light : { cls:'ti ti-sun',          txt:'Light'  },
-    dark  : { cls:'ti ti-moon',         txt:'Dark'   },
-    purple: { cls:'ti ti-sparkles',     txt:'Purple' },
-    ocean : { cls:'ti ti-wave-sine',    txt:'Ocean'  },
-    slate : { cls:'ti ti-layout-grid',  txt:'Slate'  },
+    light : { cls:'ti ti-sun'          },
+    dark  : { cls:'ti ti-moon'         },
+    purple: { cls:'ti ti-sparkles'     },
+    ocean : { cls:'ti ti-wave-sine'    },
+    slate : { cls:'ti ti-layout-grid'  },
   };
   const cfg = map[mode] || map.dark;
   icon.className = cfg.cls;
-  if (label) label.textContent = cfg.txt;
 }
 
 /* Quick dark ↔ light toggle via the icon button */
@@ -1126,10 +1161,18 @@ window.addEventListener('DOMContentLoaded', () => {
   populateUserChip();
   updateCacheHealthDot();
   setInterval(updateCacheHealthDot, 30000);
+
+  // Reset sub-bar autohide timer on any activity inside sub-bar
+  const sb = document.getElementById('sub-bar');
+  if (sb) {
+    sb.addEventListener('mousemove', () => { if (subOpen) startSubHideTimer(); });
+    sb.addEventListener('touchstart', () => { if (subOpen) startSubHideTimer(); }, { passive: true });
+  }
 });
 
 /* ══ CACHE PANEL ══ */
 let cachePanelOpen = false;
+let cachePanelTimer = null;
 
 const DS_META = {
   bike:          { label:'Bikes',            icon:'ti-motorbike', color:'var(--teal)',   colorDim:'var(--teal-dim)',   ttlMs: 15*60*1000 },
@@ -1149,6 +1192,8 @@ function toggleCachePanel(e) {
     panel.classList.add('open');
     btn.classList.add('active');
     renderCacheTable();
+    // Tick every second so "remaining" counts down live
+    cachePanelTimer = setInterval(renderCacheTable, 1000);
     setTimeout(() => document.addEventListener('click', closePanelOutside, { once: true }), 0);
   } else {
     closeCachePanel();
@@ -1167,6 +1212,7 @@ function closeCachePanel() {
   document.getElementById('cache-panel')?.classList.remove('open');
   document.getElementById('cache-status-btn')?.classList.remove('active');
   cachePanelOpen = false;
+  if (cachePanelTimer) { clearInterval(cachePanelTimer); cachePanelTimer = null; }
 }
 
 function fmtTtl(ms) {
@@ -1236,11 +1282,11 @@ function renderCacheTable() {
           <div class="cp-ds-icon" style="background:${meta.colorDim};color:${meta.color};">
             <i class="ti ${meta.icon}"></i>
           </div>
-          ${row.label || row.key}
+          <span class="cp-ds-name-text" title="${row.label || row.key}">${row.label || row.key}</span>
         </div>
       </td>
-      <td style="color:var(--text3);font-size:11px;">${fmtTtlLabel(ttlMs)}</td>
-      <td style="font-size:11px;color:${row.lastSync ? 'var(--text2)' : 'var(--text3)'};">
+      <td class="cp-col-ttl" style="color:var(--text3);font-size:11px;">${fmtTtlLabel(ttlMs)}</td>
+      <td class="cp-col-sync" style="font-size:11px;color:${row.lastSync ? 'var(--text2)' : 'var(--text3)'};">
         ${row.lastSync || '—'}
         ${row.ageMs !== Infinity ? `<div style="font-size:10px;color:var(--text3);">${row.ageLabel}</div>` : ''}
       </td>
@@ -1363,6 +1409,55 @@ function updateCacheHealthDot() {
     dot.className = 'cache-dot' + (anyEmpty ? ' error' : anyStale ? ' stale' : '');
   } catch(e) {}
 }
+
+/* ══ CACHE STALENESS AUTO-REQUEST LISTENER ══
+   Listens for messages from child pages requesting a data refresh,
+   and also proactively re-fetches stale datasets when AdminPro.forceRefresh is available.
+   Cache is stored in localStorage under ap2_* keys — it is SHARED across all
+   users on the same browser/device (same localStorage origin). If a different
+   user logs in on the same device they will see the same cached data until
+   TTL expires or they hard-refresh. To isolate per-user, prefix keys with the
+   user email (handled in dataLayer.js if ap_user_cache_isolation is set). */
+(function cacheWatchdog() {
+  // Listen for child iframe requests: { type:'ap-cache-request', key:'employee' }
+  window.addEventListener('message', async function(evt) {
+    if (!evt.data || evt.data.type !== 'ap-cache-request') return;
+    const key = evt.data.key;
+    if (!key || !DS_META[key]) return;
+    const age = getCacheAge(key);
+    const meta = DS_META[key];
+    const isStale = age === Infinity || age > meta.ttlMs;
+    if (isStale && window.AdminPro && AdminPro.forceRefresh) {
+      try {
+        await AdminPro.forceRefresh(key);
+        updateCacheHealthDot();
+        // Notify child that data is ready
+        const frame = document.getElementById('main-frame');
+        if (frame && frame.contentWindow) {
+          frame.contentWindow.postMessage({ type:'ap-cache-ready', key }, '*');
+        }
+      } catch(e) { console.warn('[cacheWatchdog] refresh failed for', key, e); }
+    } else if (!isStale) {
+      // Data is fresh — immediately tell child
+      const frame = document.getElementById('main-frame');
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage({ type:'ap-cache-ready', key }, '*');
+      }
+    }
+  });
+
+  // Proactive watchdog: every 60 s check if any key is stale and auto-warm
+  setInterval(async function() {
+    if (!window.AdminPro || !AdminPro.forceRefresh) return;
+    for (const [key, meta] of Object.entries(DS_META)) {
+      const age = getCacheAge(key);
+      if (age !== Infinity && age > meta.ttlMs) {
+        try { await AdminPro.forceRefresh(key); } catch(_) {}
+      }
+    }
+    updateCacheHealthDot();
+  }, 60000);
+})();
 </script>
 </body>
 </html>
