@@ -71,14 +71,6 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 .btn:disabled{opacity:.45;cursor:not-allowed;}
 
 /* ── CACHE BAR (inline with toolbar) ── */
-.cache-bar{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);font-size:11px;flex-shrink:0;white-space:nowrap;}
-.cache-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;flex-shrink:0;}
-.cache-pill.synced{color:var(--teal);}
-.cache-pill.syncing{color:var(--amber);}
-.cache-pill.err{color:var(--red);}
-.cache-ts{font-size:10.5px;color:var(--text3);font-family:var(--mono);}
-.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;font-size:11px;transition:all .15s;flex-shrink:0;}
-.icon-btn:hover{background:var(--surface2);color:var(--text);}
 
 /* ━━ TOP ROW: cards + toolbar fused on big screen ━━ */
 .top-row{display:flex;align-items:stretch;gap:8px;margin-bottom:11px;flex-wrap:nowrap;min-width:0;}
@@ -358,11 +350,6 @@ th, td { border-left: none !important; border-right: none !important; }
         <button class="fp fa-active" data-filter="active" onclick="setFilter('active')" title="Active"><i class="ti ti-circle-check"></i></button>
         <button class="fp fa-inactive" data-filter="inactive" onclick="setFilter('inactive')" title="Inactive"><i class="ti ti-ban"></i></button>
       </div>
-      <div class="cache-bar" id="cache-bar">
-        <span class="cache-pill syncing" id="cache-pill"><i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i></span>
-        <span class="cache-ts" id="cache-ts">Loading…</span>
-        <button class="icon-btn" onclick="forceFresh()" title="Reload from Sheet"><i class="ti ti-refresh"></i></button>
-      </div>
     </div>
   </div>
 
@@ -470,7 +457,6 @@ th, td { border-left: none !important; border-right: none !important; }
 const API_BASE = '';
 const WARN_DAYS = 60;
 const CACHE_KEY = 'ap2_bike';
-const CACHE_TTL = 5 * 60 * 1000;
 
 /* Sheet column order (0-based) */
 const COL = {
@@ -582,27 +568,6 @@ function bikeCacheLoad() {
 }
 function bikeCacheClear() { try { localStorage.removeItem(CACHE_KEY); } catch {} }
 
-/* ═══  CACHE BAR  ═══ */
-function setCacheBar(state, ts) {
-  const pill = document.getElementById('cache-pill');
-  const tsEl = document.getElementById('cache-ts');
-  if (state === 'loading') {
-    pill.className='cache-pill syncing';
-    pill.innerHTML='<i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i>';
-    tsEl.textContent='Loading…';
-  } else if (state === 'synced') {
-    pill.className='cache-pill synced';
-    pill.innerHTML='<i class="ti ti-circle-check"></i>';
-    const d = new Date(ts||Date.now());
-    tsEl.textContent=`${d.toLocaleDateString([],{day:'2-digit',month:'short'})}, ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
-  } else {
-    pill.className='cache-pill err';
-    pill.innerHTML='<i class="ti ti-alert-circle"></i>';
-    tsEl.textContent='Fetch error';
-  }
-}
-
-async function forceFresh() { bikeCacheClear(); loadBikes(); }
 
 /* ═══  NORMALISE ROW  ═══ */
 function normaliseRow(r, i) {
@@ -651,10 +616,7 @@ function loadBikes() {
   if (cached && cached.length) {
     bikes = cached.map((r,i) => normaliseRow(r,i)).filter(Boolean);
     renderAll();
-    const _c = JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); const ts = _c.ts;
-    setCacheBar('synced', ts || Date.now());
   } else {
-    setCacheBar('error');
     if (tbody) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text3);">
       <i class="ti ti-database-off" style="font-size:22px;display:block;margin-bottom:8px;"></i>
       No data in cache yet. Data will appear automatically once the cache (<code style="font-size:11px;background:var(--bg3);padding:1px 5px;border-radius:4px;">ap2_bike</code>) is populated.
@@ -669,14 +631,12 @@ window.addEventListener('storage', function(e) {
   if (!e.newValue) return; // cache was cleared, do nothing
   try {
     const parsed = JSON.parse(e.newValue);
-    const ts = parsed.ts;
     const rows = parsed.data || parsed.rows || parsed;
     if (!rows || !rows.length) return;
     const updated = rows.map((r,i) => normaliseRow(r,i)).filter(Boolean);
     if (!updated.length) return;
     bikes = updated;
     renderAll();
-    setCacheBar('synced', ts || Date.now());
   } catch {}
 });
 
