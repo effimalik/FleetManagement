@@ -560,11 +560,15 @@ function normaliseRow(r, i) {
    *  [13] Status (Active / Inactive)
    * ─────────────────────────────────────────────────────────── */
   if (Array.isArray(r)) {
-    const _str = v => (v !== null && v !== undefined && v !== 0 && v !== false) ? String(v).trim() : '';
+    const _str = v => (v !== null && v !== undefined && v !== '') ? String(v).trim() : '';
 
     /* Detect whether col[4] looks like a date (DOB present) or a phone number */
     const col4 = _str(r[4]);
-    const col4IsDate = col4 && (col4.includes('T') || col4.includes('-') || col4.includes('/'));
+    // A date looks like ISO string or YYYY-MM-DD; a phone starts with + or is all digits/spaces
+    const col4IsDate = col4 && (
+      /^\d{4}-\d{2}/.test(col4) ||   // YYYY-MM-DD...
+      col4.includes('T')              // ISO datetime
+    );
     let dob, mobile, emergency, reference, eidExp, licExp, labExp, insExp, coExc;
 
     if (col4IsDate) {
@@ -659,7 +663,7 @@ function parseRows(raw) {
 
 
 /* ═══════════ CACHE ═══════════ */
-const _AP2_CACHE_KEY = 'ap2_employee';
+const _AP2_CACHE_KEY = 'ap2_employees';
 const API_BASE = ''; // stub — no network calls used
 
 function _readCache() {
@@ -678,8 +682,7 @@ function loadEmployees() {
   const tbody = document.getElementById('emp-tbody');
   const rows = _readCache();
   if (rows && rows.length) {
-    const parsed = parseRows(rows);
-    employees = parsed.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+    employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
   } else {
     if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;color:var(--text3);">
@@ -697,8 +700,7 @@ function loadEmployees() {
       const arr = Array.isArray(parsed) ? parsed
                 : Array.isArray(parsed?.data) ? parsed.data : null;
       if (!arr || !arr.length) return;
-      const rows = parseRows(arr);
-      const fresh = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+      const fresh = arr.map((r, i) => normaliseRow(r, i)).filter(Boolean);
       if (!fresh.length) return;
       employees = fresh;
       renderEmpTable(employees);
