@@ -333,7 +333,7 @@ th, td { border-left: none !important; border-right: none !important; }
     <div class="page-header-left">
       <div class="ph-icon"><i class="ti ti-motorbike"></i></div>
       <div>
-        <div class="ph-title">Bike . Fleet</div>
+        <div class="ph-title">Bike Fleet</div>
         <div class="ph-sub">UAE fleet compliance &amp; document tracking</div>
       </div>
     </div>
@@ -466,6 +466,8 @@ th, td { border-left: none !important; border-right: none !important; }
 
 <script>
 'use strict';
+/* Stub so any legacy reference to API_BASE is harmless */
+const API_BASE = '';
 const WARN_DAYS = 60;
 const CACHE_KEY = 'ap2_bike';
 const CACHE_TTL = 5 * 60 * 1000;
@@ -573,8 +575,7 @@ function bikeCacheLoad() {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw) return null;
     const {ts,rows} = JSON.parse(raw);
-    if (Date.now()-ts > CACHE_TTL) return null;
-    return rows;
+    return rows; // no TTL — always use cache as source of truth
   } catch { return null; }
 }
 function bikeCacheClear() { try { localStorage.removeItem(CACHE_KEY); } catch {} }
