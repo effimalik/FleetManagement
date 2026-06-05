@@ -102,20 +102,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .page-desc i { color: var(--accent); font-size: clamp(14px, 1.8vw, 17px); flex-shrink: 0; line-height: 1; }
 @media (max-width: 600px) { .page-desc { display: none; } .page-divider { padding-top: 4px; margin-bottom: 10px; } }
 
-/* ── Cache banner refresh button — wider for label ── */
-.cache-banner-icon-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 12px; height: 28px; border-radius: 6px; background: none; border: 1px solid var(--border2); color: var(--text3); cursor: pointer; font-size: 12px; font-family: var(--font); font-weight: 600; transition: all .15s; margin-left: auto; flex-shrink: 0; }
-.cache-banner-icon-btn:hover { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
-.cache-banner-icon-btn i { font-size: 15px; line-height: 1; }
-.cache-banner { margin-bottom: 8px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--bg3); font-size: 12px; }
-.cache-banner-main { display: flex; align-items: center; gap: 10px; padding: 7px 12px; }
-.cache-banner-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
-.cache-banner-status i { font-size: 14px; line-height: 1; }
-.cache-banner-status.synced  { background: var(--teal-dim); color: var(--teal); }
-.cache-banner-status.syncing { background: var(--amber-dim); color: var(--amber); }
-.cache-banner-datetime { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text3); font-family: var(--mono); }
-.cache-banner-datetime i { font-size: 14px; line-height: 1; }
-.cache-banner-sub { display: none; }
-.cache-banner-sub.open { display: flex; }
 
 /* ── Toolbar ── */
 .emp-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; width: 100%; }
@@ -353,7 +339,7 @@ select option { background: var(--surface2); color: var(--text); }
   <div class="page-header">
     <div class="page-title">
       <i class="ti ti-users"></i>
-      Employees
+      All Employees
     </div>
   </div>
   <div class="page-divider">
@@ -662,218 +648,67 @@ function parseRows(raw) {
   return [];
 }
 
-function showCacheBanner(show) {
-  let banner = document.getElementById('emp-cache-banner');
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'emp-cache-banner';
-    banner.className = 'cache-banner';
-    const tbl = document.getElementById('emp-tbody')?.closest('table');
-    tbl?.parentElement?.parentElement?.insertBefore(banner, tbl.parentElement);
-  }
-  if (show) {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-    const dateStr = now.toLocaleDateString([], { day:'2-digit', month:'short' });
-    banner.innerHTML = `
-      <div class="cache-banner-main">
-        <span class="cache-banner-status syncing"><i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-flex;"></i> Refreshing…</span>
-        <span class="cache-banner-datetime"><i class="ti ti-clock"></i> ${dateStr}, ${timeStr}</span>
-        <button class="cache-banner-icon-btn" disabled style="opacity:.45;cursor:not-allowed;"><i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-flex;"></i> Refresh</button>
-      </div>`;
-  } else {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-    const dateStr = now.toLocaleDateString([], { day:'2-digit', month:'short' });
-    banner.innerHTML = `
-      <div class="cache-banner-main">
-        <span class="cache-banner-status synced"><i class="ti ti-circle-check"></i> Synced</span>
-        <span class="cache-banner-datetime"><i class="ti ti-clock"></i> ${dateStr}, ${timeStr}</span>
-        <button class="cache-banner-icon-btn" onclick="forceRefreshEmployees();" title="Force refresh from sheet"><i class="ti ti-refresh"></i> Refresh</button>
-      </div>`;
-  }
-}
 
-function toggleCacheSub() {
-  const sub = document.getElementById('emp-cache-sub');
-  if (sub) sub.classList.toggle('open');
-}
 
-/* ═══════════ SHARED-CACHE CONSTANTS ═══════════ */
-// Must match index.html DS_META values exactly
-const _EMP_CACHE_KEY = 'ap2_employees';
-const _AP2_CACHE_KEY = 'ap2_employees';          // Apps Script array cache
-const _EMP_CACHE_TTL = 10 * 60 * 1000;           // 10 min
+/* ═══════════ CACHE ═══════════ */
+const _AP2_CACHE_KEY = 'ap2_employees';
+const API_BASE = ''; // stub — no network calls used
 
-/* ── Read ap2_employees cache (plain JSON array from Apps Script) ── */
-function _readAp2Cache() {
+function _readCache() {
   try {
     const raw = localStorage.getItem(_AP2_CACHE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    // Accept plain array OR { data:[...], ts? } wrapper
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return { data: parsed, ts: Date.now() };
-    }
-    if (parsed && Array.isArray(parsed.data) && parsed.data.length > 0) {
-      const age = typeof parsed.ts === 'number' ? Date.now() - parsed.ts : 0;
-      if (age > _EMP_CACHE_TTL) return null;
-      return parsed;
-    }
+    if (Array.isArray(parsed) && parsed.length) return parsed;
+    if (parsed && Array.isArray(parsed.data) && parsed.data.length) return parsed.data;
     return null;
-  } catch (e) { return null; }
+  } catch { return null; }
 }
 
-/* ── Secure cache reader: validates structure before trusting data ── */
-function _readEmpCache() {
-  // 1. Prefer ap2_employees (array format, set by Apps Script bridge)
-  const ap2 = _readAp2Cache();
-  if (ap2) return ap2;
-
-  // 2. Fall back to fleet_cache_v1 (DataLayer object format)
-  try {
-    const raw = localStorage.getItem(_EMP_CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (
-      !parsed ||
-      typeof parsed.ts !== 'number' ||
-      !Array.isArray(parsed.data) ||
-      parsed.data.length === 0 ||
-      Date.now() - parsed.ts > _EMP_CACHE_TTL
-    ) return null;
-    return parsed;
-  } catch (e) {
-    return null;
-  }
-}
-
-/* ── Watch ap2_employees for live updates (cross-tab + same-tab poll) ── */
-(function _watchAp2Cache() {
-  function _applyAp2(parsed) {
-    const arr = Array.isArray(parsed) ? parsed
-              : Array.isArray(parsed?.data) ? parsed.data : null;
-    if (!arr || !arr.length) return;
-    const rows = parseRows(arr);
-    const fresh = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
-    if (!fresh.length) return;
-    employees = fresh;
+/* ═══════════ LOAD ═══════════ */
+function loadEmployees() {
+  const tbody = document.getElementById('emp-tbody');
+  const rows = _readCache();
+  if (rows && rows.length) {
+    const parsed = parseRows(rows);
+    employees = parsed.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
-    showCacheBanner(false);
-    console.log('[ap2_employees] table refreshed, rows:', employees.length);
+  } else {
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;color:var(--text3);">
+      <i class="ti ti-database-off" style="font-size:26px;display:block;margin-bottom:8px;"></i>
+      No data in cache yet. Data will appear automatically once <code style="font-size:11px;background:var(--bg3);padding:1px 5px;border-radius:4px;">ap2_employees</code> is populated.
+    </td></tr>`;
   }
+}
 
-  // Cross-tab: fires when another tab writes localStorage
+/* ═══════════ BACKGROUND CACHE WATCHER ═══════════ */
+(function() {
+  function _apply(raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      const arr = Array.isArray(parsed) ? parsed
+                : Array.isArray(parsed?.data) ? parsed.data : null;
+      if (!arr || !arr.length) return;
+      const rows = parseRows(arr);
+      const fresh = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+      if (!fresh.length) return;
+      employees = fresh;
+      renderEmpTable(employees);
+    } catch {}
+  }
   window.addEventListener('storage', function(e) {
-    if (e.key === _AP2_CACHE_KEY && e.newValue) {
-      try { _applyAp2(JSON.parse(e.newValue)); } catch(e) {}
-    }
+    if (e.key === _AP2_CACHE_KEY && e.newValue) _apply(e.newValue);
   });
-
-  // Same-tab poll every 30 s to catch writes from shared scripts
   let _lastHash = null;
   setInterval(function() {
     try {
       const raw = localStorage.getItem(_AP2_CACHE_KEY);
       if (!raw || raw === _lastHash) return;
       _lastHash = raw;
-      _applyAp2(JSON.parse(raw));
-    } catch(e) {}
+      _apply(raw);
+    } catch {}
   }, 30000);
 })();
-
-/* ═══════════ LOAD ═══════════ */
-async function loadEmployees() {
-  const tbody = document.getElementById('emp-tbody');
-
-  // ── PHASE 1: Instant paint from shared localStorage cache (zero network) ──
-  const cached = _readEmpCache();
-  if (cached) {
-    const rows = parseRows(cached.data);
-    const painted = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
-    if (painted.length) {
-      employees = painted;
-      renderEmpTable(employees);
-      showCacheBanner(false);
-
-      // ── PHASE 2: Silent background validation — re-fetch only if near-stale ──
-      const ageMs = Date.now() - cached.ts;
-      const BACKGROUND_REFRESH_THRESHOLD = _EMP_CACHE_TTL * 0.7; // refresh if >70% of TTL used
-      if (ageMs < BACKGROUND_REFRESH_THRESHOLD) {
-        // Cache is fresh enough — skip network entirely
-        return;
-      }
-      // Cache is aging — quietly refresh in background, table already visible
-      try {
-        await DataLayer.forceRefresh('employee');
-        const fresh = await DataLayer.getEmployees();
-        const freshRows = parseRows(fresh);
-        employees = freshRows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
-        renderEmpTable(employees);
-        showCacheBanner(false);
-      } catch (e) {
-        // Background refresh failed — stale data already showing, that's fine
-        console.warn('Background refresh failed, showing cached data:', e.message);
-      }
-      return;
-    }
-  }
-
-  // ── PHASE 1 miss: no usable cache — show skeleton and fetch ──
-  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;">
-    <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-flex;font-size:26px;color:var(--text3);"></i>
-    <div style="margin-top:10px;color:var(--text3);font-size:13px;">Loading employees…</div>
-  </td></tr>`;
-  showCacheBanner(true);
-
-  try {
-    const raw  = await DataLayer.getEmployees();
-    const rows = parseRows(raw);
-    employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
-    renderEmpTable(employees);
-    showCacheBanner(false);
-  } catch (err) {
-    console.error('loadEmployees error:', err);
-    showCacheBanner(false);
-    if (!employees.length) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--red);"><i class="ti ti-wifi-off" style="font-size:22px;display:block;margin-bottom:8px;"></i>Could not load data — check connection.</td></tr>`;
-    } else {
-      toast('Could not refresh — showing cached data.', 'error');
-    }
-  }
-}
-
-// Force-refresh: clears DataLayer cache, re-fetches from sheet, then re-renders table
-async function forceRefreshEmployees() {
-  showCacheBanner(true);
-  try {
-    await DataLayer.forceRefresh('employee');
-    const raw  = await DataLayer.getEmployees();
-    const rows = parseRows(raw);
-    employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
-    renderEmpTable(employees);
-    showCacheBanner(false);
-    toast('Data refreshed successfully.');
-
-    // ── Write fresh data back to ap2_employees so other pages see it ──
-    try {
-      const payload = JSON.stringify({ data: rows.map(r => r), ts: Date.now() });
-      localStorage.setItem(_AP2_CACHE_KEY, payload);
-    } catch(e) { /* storage full or denied — no-op */ }
-
-    // ── Notify other open tabs (index.html cache panel) that data changed ──
-    try {
-      const bc = new BroadcastChannel('adminpro_cache');
-      bc.postMessage({ type: 'cache_updated', key: 'employee', ts: Date.now() });
-      bc.close();
-    } catch(e) { /* BroadcastChannel not supported — no-op */ }
-
-  } catch (err) {
-    console.error('forceRefresh error:', err);
-    showCacheBanner(false);
-    toast('Refresh failed — check connection.', 'error');
-  }
-}
 
 /* ═══════════ FILTER / TABLE ═══════════ */
 function calcOverall(ex) {
@@ -1094,22 +929,6 @@ async function viewEmployee(empId) {
   document.getElementById('detail-panel').classList.add('open');
   _renderEmpDetail(emp, ex);
 
-  if (!_empDetailCache[empId]) {
-    try {
-      const res = await fetch(`${API_BASE}?type=employeeDetail&empId=${encodeURIComponent(empId)}&nocache=${Date.now()}`);
-      const data = await res.json();
-      if (data && (data.id || data.empId)) {
-        _empDetailCache[empId] = data;
-        const merged = Object.assign({}, emp, {
-          dob:      data.dob      || emp.dob      || '',
-          hrStatus: data.hrStatus || emp.hrStatus || '',
-          checkoutException: data.checkoutException || emp.checkoutException || '',
-          expiry: {
-            eid:      computeExpiry(data.eidExpiry   || (emp.expiry?.eid?.date)      || ''),
-            license:  computeExpiry(data.licExpiry   || (emp.expiry?.license?.date)  || ''),
-            labour:   computeExpiry(data.labourExpiry|| (emp.expiry?.labour?.date)   || ''),
-            insurance:computeExpiry(data.insExpiry   || (emp.expiry?.insurance?.date)|| ''),
-          }
         });
         if (_panelType === 'emp' && String(_panelId) === String(empId)) _renderEmpDetail(merged, merged.expiry);
       }
@@ -1224,14 +1043,9 @@ async function _dpSave() {
 
   renderEmpTable(employees);
   // Bust the centralized cache so next load reflects the edit
-  if (typeof DataLayer !== 'undefined' && DataLayer.invalidateEmployees) DataLayer.invalidateEmployees();
   _dpResetButtons(); _renderEmpDetail(emp, emp.expiry || {});
 
-  const payload = { action:'updateEmployee', empId:String(emp.id), name:emp.name, eid:emp.eid, mobile:emp.mobile, mobilePak:emp.mobilePak||'', reference:emp.ref||'', eidExpiry:vals.eidExp||'', licExpiry:vals.licExpiry||'', labourExpiry:vals.labourExpiry||'', insExpiry:vals.insExpiry||'' };
-  try {
-    await fetch(API_BASE, { method:'POST', mode:'no-cors', body: new URLSearchParams(payload) });
-    toast('Employee saved to sheet.');
-  } catch(err) { toast('Sheet save failed: ' + err.message, 'error'); }
+  toast('Employee saved.');
 
   saveBtn.disabled=false; saveBtn.innerHTML='<i class="ti ti-device-floppy"></i> Save';
 }
