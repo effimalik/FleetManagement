@@ -936,14 +936,6 @@ async function viewEmployee(empId) {
   document.getElementById('dp-body').innerHTML = `<div class="dp-loading"><div class="dp-spinner"></div><span>Loading details…</span></div>`;
   document.getElementById('detail-panel').classList.add('open');
   _renderEmpDetail(emp, ex);
-
-        });
-        if (_panelType === 'emp' && String(_panelId) === String(empId)) _renderEmpDetail(merged, merged.expiry);
-      }
-    } catch(e) { console.warn('detail fetch failed:', e.message); }
-  } else {
-    _renderEmpDetail(Object.assign({}, emp, _empDetailCache[empId], { expiry: emp.expiry }), ex);
-  }
 }
 
 function _renderEmpDetail(emp, ex) {
