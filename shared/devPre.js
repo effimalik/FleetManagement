@@ -29,4 +29,31 @@
       e.preventDefault();
       return false;
     }
-  </script>
+
+
+
+
+
+
+
+
+
+
+    
+       async function loadEmployees() {
+         const employees = await AdminPro.getEmployees();
+         // employees is the cached or freshly fetched array
+         renderTable(employees);
+       }
+ 
+       async function loadBikes() {
+         const bikes = await AdminPro.getBikes();
+         renderBikeList(bikes);
+       }
+ 
+       // Force refresh (e.g. after user saves a record):
+       async function refreshAfterSave() {
+         await AdminPro.forceRefresh('employee');
+         loadEmployees();
+       }
+     </script>
