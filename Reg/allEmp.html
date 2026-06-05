@@ -534,9 +534,7 @@ function computeExpiry(dateStr) {
 function normaliseRow(r, i) {
   if (!r) return null;
 
-  // CACHE OBJECT FORMAT
   if (!Array.isArray(r) && r["Name"] !== undefined) {
-
     return {
       id: r["Emp ID"] || (i + 1),
       name: r["Name"] || "",
@@ -548,7 +546,6 @@ function normaliseRow(r, i) {
       timestamp: r["Timestamp"] || "",
       hrStatus: r["HR_Status"] || "",
       checkoutException: r["Checkout_Exception"] || "",
-
       expiry: {
         eid: computeExpiry(r["EID Expiry"]),
         license: computeExpiry(r["License Expiry"]),
@@ -558,6 +555,8 @@ function normaliseRow(r, i) {
     };
   }
 
+  return null;
+}
 
 function parseRows(raw) {
 
