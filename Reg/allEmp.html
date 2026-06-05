@@ -659,12 +659,16 @@ async function loadEmployees() {
   }
 }
 
-// Force-refresh: bypasses DataLayer cache, shows spinner in banner but keeps table rows visible
+// Force-refresh: clears DataLayer cache, re-fetches from sheet, then re-renders table
 async function forceRefreshEmployees() {
-  showCacheBanner(true); // spinner in banner, table stays
+  showCacheBanner(true); // spinner in banner, table stays visible
   try {
-    // forceRefresh: true tells DataLayer to skip fleet_cache_v1 and re-fetch from the sheet
-    const raw  = await DataLayer.getEmployees({ forceRefresh: true });
+    // FIX: use DataLayer.forceRefresh('employee') to clear cache + fetch fresh data,
+    // then call getEmployees() to read the freshly populated cache.
+    // Previously called getEmployees({ forceRefresh: true }) which is NOT a valid signature
+    // — dataLayer.js getEmployees(force) expects a plain truthy boolean, not an options object.
+    await DataLayer.forceRefresh('employee');  // clears cache entry + fetches from server
+    const raw  = await DataLayer.getEmployees(); // reads the fresh data just stored
     const rows = parseRows(raw);
     // ── Column inspector ──
     if (rows.length && Array.isArray(rows[0])) {
