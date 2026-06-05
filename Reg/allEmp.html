@@ -337,6 +337,16 @@ select option { background: var(--surface2); color: var(--text); }
 </head>
 <body>
 
+<!-- ═══ INSTANT THEME SYNC (no flash) ═══ -->
+<script>
+(function(){
+  try {
+    var t = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  } catch(e) {}
+})();
+</script>
+
 <div class="page">
 
   <!-- Page header -->
@@ -617,34 +627,78 @@ function toggleCacheSub() {
   if (sub) sub.classList.toggle('open');
 }
 
+/* ═══════════ SHARED-CACHE CONSTANTS ═══════════ */
+// Must match index.html DS_META values exactly
+const _EMP_CACHE_KEY = 'ap2_employee';
+const _EMP_CACHE_TTL = 10 * 60 * 1000; // 10 min — mirrors index.html DS_META.employee.ttlMs
+
+/* ── Secure cache reader: validates structure before trusting data ── */
+function _readEmpCache() {
+  try {
+    const raw = localStorage.getItem(_EMP_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Integrity checks: must have ts (number) and data (non-empty array)
+    if (
+      !parsed ||
+      typeof parsed.ts !== 'number' ||
+      !Array.isArray(parsed.data) ||
+      parsed.data.length === 0 ||
+      Date.now() - parsed.ts > _EMP_CACHE_TTL   // honour TTL
+    ) return null;
+    return parsed;
+  } catch (e) {
+    return null; // malformed JSON — ignore silently
+  }
+}
+
 /* ═══════════ LOAD ═══════════ */
 async function loadEmployees() {
   const tbody = document.getElementById('emp-tbody');
 
-  // Show loading skeleton only on first-ever load (no data yet)
-  if (!employees.length) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;">
-      <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-flex;font-size:26px;color:var(--text3);"></i>
-      <div style="margin-top:10px;color:var(--text3);font-size:13px;">Loading employees…</div>
-    </td></tr>`;
+  // ── PHASE 1: Instant paint from shared localStorage cache (zero network) ──
+  const cached = _readEmpCache();
+  if (cached) {
+    const rows = parseRows(cached.data);
+    const painted = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+    if (painted.length) {
+      employees = painted;
+      renderEmpTable(employees);
+      showCacheBanner(false);
+
+      // ── PHASE 2: Silent background validation — re-fetch only if near-stale ──
+      const ageMs = Date.now() - cached.ts;
+      const BACKGROUND_REFRESH_THRESHOLD = _EMP_CACHE_TTL * 0.7; // refresh if >70% of TTL used
+      if (ageMs < BACKGROUND_REFRESH_THRESHOLD) {
+        // Cache is fresh enough — skip network entirely
+        return;
+      }
+      // Cache is aging — quietly refresh in background, table already visible
+      try {
+        await DataLayer.forceRefresh('employee');
+        const fresh = await DataLayer.getEmployees();
+        const freshRows = parseRows(fresh);
+        employees = freshRows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
+        renderEmpTable(employees);
+        showCacheBanner(false);
+      } catch (e) {
+        // Background refresh failed — stale data already showing, that's fine
+        console.warn('Background refresh failed, showing cached data:', e.message);
+      }
+      return;
+    }
   }
+
+  // ── PHASE 1 miss: no usable cache — show skeleton and fetch ──
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px 16px;">
+    <i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-flex;font-size:26px;color:var(--text3);"></i>
+    <div style="margin-top:10px;color:var(--text3);font-size:13px;">Loading employees…</div>
+  </td></tr>`;
   showCacheBanner(true);
 
   try {
-    // DataLayer handles fleet_cache_v1 reads/writes and TTL — no local cache logic needed here
     const raw  = await DataLayer.getEmployees();
     const rows = parseRows(raw);
-    // ── Column inspector: logs first 2 data rows so you can verify column mapping ──
-    if (rows.length && Array.isArray(rows[0])) {
-      console.group('📋 Sheet column map (first 2 rows)');
-      const labels = ['[0] id','[1] name','[2] eid','[3] dob','[4] mobile','[5] emergency','[6] reference','[7] timestamp','[8] hrStatus','[9] checkoutException','[10] eidDate','[11] licenseDate','[12] labourDate','[13] insuranceDate'];
-      rows.slice(0, 2).forEach((row, ri) => {
-        console.group(`Row ${ri}`);
-        row.forEach((val, ci) => console.log(`${labels[ci] || '['+ci+']'} =`, JSON.stringify(val)));
-        console.groupEnd();
-      });
-      console.groupEnd();
-    }
     employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
     showCacheBanner(false);
@@ -661,30 +715,23 @@ async function loadEmployees() {
 
 // Force-refresh: clears DataLayer cache, re-fetches from sheet, then re-renders table
 async function forceRefreshEmployees() {
-  showCacheBanner(true); // spinner in banner, table stays visible
+  showCacheBanner(true);
   try {
-    // FIX: use DataLayer.forceRefresh('employee') to clear cache + fetch fresh data,
-    // then call getEmployees() to read the freshly populated cache.
-    // Previously called getEmployees({ forceRefresh: true }) which is NOT a valid signature
-    // — dataLayer.js getEmployees(force) expects a plain truthy boolean, not an options object.
-    await DataLayer.forceRefresh('employee');  // clears cache entry + fetches from server
-    const raw  = await DataLayer.getEmployees(); // reads the fresh data just stored
+    await DataLayer.forceRefresh('employee');
+    const raw  = await DataLayer.getEmployees();
     const rows = parseRows(raw);
-    // ── Column inspector ──
-    if (rows.length && Array.isArray(rows[0])) {
-      console.group('📋 Sheet column map — force refresh (first 2 rows)');
-      const labels = ['[0] id','[1] name','[2] eid','[3] dob','[4] mobile','[5] emergency','[6] reference','[7] timestamp','[8] hrStatus','[9] checkoutException','[10] eidDate','[11] licenseDate','[12] labourDate','[13] insuranceDate'];
-      rows.slice(0, 2).forEach((row, ri) => {
-        console.group(`Row ${ri}`);
-        row.forEach((val, ci) => console.log(`${labels[ci] || '['+ci+']'} =`, JSON.stringify(val)));
-        console.groupEnd();
-      });
-      console.groupEnd();
-    }
     employees = rows.map((r, i) => normaliseRow(r, i)).filter(Boolean);
     renderEmpTable(employees);
     showCacheBanner(false);
     toast('Data refreshed successfully.');
+
+    // ── Notify other open tabs (index.html cache panel) that data changed ──
+    try {
+      const bc = new BroadcastChannel('adminpro_cache');
+      bc.postMessage({ type: 'cache_updated', key: 'employee', ts: Date.now() });
+      bc.close();
+    } catch(e) { /* BroadcastChannel not supported — no-op */ }
+
   } catch (err) {
     console.error('forceRefresh error:', err);
     showCacheBanner(false);
