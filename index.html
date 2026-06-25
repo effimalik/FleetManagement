@@ -1,1791 +1,864 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AdminPro UAE — HR &amp; Fleet Management</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
-<script src="https://effimalik.github.io/FleetManagement/shared/auth.js?v=5"></script>
-<script src="https://effimalik.github.io/FleetManagement/shared/dataLayer.js"></script>
+/* ═══════════════════════════════════════════════════════════════════════
+   dataLayer.js — FleetFlow Pro  v2.2
+   Cache-first data layer · IndexedDB persistence · session-auth
+   Permission-driven: only permitted datasets are fetched or cached.
 
-	
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+   ARCHITECTURE:
+   ─ window.AdminPro  → public API (warmIfEmpty, get*, forceRefresh, etc.)
+   ─ window.DataLayer → alias for window.AdminPro (backwards compat)
+   ─ Cache layer      → IndexedDB with prefix 'ap2_' + datasetKey
+   ─ Auth gate        → every fetch checks window.Auth.getCredentials()
+   ─ Permission gate  → DATASETS built entirely from Auth.getPermissions()
+                        at runtime — NO hardcoded metadata in this file.
 
-/* ═══ TOKENS ═══ */
-:root,[data-theme="dark"]{
-  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;
-  --surface:#21262d;--surface2:#2d333b;
-  --border:#30363d;--border2:#444c56;
-  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
-  --accent:#58a6ff;--accent-dim:rgba(88,166,255,.12);--accent-glow:rgba(88,166,255,.28);
-  --teal:#39d353;--teal-dim:rgba(57,211,83,.12);
-  --amber:#e3b341;--amber-dim:rgba(227,179,65,.12);
-  --red:#f85149;--red-dim:rgba(248,81,73,.12);
-  --purple:#a371f7;--purple-dim:rgba(163,113,247,.12);
-  --orange:#f0883e;--orange-dim:rgba(240,136,62,.12);
-  --icon-bar-w:56px;--sub-bar-w:220px;
-  --topbar-h:52px;
-  --radius:8px;--radius-lg:12px;
-  --font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,.4);
-  --shadow-md:0 4px 16px rgba(0,0,0,.5);
-  --shadow-lg:0 8px 32px rgba(0,0,0,.6);
-}
-[data-theme="light"]{
-  --bg:#f0f2f5;--bg2:#ffffff;--bg3:#e8ecf0;
-  --surface:#ffffff;--surface2:#e2e7ed;
-  --border:#c8d0d9;--border2:#9aa5b1;
-  --text:#0d1117;--text2:#3d454f;--text3:#5a6370;
-  --accent:#0550ae;--accent-dim:rgba(5,80,174,.12);--accent-glow:rgba(5,80,174,.22);
-  --teal:#116329;--teal-dim:rgba(17,99,41,.13);
-  --amber:#7d4e00;--amber-dim:rgba(125,78,0,.13);
-  --red:#a8111b;--red-dim:rgba(168,17,27,.11);
-  --purple:#6639c8;--purple-dim:rgba(102,57,200,.13);
-  --orange:#953800;--orange-dim:rgba(149,56,0,.13);
-  --shadow:0 1px 3px rgba(0,0,0,.10);
-  --shadow-md:0 4px 16px rgba(0,0,0,.12);
-  --shadow-lg:0 8px 32px rgba(0,0,0,.15);
-}
-[data-theme="purple"]{
-  --bg:#0f0b1e;--bg2:#17112e;--bg3:#1e1840;
-  --surface:#221a3a;--surface2:#2c2250;
-  --border:#3a2e5e;--border2:#5a4890;
-  --text:#e8e0ff;--text2:#a899d4;--text3:#7a6ca8;
-  --accent:#c084fc;--accent-dim:rgba(192,132,252,.14);--accent-glow:rgba(192,132,252,.3);
-  --teal:#4ade80;--teal-dim:rgba(74,222,128,.12);
-  --amber:#fbbf24;--amber-dim:rgba(251,191,36,.12);
-  --red:#f87171;--red-dim:rgba(248,113,113,.12);
-  --purple:#c084fc;--purple-dim:rgba(192,132,252,.14);
-  --orange:#fb923c;--orange-dim:rgba(251,146,60,.12);
-  --shadow:0 1px 3px rgba(0,0,0,.5);
-  --shadow-md:0 4px 16px rgba(0,0,0,.6);
-  --shadow-lg:0 8px 32px rgba(0,0,0,.7);
-}
-[data-theme="ocean"]{
-  --bg:#071520;--bg2:#0d2035;--bg3:#112840;
-  --surface:#143050;--surface2:#1a3d60;
-  --border:#1e4a72;--border2:#2e6a9e;
-  --text:#d6eeff;--text2:#7db8e8;--text3:#4a87b8;
-  --accent:#38bdf8;--accent-dim:rgba(56,189,248,.14);--accent-glow:rgba(56,189,248,.3);
-  --teal:#34d399;--teal-dim:rgba(52,211,153,.12);
-  --amber:#fbbf24;--amber-dim:rgba(251,191,36,.12);
-  --red:#f87171;--red-dim:rgba(248,113,113,.12);
-  --purple:#a78bfa;--purple-dim:rgba(167,139,250,.12);
-  --orange:#fb923c;--orange-dim:rgba(251,146,60,.12);
-  --shadow:0 1px 3px rgba(0,0,0,.5);
-  --shadow-md:0 4px 16px rgba(0,0,0,.55);
-  --shadow-lg:0 8px 32px rgba(0,0,0,.65);
-}
-[data-theme="slate"]{
-  --bg:#0e1117;--bg2:#1a1f28;--bg3:#222836;
-  --surface:#28303e;--surface2:#313c4e;
-  --border:#3a4556;--border2:#556070;
-  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
-  --accent:#60a5fa;--accent-dim:rgba(96,165,250,.13);--accent-glow:rgba(96,165,250,.28);
-  --teal:#4ade80;--teal-dim:rgba(74,222,128,.12);
-  --amber:#fbbf24;--amber-dim:rgba(251,191,36,.12);
-  --red:#f87171;--red-dim:rgba(248,113,113,.12);
-  --purple:#a78bfa;--purple-dim:rgba(167,139,250,.12);
-  --orange:#fb923c;--orange-dim:rgba(251,146,60,.12);
-  --shadow:0 1px 3px rgba(0,0,0,.45);
-  --shadow-md:0 4px 16px rgba(0,0,0,.5);
-  --shadow-lg:0 8px 32px rgba(0,0,0,.6);
-}
+   PERMISSION SHAPE (from server login response):
+   {
+     "ap2_employee": { label:"Employees", apiKey:"employee", paramKey:"type", ttlMs:60000  },
+     "ap2_bike":     { label:"Bikes",     apiKey:"bike",     paramKey:"type", ttlMs:900000 }
+   }
+   Each key becomes a dataset key. All config (label, API param, TTL) comes
+   from the server — change them in the Permissions sheet, not in this file.
 
-html,body{
-  height:100%;width:100%;
-  font-family:var(--font);
-  background:var(--bg);color:var(--text);
-  font-size:14px;-webkit-font-smoothing:antialiased;
-  overflow:hidden;
-}
+   FLOW:
+     login.html → Auth.createSession({ permissions }) ✓
+               → AdminPro.init()       ← builds DATASETS from permissions
+               → AdminPro.warmIfEmpty() ← parallel fetch permitted datasets only
+               → redirect to index
 
-/* ═══ SHELL ═══ */
-.shell{
-  display:flex;flex-direction:column;
-  height:100vh;width:100%;
-  overflow:hidden;position:fixed;
-  top:0;left:0;right:0;bottom:0;
-}
+     anyPage.js → AdminPro.get('ap2_employee') / AdminPro.get('ap2_bike') / …
+               → cache HIT  → returns instantly, zero network
+               → cache MISS → fetch → store → return
 
-/* ═══ TOPBAR ═══ */
-.topbar{
-  height:var(--topbar-h);
-  background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:stretch;
-  flex-shrink:0;position:relative;
-  /* topbar must be above the dropdown — z-index:300 so dropdown (z:9999 fixed) still clears */
-  z-index:300;width:100%;
-  overflow:visible; /* allow dropdown to escape */
-}
-.topbar::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--accent) 0%,var(--purple) 40%,var(--teal) 100%);
-  opacity:.75;pointer-events:none;
-}
+   LOAD ORDER:
+     1. auth.js      (session guard + permissions)
+     2. dataLayer.js (this file)
+     3. page JS
+═══════════════════════════════════════════════════════════════════════ */
+'use strict';
 
-/* ── Brand zone ── */
-.tb-brand{
-  width:var(--icon-bar-w);
-  display:flex;align-items:center;justify-content:center;
-  border-right:1px solid var(--border);flex-shrink:0;
-  background:linear-gradient(160deg,rgba(88,166,255,.06) 0%,transparent 100%);
-}
-.tb-brand-icon{
-  width:34px;height:34px;
-  background:linear-gradient(135deg,var(--accent) 0%,#1f6feb 100%);
-  border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:16px;
-  box-shadow:0 0 14px var(--accent-glow),0 2px 4px rgba(0,0,0,.3);
-  transition:box-shadow .2s,transform .15s;
-  cursor:pointer;border:none;
-}
-.tb-brand-icon:hover{box-shadow:0 0 22px var(--accent-glow),0 2px 8px rgba(0,0,0,.4);transform:scale(1.05);}
-.tb-brand-icon:active{transform:scale(.96);}
+(function () {
 
-/* ── App name zone ── */
-.tb-app{
-  width:var(--sub-bar-w);
-  border-right:1px solid var(--border);
-  display:flex;align-items:center;
-  padding:0 14px;gap:10px;flex-shrink:0;
-  min-width:0;overflow:hidden;
-  transition:width .25s cubic-bezier(.4,0,.2,1),padding .25s,border .25s;
-}
-.tb-app.collapsed{width:0;padding:0;border-right-color:transparent;}
-.tb-app-name{font-size:12.5px;font-weight:700;color:var(--text);letter-spacing:-.015em;line-height:1.2;white-space:nowrap;}
-.tb-app-sub{font-size:9.5px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;margin-top:2px;white-space:nowrap;}
+  /* ─────────────────────────────────────────
+     CONFIG — must match auth.js API_BASE
+  ───────────────────────────────────────── */
+  const API_BASE = 'https://script.google.com/macros/s/AKfycbwnPUkpqvUdNey7SoEzd2JN1yfG_TJ6cneI_hZ0n-uZDN6Wk2jgYKkmoDxtdUWuvbOP6g/exec';
 
-/* ── Day/Night toggle pill ── */
-.tb-daynight{
-  margin-left:auto;flex-shrink:0;
-  height:24px;padding:0 8px;
-  border-radius:20px;
-  border:1.5px solid var(--border2);
-  background:var(--bg3);
-  display:flex;align-items:center;gap:5px;
-  cursor:pointer;transition:all .2s;
-  color:var(--text2);font-size:12px;
-  font-family:var(--font);font-weight:600;
-  white-space:nowrap;
-}
-.tb-daynight i{font-size:13px;transition:color .2s,transform .3s;}
-.tb-daynight:hover{background:var(--surface2);border-color:var(--accent);color:var(--text);}
-.tb-daynight:hover i{transform:rotate(20deg);}
-[data-theme="light"] .tb-daynight i{color:var(--amber);}
-[data-theme="dark"]  .tb-daynight i{color:#a0b4d0;}
-[data-theme="purple"] .tb-daynight i{color:var(--purple);}
-[data-theme="ocean"]  .tb-daynight i{color:var(--accent);}
-[data-theme="slate"]  .tb-daynight i{color:var(--accent);}
+  const CACHE_PREFIX = 'ap2_';
 
-/* ── Main strip ── */
-.tb-strip{
-  flex:1;display:flex;align-items:center;
-  padding:0 10px;gap:5px;min-width:0;
-  /* allow overflow visible so dropdown can show above everything */
-  overflow:visible;
-}
+  /* ─────────────────────────────────────────
+     LOGOUT CLEANUP
+     Wipes every trace of user data on sign-out:
+       • IndexedDB store (all ap2_ entries)
+       • sessionStorage (entire namespace)
+       • localStorage   (ap2_ prefixed keys only — leave 3rd-party keys intact)
+     Called automatically when Auth fires a 'ap:signout' event, and exposed
+     as AdminPro.clearAllStorage() for manual call from logout buttons.
+  ───────────────────────────────────────── */
+  async function _clearAllStorageOnLogout() {
+    // 1. Clear entire IDB store
+    try {
+      const db = await _openDB();
+      await new Promise((res, rej) => {
+        const req = db.transaction(IDB_STORE, 'readwrite').objectStore(IDB_STORE).clear();
+        req.onsuccess = () => res();
+        req.onerror   = () => rej(req.error);
+      });
+      _shadow.clear();
+      console.log('[DataLayer] logout: IndexedDB store cleared');
+    } catch (e) {
+      console.warn('[DataLayer] logout: IDB clear failed —', e.message);
+    }
 
-/* page context — hide on small screens */
-.tb-page-ctx{
-  display:flex;align-items:center;gap:8px;
-  padding-right:12px;
-  border-right:1px solid var(--border);
-  flex-shrink:0;
-}
-.tb-page-pill{
-  width:28px;height:28px;border-radius:7px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;flex-shrink:0;
-}
-.tb-page-label{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;}
-.tb-page-sub2{font-size:10px;color:var(--text3);margin-top:1px;}
+    // 2. Clear sessionStorage entirely (it's scoped to this origin/tab)
+    try {
+      sessionStorage.clear();
+      console.log('[DataLayer] logout: sessionStorage cleared');
+    } catch (e) {
+      console.warn('[DataLayer] logout: sessionStorage clear failed —', e.message);
+    }
 
-/* shortcuts — always visible, scrollable if needed */
-.tb-shortcuts{
-  display:flex;align-items:center;gap:4px;
-  padding:0 8px;
-  border-right:1px solid var(--border);
-  flex-shrink:0;
-  /* scrollable when items overflow */
-  overflow-x:auto;overflow-y:hidden;
-  max-width:560px;
-  scrollbar-width:none;
-}
-.tb-shortcuts::-webkit-scrollbar{display:none;}
-.tb-sc{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:0 9px;height:28px;
-  border-radius:6px;border:1px solid var(--border);
-  background:var(--surface);color:var(--text2);
-  font-size:11px;font-weight:500;cursor:pointer;
-  font-family:var(--font);transition:all .15s;white-space:nowrap;flex-shrink:0;
-}
-.tb-sc i{font-size:13px;flex-shrink:0;}
-.tb-sc:hover{background:var(--surface2);color:var(--text);border-color:var(--border2);}
-.tb-sc.emp{color:var(--accent);border-color:rgba(88,166,255,.3);background:var(--accent-dim);}
-.tb-sc.emp:hover{background:var(--accent);color:#fff;box-shadow:0 0 10px var(--accent-glow);}
-.tb-sc.bike{color:var(--teal);border-color:rgba(57,211,83,.3);background:var(--teal-dim);}
-.tb-sc.bike:hover{background:var(--teal);color:#fff;}
-.tb-sc.adv{color:var(--amber);border-color:rgba(227,179,65,.3);background:var(--amber-dim);}
-.tb-sc.adv:hover{background:var(--amber);color:#0d1117;}
-
-.tb-gap{flex:1;min-width:4px;}
-
-/* clock */
-.tb-clock{
-  display:flex;align-items:center;gap:5px;
-  padding:0 8px;height:28px;
-  border-radius:6px;
-  background:var(--bg3);border:1px solid var(--border);
-  flex-shrink:0;
-}
-.tb-clock i{font-size:12px;color:var(--teal);}
-.tb-time{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);letter-spacing:.04em;}
-@media(max-width:640px){
-  .tb-clock .ti-clock{display:none;}
-  .tb-clock{padding:0 6px;gap:0;background:transparent;border-color:transparent;}
-  .tb-time{font-size:12px;}
-}
-
-/* ══ THEME DROPDOWN ══
-   The button sits inside .topbar (z:300).
-   The dropdown is position:fixed so it always renders on top of everything. */
-.theme-dd-wrap{position:relative;flex-shrink:0;}
-
-.tb-theme-btn{
-  display:flex;align-items:center;gap:6px;
-  padding:0 11px;height:28px;
-  border-radius:6px;
-  border:1px solid var(--border2);
-  background:var(--surface);
-  color:var(--text);
-  font-size:11.5px;font-weight:600;cursor:pointer;
-  font-family:var(--font);transition:all .15s;white-space:nowrap;
-  box-shadow:0 1px 3px rgba(0,0,0,.2);
-}
-.tb-theme-btn i.icon-main{font-size:14px;color:var(--accent);}
-.tb-theme-btn .caret{font-size:10px;color:var(--text3);transition:transform .2s;margin-left:1px;}
-.tb-theme-btn:hover{background:var(--surface2);border-color:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
-.tb-theme-btn.open{border-color:var(--accent);background:var(--surface2);box-shadow:0 0 10px var(--accent-glow);}
-.tb-theme-btn.open .caret{transform:rotate(180deg);}
-
-/* Dropdown — position:fixed so it always renders above all siblings */
-.theme-dropdown{
-  position:fixed;
-  /* JS sets top/right at open time */
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:10px;padding:6px;
-  box-shadow:0 8px 32px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.3);
-  z-index:99999;
-  min-width:175px;
-  display:none;
-  animation:ddIn .15s ease;
-}
-.theme-dropdown.open{display:block;}
-@keyframes ddIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-
-.td-label{
-  font-size:9px;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--text3);
-  padding:4px 10px 5px;
-}
-.td-item{
-  display:flex;align-items:center;gap:9px;
-  padding:7px 10px;border-radius:7px;
-  cursor:pointer;font-size:12px;color:var(--text2);
-  transition:all .12s;
-  border:1px solid transparent;
-  font-family:var(--font);background:none;width:100%;text-align:left;
-}
-.td-item:hover{background:var(--surface2);color:var(--text);}
-.td-item.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(88,166,255,.25);font-weight:600;}
-.td-swatch{
-  width:13px;height:13px;border-radius:50%;
-  flex-shrink:0;border:1.5px solid rgba(255,255,255,.2);
-}
-.td-item i{font-size:13px;flex-shrink:0;width:15px;text-align:center;}
-
-/* sep */
-.tb-vsep{width:1px;height:18px;background:var(--border);flex-shrink:0;}
-
-/* user chip */
-.tb-user{
-  display:flex;align-items:center;gap:7px;
-  padding:0 10px;height:28px;
-  border-radius:6px;
-  border:1px solid var(--border);background:var(--surface);
-  cursor:pointer;transition:all .15s;flex-shrink:0;
-}
-.tb-user:hover{background:var(--surface2);border-color:var(--border2);}
-.tb-avatar{
-  width:20px;height:20px;border-radius:50%;
-  background:linear-gradient(135deg,var(--purple),#6e40c9);
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:8.5px;font-weight:700;flex-shrink:0;
-}
-.tb-uname{font-size:11px;font-weight:600;color:var(--text);line-height:1.1;}
-.tb-urole{font-size:9px;color:var(--text3);}
-
-/* ═══ BODY ROW ═══ */
-.body-row{flex:1;display:flex;overflow:hidden;min-height:0;}
-
-/* ─── ICON BAR ─── 
-   Always visible, never hidden, scrollable when items overflow */
-#icon-bar{
-  width:var(--icon-bar-w);
-  min-width:var(--icon-bar-w);
-  background:var(--bg2);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;align-items:center;
-  padding:8px 0;gap:3px;
-  flex-shrink:0;z-index:110;position:relative;
-  overflow-y:auto;overflow-x:hidden;
-  scrollbar-width:none;
-}
-#icon-bar::-webkit-scrollbar{display:none;}
-#icon-bar::after{
-  content:'';position:absolute;top:0;right:-1px;
-  width:1px;height:100%;
-  background:linear-gradient(to bottom,var(--accent-glow),transparent 55%);
-  pointer-events:none;
-}
-.ib-divider{width:26px;height:1px;background:var(--border);margin:4px 0;flex-shrink:0;}
-.ib-spacer{flex:1;}
-.ib-btn{
-  position:relative;width:36px;height:36px;
-  border-radius:var(--radius);border:none;
-  background:transparent;color:var(--text2);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:18px;transition:background .15s,color .15s;flex-shrink:0;
-}
-.ib-btn:hover{background:var(--surface);color:var(--text);}
-.ib-btn.active{background:var(--accent-dim);color:var(--accent);}
-.ib-tip{
-  position:absolute;left:calc(100% + 10px);top:50%;
-  transform:translateY(-50%);
-  background:var(--surface2);color:var(--text);
-  font-size:11px;padding:4px 9px;border-radius:6px;
-  white-space:nowrap;pointer-events:none;opacity:0;
-  transition:opacity .15s;border:1px solid var(--border2);
-  z-index:400;font-family:var(--font);
-}
-.ib-btn:hover .ib-tip{opacity:1;}
-
-/* icon-bar adaptive: smaller icons when very tight */
-@media(max-height:400px){
-  .ib-btn{width:30px;height:30px;font-size:15px;}
-  #icon-bar{padding:4px 0;gap:1px;}
-}
-
-/* ─── SUB BAR ─── */
-#sub-bar{
-  width:var(--sub-bar-w);
-  background:var(--bg2);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  flex-shrink:0;overflow:hidden;
-  transition:width .25s cubic-bezier(.4,0,.2,1);z-index:100;
-}
-#sub-bar.collapsed{width:0;}
-.sb2-header{
-  padding:12px 14px 8px;
-  font-size:9.5px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--text3);
-  border-bottom:1px solid var(--border);flex-shrink:0;white-space:nowrap;
-  display:flex;align-items:center;gap:8px;
-}
-.sb2-header i{font-size:13px;color:var(--accent);}
-.sb2-nav{flex:1;overflow-y:auto;padding:6px;}
-.sb2-nav::-webkit-scrollbar{width:3px;}
-.sb2-nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-.sb2-section{
-  font-size:9px;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--text3);
-  padding:8px 10px 3px;
-}
-.sb2-item{
-  display:flex;align-items:center;gap:8px;
-  padding:7px 10px;border-radius:var(--radius);
-  cursor:pointer;font-size:12px;color:var(--text2);
-  transition:all .15s;user-select:none;white-space:nowrap;
-  border:1px solid transparent;margin-bottom:2px;
-}
-.sb2-item i{font-size:14px;flex-shrink:0;}
-.sb2-item:hover{background:var(--surface);color:var(--text);border-color:var(--border);}
-.sb2-item.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(88,166,255,.2);font-weight:500;}
-.sb2-badge{
-  margin-left:auto;font-size:9px;font-weight:700;
-  padding:1px 5px;border-radius:10px;
-  background:var(--red-dim);color:var(--red);
-}
-#sub-bar.subitems-hiding .sb2-item{
-  animation:subOut .45s ease forwards;
-}
-@keyframes subOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(-10px);}}
-
-/* ─── MAIN AREA ─── */
-.main-area{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;}
-.main-container{
-  flex:1;margin:5px;overflow:hidden;
-  display:flex;flex-direction:column;
-  border-radius:var(--radius);
-  border:1px solid var(--border);
-  background:var(--bg);min-height:0;
-}
-#main-frame{flex:1;border:none;background:var(--bg);width:100%;height:100%;min-height:0;border-radius:var(--radius);}
-
-/* ══ RESPONSIVE ══ */
-
-/* Hide page-ctx on medium and small screens */
-@media(max-width:900px){
-  .tb-page-ctx{display:none;}
-}
-/* Hide app name zone on small screens */
-@media(max-width:720px){
-  .tb-app{display:none;}
-  #sub-bar{
-    position:fixed;
-    left:var(--icon-bar-w);top:var(--topbar-h);
-    height:calc(100vh - var(--topbar-h));
-    z-index:150;box-shadow:var(--shadow-lg);
+    // 3. Clear only ap2_ keys from localStorage (leave unrelated keys intact)
+    try {
+      const lsKeys = Object.keys(localStorage).filter(k => k.startsWith(CACHE_PREFIX) || k.startsWith('ap_') || k.startsWith('ap2_'));
+      lsKeys.forEach(k => localStorage.removeItem(k));
+      if (lsKeys.length) console.log('[DataLayer] logout: localStorage keys removed:', lsKeys);
+    } catch (e) {
+      console.warn('[DataLayer] logout: localStorage clear failed —', e.message);
+    }
   }
-}
-@media(max-width:520px){
-  :root{--icon-bar-w:44px;--topbar-h:44px;}
-  .tb-clock{display:none;}
-  .tb-vsep{display:none;}
-  .tb-uname,.tb-urole{display:none;}
-  .tb-user{padding:0 7px;}
-  .tb-sc span{display:none;}
-  /* Make shortcuts compact icon-only */
-  .tb-sc{padding:0 7px;gap:0;}
-}
 
-/* ══ CACHE STATUS BUTTON ══ */
-.tb-cache-btn{
-  position:relative;
-  display:flex;align-items:center;justify-content:center;
-  width:32px;height:28px;
-  border-radius:6px;border:1px solid var(--border);
-  background:var(--surface);color:var(--text2);
-  cursor:pointer;font-family:var(--font);transition:all .15s;flex-shrink:0;
-}
-.tb-cache-btn i{font-size:14px;}
-.tb-cache-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border2);}
-.tb-cache-btn.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(88,166,255,.3);}
-/* signal dot — bottom-right corner of the icon button */
-.tb-cache-btn .cache-dot{
-  position:absolute;bottom:4px;right:4px;
-  width:6px;height:6px;border-radius:50%;
-  background:var(--teal);
-  box-shadow:0 0 4px rgba(57,211,83,.7);
-  border:1px solid var(--bg2);
-}
-.tb-cache-btn .cache-dot.stale{background:var(--amber);box-shadow:0 0 4px rgba(227,179,65,.7);}
-.tb-cache-btn .cache-dot.error{background:var(--red);box-shadow:0 0 4px rgba(248,81,73,.7);}
-
-/* ══ CACHE PANEL ══ */
-.cache-panel{
-  position:fixed;
-  top:calc(var(--topbar-h) + 8px);
-  right:clamp(8px, 2vw, 120px);
-  width:min(480px, calc(100vw - 16px));
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:10px;
-  box-shadow:0 10px 36px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.3);
-  z-index:99998;
-  display:none;
-  overflow:hidden;
-  animation:cpIn .18s ease;
-  flex-direction:column;
-}
-.cache-panel.open{display:flex;}
-.cp-scroll{overflow:hidden;flex:1;}
-@keyframes cpIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-
-/* Mobile: centered sheet at top, 80% wide */
-@media(max-width:600px){
-  .cache-panel{
-    top:calc(var(--topbar-h) + 10px);
-    bottom:auto;
-    left:50%;
-    right:auto;
-    transform:translateX(-50%);
-    width:80%;
-    max-width:none;
-    border-radius:10px;
-    animation:cpInMob .2s ease;
-  }
-  @keyframes cpInMob{from{opacity:0;transform:translateX(-50%) translateY(-8px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
-}
-
-.cp-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 12px 7px;
-  border-bottom:1px solid var(--border);
-}
-.cp-title{
-  display:flex;align-items:center;gap:7px;
-  font-size:11.5px;font-weight:700;color:var(--text);
-}
-.cp-title i{font-size:14px;color:var(--accent);}
-.cp-actions{display:flex;align-items:center;gap:5px;}
-.cp-action-btn{
-  display:flex;align-items:center;gap:3px;
-  padding:3px 8px;border-radius:5px;
-  border:1px solid var(--border);background:var(--surface2);
-  color:var(--text2);font-size:10px;font-weight:600;
-  cursor:pointer;font-family:var(--font);transition:all .15s;
-}
-.cp-action-btn:hover{color:var(--text);border-color:var(--border2);}
-.cp-action-btn.danger:hover{color:var(--red);border-color:rgba(248,81,73,.4);background:var(--red-dim);}
-.cp-action-btn i{font-size:11px;}
-
-/* Table */
-.cp-table{width:100%;border-collapse:collapse;table-layout:fixed;}
-.cp-table .cp-col-hdr th{
-  font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--text3);padding:4px 8px;text-align:left;
-  border-bottom:1px solid var(--border);background:var(--bg3);
-}
-.cp-table .cp-col-hdr th:last-child{text-align:center;}
-.cp-table td{
-  padding:6px 8px;font-size:10.5px;color:var(--text2);
-  border-bottom:1px solid var(--border);vertical-align:middle;
-}
-.cp-table tr:last-child td{border-bottom:none;}
-.cp-table tr:hover td{background:var(--surface2);}
-
-/* Stacked cell layout — top line bold, bottom line muted */
-.cp-cell-top{
-  font-size:11px;line-height:1.3;
-}
-.cp-cell-bot{
-  font-size:9.5px;line-height:1.3;margin-top:2px;
-  display:flex;align-items:center;
-}
-
-/* Dataset name */
-.cp-ds-name{
-  display:flex;align-items:center;gap:6px;
-  font-weight:600;color:var(--text);font-size:11px;min-width:0;
-}
-.cp-ds-name-text{
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
-}
-.cp-ds-icon{
-  width:20px;height:20px;border-radius:5px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;flex-shrink:0;
-}
-
-/* Status pill */
-.cp-status-pill{
-  display:inline-flex;align-items:center;gap:3px;
-  padding:2px 6px;border-radius:20px;
-  font-size:9.5px;font-weight:700;letter-spacing:.03em;
-}
-.cp-status-pill.fresh{background:var(--teal-dim);color:var(--teal);}
-.cp-status-pill.stale{background:var(--amber-dim);color:var(--amber);}
-.cp-status-pill.empty{background:var(--surface2);color:var(--text3);}
-.cp-status-pill i{font-size:9.5px;}
-
-/* TTL bar (inline in remaining line) */
-.cp-ttl-fill.fresh{background:var(--teal);}
-.cp-ttl-fill.mid  {background:var(--amber);}
-.cp-ttl-fill.low  {background:var(--red);}
-
-/* Action buttons */
-.cp-row-btns{display:flex;align-items:center;justify-content:center;gap:3px;}
-.cp-row-btn{
-  width:22px;height:22px;border-radius:5px;
-  border:1px solid var(--border);background:var(--surface2);
-  color:var(--text2);font-size:12px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all .15s;
-}
-.cp-row-btn:hover.refresh{color:var(--accent);border-color:rgba(88,166,255,.4);background:var(--accent-dim);}
-.cp-row-btn:hover.delete {color:var(--red);border-color:rgba(248,81,73,.4);background:var(--red-dim);}
-.cp-row-btn.spin i{animation:spin 1s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-.cp-footer{
-  padding:6px 12px;background:var(--bg3);
-  border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:9.5px;color:var(--text3);
-}
-.cp-footer-note{display:flex;align-items:center;gap:4px;}
-.cp-footer-note i{font-size:10px;}
-
-/* ══ CACHE MISS CHECKER PANEL ══ */
-.cm-panel{
-  position:fixed;bottom:14px;right:14px;
-  width:320px;max-height:260px;
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--radius-lg);
-  box-shadow:var(--shadow-lg);
-  z-index:9000;
-  display:none;flex-direction:column;overflow:hidden;
-  font-family:var(--font);
-}
-.cm-panel.open{display:flex;}
-.cm-header{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 12px;background:var(--bg3);border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.cm-title{font-size:11px;font-weight:700;color:var(--text);flex:1;display:flex;align-items:center;gap:6px;}
-.cm-title i{color:var(--amber);font-size:13px;}
-.cm-close{width:20px;height:20px;border-radius:4px;border:none;background:none;color:var(--text3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;}
-.cm-close:hover{background:var(--surface2);color:var(--text);}
-.cm-body{flex:1;overflow-y:auto;padding:8px;scrollbar-width:none;}
-.cm-body::-webkit-scrollbar{display:none;}
-.cm-row{
-  display:flex;align-items:center;gap:8px;
-  padding:6px 8px;border-radius:var(--radius);margin-bottom:3px;
-  font-size:11px;background:var(--bg2);border:1px solid var(--border);
-}
-.cm-row.miss{border-color:rgba(248,81,73,.3);background:var(--red-dim);}
-.cm-row.error{border-color:rgba(248,81,73,.5);background:var(--red-dim);}
-.cm-row.ok{border-color:rgba(57,211,83,.25);background:var(--teal-dim);}
-.cm-row-name{flex:1;color:var(--text);font-weight:600;}
-.cm-row-info{color:var(--text3);font-size:10px;}
-.cm-row-badge{
-  font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;
-  text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;
-}
-.cm-row-badge.miss{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,81,73,.3);}
-.cm-row-badge.error{background:var(--red-dim);color:var(--red);}
-.cm-row-badge.ok{background:var(--teal-dim);color:var(--teal);}
-.cm-row-badge.stale{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(227,179,65,.3);}
-.cm-row-btn{
-  width:22px;height:22px;border-radius:4px;border:1px solid var(--border);
-  background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;padding:0;flex-shrink:0;
-}
-.cm-row-btn:hover{color:var(--accent);border-color:rgba(88,166,255,.4);background:var(--accent-dim);}
-.cm-row-btn.spin i{animation:spin 1s linear infinite;}
-.cm-footer-strip{
-  padding:7px 12px;background:var(--bg3);border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:10px;color:var(--text3);flex-shrink:0;
-}
-.cm-footer-strip button{
-  font-size:10px;padding:3px 8px;border-radius:4px;
-  border:1px solid var(--border);background:var(--surface2);
-  color:var(--text2);cursor:pointer;font-family:var(--font);
-  display:flex;align-items:center;gap:4px;transition:all .15s;
-}
-.cm-footer-strip button:hover{color:var(--accent);border-color:rgba(88,166,255,.3);}
-/* miss badge on cache btn */
-.cache-miss-badge{
-  position:absolute;top:-4px;right:-4px;
-  min-width:14px;height:14px;border-radius:7px;
-  background:var(--red);color:#fff;
-  font-size:8px;font-weight:700;font-family:var(--font);
-  display:none;align-items:center;justify-content:center;
-  padding:0 3px;border:1.5px solid var(--bg2);
-}
-.cache-miss-badge.show{display:flex;}
-
-/* ib btn badge (unused, kept for compat) */
-.ib-btn-el-badge{ display:none!important; }
-</style>
-</head>
-<body>
-<div class="shell">
-
-  <!-- TOPBAR -->
-  <header class="topbar">
-
-    <!-- Truck = sidebar toggle -->
-    <div class="tb-brand">
-      <button class="tb-brand-icon" onclick="toggleSidebar()" title="Toggle sidebar">
-        <i class="ti ti-truck"></i>
-      </button>
-    </div>
-
-    <!-- App name + day/night toggle icon -->
-    <div class="tb-app" id="tb-app-zone">
-      <div style="min-width:0;">
-        <div class="tb-app-name">AdminPro UAE</div>
-        <div class="tb-app-sub">HR &amp; Fleet Management</div>
-      </div>
-      <!-- Day/Night pill toggle — icon only -->
-      <button class="tb-daynight" id="daynight-btn"
-        onclick="quickToggleDarkLight()"
-        title="Toggle dark / light mode">
-        <i class="ti ti-moon" id="daynight-icon"></i>
-      </button>
-    </div>
-
-    <!-- Main strip -->
-    <div class="tb-strip">
-
-      <!-- Page context (hides on small screens) -->
-      <div class="tb-page-ctx">
-        <div class="tb-page-pill" id="tb-pill" style="background:var(--accent-dim);color:var(--accent);">
-          <i class="ti ti-users" id="tb-pill-i"></i>
-        </div>
-        <div>
-          <div class="tb-page-label" id="tb-page-label">Employees</div>
-          <div class="tb-page-sub2" id="tb-page-sub2">Staff directory</div>
-        </div>
-      </div>
-
-      <!-- Shortcuts — always visible, scrollable -->
-      <div class="tb-shortcuts">
-        <button class="tb-sc emp"
-          onclick="loadPage('Reg/addEmp.html',null,'Add Employee','ti-user-plus','Register new employee','var(--accent-dim)','var(--accent)')">
-          <i class="ti ti-user-plus"></i><span> Add Employee</span>
-        </button>
-        <button class="tb-sc bike"
-          onclick="loadPage('Reg/addBike.html',null,'Add Bike','ti-motorbike','Register vehicle','var(--teal-dim)','var(--teal)')">
-          <i class="ti ti-motorbike"></i><span> Add Bike</span>
-        </button>
-        <button class="tb-sc adv"
-          onclick="loadPage('Reg/allEmp.html',null,'Advance Salary','ti-cash','Salary advances','var(--amber-dim)','var(--amber)')">
-          <i class="ti ti-cash"></i><span> Advance</span>
-        </button>
-      </div>
-
-      <div class="tb-gap"></div>
-
-      <!-- Cache Status Button — icon + signal dot only -->
-      <button class="tb-cache-btn" id="cache-status-btn" onclick="toggleCachePanel(event)" title="Cache Status">
-        <i class="ti ti-database"></i>
-        <span class="cache-dot" id="cache-health-dot"></span>
-        <span class="cache-miss-badge" id="cache-miss-badge"></span>
-      </button>
-
-      <div class="tb-vsep"></div>
-
-      <!-- Clock — HH:MM only -->
-      <div class="tb-clock">
-        <i class="ti ti-clock"></i>
-        <span class="tb-time" id="tb-time">00:00</span>
-      </div>
-
-      <div class="tb-vsep"></div>
-
-      <!-- Theme dropdown — position:fixed dropdown -->
-      <div class="theme-dd-wrap" id="theme-dd-wrap">
-        <button class="tb-theme-btn" id="theme-dd-btn" onclick="toggleThemeDropdown(event)" title="Choose theme">
-          <i class="ti ti-palette icon-main" id="theme-dd-icon"></i>
-          <span id="theme-dd-label">Dark</span>
-          <i class="ti ti-chevron-down caret"></i>
-        </button>
-        <!-- Dropdown rendered here but positioned fixed via JS -->
-        <div class="theme-dropdown" id="theme-dropdown" role="menu">
-          <div class="td-label">Choose Theme</div>
-          <button class="td-item" data-t="dark"   onclick="setTheme('dark')">
-            <span class="td-swatch" style="background:#161b22;border-color:#30363d;"></span>
-            <i class="ti ti-moon"></i>Dark
-          </button>
-          <button class="td-item" data-t="light"  onclick="setTheme('light')">
-            <span class="td-swatch" style="background:#f0f2f5;border-color:#c8d0d9;"></span>
-            <i class="ti ti-sun"></i>Light
-          </button>
-          <button class="td-item" data-t="purple" onclick="setTheme('purple')">
-            <span class="td-swatch" style="background:#17112e;border-color:#3a2e5e;"></span>
-            <i class="ti ti-star"></i>Purple Night
-          </button>
-          <button class="td-item" data-t="ocean"  onclick="setTheme('ocean')">
-            <span class="td-swatch" style="background:#0d2035;border-color:#1e4a72;"></span>
-            <i class="ti ti-waves"></i>Ocean
-          </button>
-          <button class="td-item" data-t="slate"  onclick="setTheme('slate')">
-            <span class="td-swatch" style="background:#1a1f28;border-color:#3a4556;"></span>
-            <i class="ti ti-layout-grid"></i>Slate
-          </button>
-        </div>
-      </div>
-
-      <div class="tb-vsep"></div>
-
-      <!-- User -->
-      <div class="tb-user" id="tb-user-chip" title="Loading...">
-        <div class="tb-avatar" id="tb-avatar">--</div>
-        <div>
-          <div class="tb-uname" id="tb-uname">Loading...</div>
-          <div class="tb-urole" id="tb-urole">Please wait</div>
-        </div>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- BODY ROW -->
-  <div class="body-row" id="body-row">
-
-    <!-- ICON BAR — never hides, always scrollable -->
-    <nav id="icon-bar" aria-label="Navigation">
-      <div class="ib-divider"></div>
-      <button class="ib-btn active" id="ib-emp" onclick="ibOpen('ib-emp',this)" title="Employees">
-        <i class="ti ti-users"></i><span class="ib-tip">Employees</span>
-      </button>
-      <button class="ib-btn" id="ib-bike" onclick="ibOpen('ib-bike',this)" title="Bike Fleet">
-        <i class="ti ti-motorbike"></i><span class="ib-tip">Bike Fleet</span>
-      </button>
-      <button class="ib-btn" id="ib-adv" onclick="ibOpen('ib-adv',this)" title="Advance Salary">
-        <i class="ti ti-cash"></i><span class="ib-tip">Advance Salary</span>
-      </button>
-      <button class="ib-btn" id="ib-docs" onclick="ibOpen('ib-docs',this)" title="Expiring Docs">
-        <i class="ti ti-file-alert"></i><span class="ib-tip">Expiring Docs</span>
-      </button>
-      <div class="ib-spacer"></div>
-    </nav>
-
-    <!-- SUB BAR -->
-    <div id="sub-bar">
-      <div class="sb2-header">
-        <i class="ti ti-users" id="sb2-icon"></i>
-        <span id="sb2-title">Employees</span>
-      </div>
-      <div class="sb2-nav" id="sb2-nav"></div>
-    </div>
-
-    <!-- MAIN AREA — 5px margin container -->
-    <div class="main-area">
-      <div class="main-container">
-        <iframe id="main-frame" src="Reg/allEmp.html" title="Content"></iframe>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ══ CACHE STATUS PANEL ══ -->
-<div class="cache-panel" id="cache-panel">
-  <div class="cp-header">
-    <div class="cp-title">
-      <i class="ti ti-database"></i>
-      Cache Status
-    </div>
-    <div class="cp-actions">
-      <button class="cp-action-btn" onclick="toggleMissChecker()" title="Cache miss checker" style="color:var(--amber);">
-        <i class="ti ti-alert-triangle"></i> Checker
-      </button>
-      <button class="cp-action-btn" onclick="refreshAllCache()" title="Hard refresh all datasets">
-        <i class="ti ti-refresh"></i> Refresh All
-      </button>
-      <button class="cp-action-btn danger" onclick="deleteAllCache()" title="Clear entire cache">
-        <i class="ti ti-trash"></i> Clear All
-      </button>
-    </div>
-  </div>
-  <div class="cp-scroll">
-  <table class="cp-table">
-    <colgroup>
-      <col style="width:36%"/>
-      <col style="width:22%"/>
-      <col style="width:28%"/>
-      <col style="width:14%"/>
-    </colgroup>
-    <thead>
-      <tr class="cp-col-hdr">
-        <th>Dataset</th>
-        <th class="cp-col-sync">Last Sync / TTL</th>
-        <th class="cp-col-status-rem">Status / Remaining</th>
-        <th style="text-align:center;">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="cache-table-body">
-      <tr><td colspan="4" style="text-align:center;color:var(--text3);padding:20px;">Loading cache info…</td></tr>
-    </tbody>
-  </table>
-  </div>
-  <div class="cp-footer">
-    <span class="cp-footer-note"><i class="ti ti-info-circle"></i> Cache persists across pages · Session-validated on every read</span>
-    <span id="cp-last-check">—</span>
-  </div>
-</div>
-<!-- ══ CACHE MISS CHECKER PANEL ══ -->
-<div class="cm-panel" id="cm-panel">
-  <div class="cm-header">
-    <div class="cm-title"><i class="ti ti-alert-triangle"></i>Cache Checker</div>
-    <span id="cm-last-scan" style="font-size:9.5px;color:var(--text3);margin-right:6px;"></span>
-    <button class="cm-close" onclick="closeMissPanel()" title="Close"><i class="ti ti-x"></i></button>
-  </div>
-  <div class="cm-body" id="cm-body">
-    <div style="text-align:center;color:var(--text3);padding:20px;font-size:11px;">Scanning…</div>
-  </div>
-  <div class="cm-footer-strip">
-    <span id="cm-summary">—</span>
-    <button onclick="cmScanAll()"><i class="ti ti-refresh"></i> Re-scan</button>
-  </div>
-</div>
-
-
-<script>
-
-
-/* ════════════════════════════════════════════
-   EVENT LOG — silent sink (monitor removed)
-   ════════════════════════════════════════════ */
-function _logEvent() {} // no-op; kept so cache functions compile without change
-
-/* ════════════════════════════════════════════
-   CACHE MISS CHECKER
-   ════════════════════════════════════════════ */
-let _cmPanelOpen = false;
-let _cmAutoHideTimer = null;
-
-function toggleMissChecker() {
-  _cmPanelOpen = !_cmPanelOpen;
-  const p = document.getElementById('cm-panel');
-  if (_cmPanelOpen) {
-    p.classList.add('open');
-    cmScanAll();
-    p.removeEventListener('mouseleave', _onCmLeave);
-    p.removeEventListener('mouseenter', _onCmEnter);
-    p.addEventListener('mouseleave', _onCmLeave);
-    p.addEventListener('mouseenter', _onCmEnter);
-    _resetCmAutoHide();
-  } else {
-    closeMissPanel();
-  }
-}
-
-function _onCmLeave()  { _resetCmAutoHide(); }
-function _onCmEnter()  { if (_cmAutoHideTimer) { clearTimeout(_cmAutoHideTimer); _cmAutoHideTimer = null; } }
-
-function closeMissPanel() {
-  _cmPanelOpen = false;
-  const p = document.getElementById('cm-panel');
-  p?.classList.remove('open');
-  p?.removeEventListener('mouseleave', _onCmLeave);
-  p?.removeEventListener('mouseenter', _onCmEnter);
-  if (_cmAutoHideTimer) { clearTimeout(_cmAutoHideTimer); _cmAutoHideTimer = null; }
-}
-
-function _resetCmAutoHide() {
-  if (_cmAutoHideTimer) clearTimeout(_cmAutoHideTimer);
-  _cmAutoHideTimer = setTimeout(closeMissPanel, 3000);
-}
-
-function cmScanAll() {
-  const body = document.getElementById('cm-body');
-  const summary = document.getElementById('cm-summary');
-  const lastScan = document.getElementById('cm-last-scan');
-  if (!body) return;
-
-  const now = new Date();
-  if (lastScan) lastScan.textContent = 'Scanned ' + now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-
-  const results = Object.entries(DS_META).map(([key, meta]) => {
-    const ageMs = getCacheAge(key);
-    const hasData = (() => { try { const d = getCacheData(key); return Array.isArray(d) ? d.length > 0 : d != null; } catch(_){ return false; } })();
-    const fresh = ageMs < meta.ttlMs;
-    const status = !hasData ? 'miss' : !fresh ? 'stale' : 'ok';
-    return { key, label: meta.label, status, meta, ageMs };
+  // Listen for Auth sign-out event — triggered by auth.js
+  window.addEventListener('ap:signout', () => {
+    DATASETS = {};
+    Object.keys(_timers).forEach(k => { clearTimeout(_timers[k]); delete _timers[k]; });
+    _clearAllStorageOnLogout();
   });
 
-  const misses = results.filter(r => r.status === 'miss').length;
-  const stales = results.filter(r => r.status === 'stale').length;
-  if (summary) {
-    if (misses === 0 && stales === 0) summary.textContent = 'All ' + results.length + ' healthy';
-    else summary.textContent = (misses ? misses + ' miss' : '') + (misses && stales ? ', ' : '') + (stales ? stales + ' stale' : '');
-  }
+  /* ─────────────────────────────────────────
+     PERMISSION NOTIFICATION HELPER
+     Shows a toast/alert when a dataset access is denied.
+  ───────────────────────────────────────── */
+  function _notifyNotAuthorized(dsKey) {
+    const label = (DATASETS[dsKey] && DATASETS[dsKey].label) || dsKey;
+    const msg   = `⛔ Not authorized to access: ${label}`;
+    console.warn('[DataLayer]', msg);
 
-  const missTotal = misses + stales;
-  const badge = document.getElementById('cache-miss-badge');
-  if (badge) {
-    badge.textContent = missTotal || '';
-    badge.classList.toggle('show', missTotal > 0);
-  }
-
-  // Only update visible rows when panel is open
-  if (!_cmPanelOpen) {
-    if (_cmPanelOpen) _resetCmAutoHide();
-    return;
-  }
-
-  body.innerHTML = results.map(r => {
-    const badgeCls = r.status === 'miss' ? 'miss' : r.status === 'stale' ? 'stale' : 'ok';
-    const badgeTxt = r.status === 'miss' ? 'MISS' : r.status === 'stale' ? 'STALE' : 'OK';
-    const ageStr = r.ageMs === Infinity ? 'Never loaded' : r.ageMs < 60000 ? Math.floor(r.ageMs/1000)+'s ago' : Math.floor(r.ageMs/60000)+'m ago';
-    return `<div class="cm-row ${r.status !== 'ok' ? r.status : ''}">
-      <span class="cm-row-name">${r.label}</span>
-      <span class="cm-row-info">${ageStr}</span>
-      <span class="cm-row-badge ${badgeCls}">${badgeTxt}</span>
-      <button class="cm-row-btn" id="cmbtn-${r.key}" onclick="cmRefresh('${r.key}',this)" title="Force refresh">
-        <i class="ti ti-refresh"></i>
-      </button>
-    </div>`;
-  }).join('');
-
-  if (_cmPanelOpen) _resetCmAutoHide();
-}
-
-async function cmRefresh(key, btn) {
-  btn.classList.add('spin');
-  btn.disabled = true;
-  _logEvent('refresh', 'Cache refresh triggered:', key);
-  try {
-    if (window.AdminPro && AdminPro.forceRefresh) {
-      await AdminPro.forceRefresh(key);
+    if (window.AdminPro && typeof window.AdminPro.showToast === 'function') {
+      window.AdminPro.showToast(msg, 'error');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification(msg, 'error');
     } else {
-      localStorage.removeItem('ap2_' + key);
+      const existing = document.getElementById('_ap2_auth_banner');
+      if (existing) existing.remove();
+      const banner = document.createElement('div');
+      banner.id = '_ap2_auth_banner';
+      Object.assign(banner.style, {
+        position:'fixed', top:'16px', left:'50%', transform:'translateX(-50%)',
+        background:'#c0392b', color:'#fff', padding:'10px 22px', borderRadius:'6px',
+        fontFamily:'sans-serif', fontSize:'14px', zIndex:'99999',
+        boxShadow:'0 3px 10px rgba(0,0,0,.35)', whiteSpace:'nowrap'
+      });
+      banner.textContent = msg;
+      document.body.appendChild(banner);
+      setTimeout(() => banner.remove(), 4000);
     }
-    setTimeout(() => { cmScanAll(); renderCacheTable(); updateCacheHealthDot(); }, 300);
-  } catch(e) {
-    _logEvent('miss', 'Refresh error:', key);
-  } finally {
-    btn.classList.remove('spin');
-    btn.disabled = false;
   }
-}
 
-/* localStorage 1-second mutation watcher — detect delete/set/update */
-(function _watchStorage() {
-  let _prevSnap = {};
-  function _snap() {
-    const s = {};
-    Object.keys(localStorage).filter(k => k.startsWith('ap2_')).forEach(k => { s[k] = localStorage.getItem(k); });
-    return s;
+  /* ─────────────────────────────────────────
+     DATA NORMALISER
+     Converts any server response into Array<Array>
+     (all cell values kept as-is for speed & consistency).
+     • Bare Array<Array>  → returned as-is
+     • { data: [...] }   → unwrap then return
+     • Bare Array<Object>→ values() of each object row
+  ───────────────────────────────────────── */
+  function _normaliseRows(raw) {
+    const arr = Array.isArray(raw) ? raw
+      : (raw && Array.isArray(raw.data)) ? raw.data
+      : raw;
+
+    if (!Array.isArray(arr)) return arr;
+
+    return arr.map(row => {
+      if (Array.isArray(row))                    return row;
+      if (row && typeof row === 'object') return Object.values(row);
+      return [row];
+    });
   }
-  _prevSnap = _snap();
 
-  setInterval(async () => {
-    const cur = _snap();
-    const allKeys = new Set([...Object.keys(_prevSnap), ...Object.keys(cur)]);
-    let changed = false;
-    for (const k of allKeys) {
-      const dsKey = k.replace('ap2_', '');
-      if (_prevSnap[k] !== undefined && cur[k] === undefined) {
-        _logEvent('delete', 'Cache deleted:', dsKey);
-        changed = true;
-        // Auto-refresh within 1s of deletion
-        setTimeout(async () => {
-          if (window.AdminPro && AdminPro.forceRefresh) {
-            try {
-              await AdminPro.forceRefresh(dsKey);
-              _logEvent('refresh', 'Auto-refreshed after delete:', dsKey);
-            } catch(_) {}
-          }
-          updateCacheHealthDot();
-          renderCacheTable();
-          if (_cmPanelOpen) cmScanAll();
-        }, 200);
-      } else if (_prevSnap[k] === undefined && cur[k] !== undefined) {
-        _logEvent('cache', 'Cache set:', dsKey);
-        changed = true;
-      } else if (_prevSnap[k] !== cur[k]) {
-        _logEvent('storage', 'Cache updated:', dsKey);
-        changed = true;
+  /* ─────────────────────────────────────────
+     DATASETS  — built entirely from server permissions at runtime.
+
+     Shape of each entry (mirrors server Permissions sheet columns):
+       label    — human-readable name for UI / cache panel
+       apiKey   — value sent as the API type/action parameter
+       paramKey — query-string key ('type' or 'action')
+       ttlMs    — cache TTL in milliseconds
+
+     DATASETS_ALL is gone. Nothing is hardcoded here.
+     Change labels/TTLs in the Google Sheet — no redeploy needed.
+  ───────────────────────────────────────── */
+
+  /** Active datasets — permission-filtered at runtime. */
+  let DATASETS = {};
+
+  /**
+   * Reads Auth.getPermissions() and maps each entry to a normalised
+   * dataset config. Only datasets explicitly granted are included.
+   *
+   * Auth.getPermissions() must return the rich server shape:
+   *   { "ap2_employee": { label, apiKey, paramKey, ttlMs }, … }
+   *
+   * Backwards-compat: if a value is `true` (old boolean shape) the
+   * dataset key is included but with minimal defaults so the system
+   * degrades gracefully rather than breaking entirely.
+   */
+  function _buildDatasets() {
+    const perms = window.Auth && window.Auth.getPermissions
+      ? window.Auth.getPermissions()
+      : null;
+
+    if (!perms || typeof perms !== 'object') {
+      DATASETS = {};
+      console.log('[DataLayer] no permissions available — DATASETS empty');
+      return DATASETS;
+    }
+
+    const result = {};
+    for (const [key, val] of Object.entries(perms)) {
+      if (!val) continue; // skip explicit false / null
+
+      if (val === true) {
+        // Legacy boolean-only permission — include with minimal defaults
+        // so pages don't crash, but log a warning so the sheet can be updated.
+        console.warn(`[DataLayer] "${key}" has boolean permission — update Permissions sheet to include Label/ApiKey/ParamKey/TTL(ms)`);
+        result[key] = {
+          label    : key,
+          apiKey   : key.replace(/^ap2_/, ''),  // best-effort fallback
+          paramKey : 'type',
+          ttlMs    : 5 * 60 * 1000,             // 5-minute default
+        };
+      } else if (typeof val === 'object' && val.apiKey) {
+        // Rich shape from server — use as-is with safe defaults for any missing fields
+        result[key] = {
+          label    : String(val.label    || key),
+          apiKey   : String(val.apiKey),
+          paramKey : String(val.paramKey || 'type'),
+          ttlMs    : Number(val.ttlMs)   || 5 * 60 * 1000,
+        };
+      } else {
+        console.warn(`[DataLayer] "${key}" has unrecognised permission shape — skipping`, val);
       }
     }
-    if (changed) {
-      updateCacheHealthDot();
-      if (_cmPanelOpen) cmScanAll();
-    }
-    _prevSnap = cur;
-  }, 1000);
-})();
 
-
-/* ══ SECTION MAP ══ */
-const SECTIONS = {
-  'ib-emp': {
-    icon:'ti-users', label:'Employees',
-    pageLabel:'Employees', pageSub:'Staff directory',
-    pillBg:'var(--accent-dim)', pillColor:'var(--accent)', pillIcon:'ti-users',
-    groups:[
-      { label:'Directory', items:[
-        { label:'Employee List', file:'Reg/allEmp.html', icon:'ti-list',      sub:'All staff records'     },
-        { label:'Add Employee',  file:'Reg/addEmp.html', icon:'ti-user-plus', sub:'Register new employee' },
-      ]},
-      { label:'Documents', items:[
-        { label:'Expiring Docs', file:'Reg/empExp.html', icon:'ti-file-x', sub:'Visa · EID · Labour', badge:true },
-      ]},
-    ],
-  },
-  'ib-bike': {
-    icon:'ti-motorbike', label:'Bike Fleet',
-    pageLabel:'Bike Fleet', pageSub:'Fleet registry',
-    pillBg:'var(--teal-dim)', pillColor:'var(--teal)', pillIcon:'ti-motorbike',
-    groups:[
-      { label:'Fleet', items:[
-        { label:'Bike List',     file:'Reg/allBike.html', icon:'ti-list', sub:'All registered bikes' },
-        { label:'Register Bike', file:'Reg/addBike.html', icon:'ti-plus', sub:'Add new vehicle'      },
-		{ label:'Check In/Out', file:'Reg/inOut.html', icon:'ti-arrows-horizontal', sub:'Check In/Out'      },
-      ]},
-      { label:'Documents', items:[
-        { label:'Expiring Docs', file:'Reg/bikExp.html', icon:'ti-file-x', sub:'Mulkiya · Insurance', badge:true },
-      ]},
-    ],
-  },
-  'ib-adv': {
-    icon:'ti-cash', label:'Advance Salary',
-    pageLabel:'Advance Salary', pageSub:'Salary advances',
-    pillBg:'var(--amber-dim)', pillColor:'var(--amber)', pillIcon:'ti-cash',
-    groups:[
-      { label:'Salary', items:[
-        { label:'All Requests',    file:'Reg/penReq.html', icon:'ti-clipboard-list', sub:'Advance history'   },
-        { label:'New Request',     file:'Reg/finQue.html', icon:'ti-cash',           sub:'Submit an advance'  },
-        { label:'Recovery Module', file:'Reg/recMod.html', icon:'ti-wallet',         sub:'Recovery details'   },
-      ]},
-    ],
-  },
-  'ib-docs': {
-    icon:'ti-file-alert', label:'Expiring Docs',
-    pageLabel:'Expiring Docs', pageSub:'Document tracker',
-    pillBg:'var(--red-dim)', pillColor:'var(--red)', pillIcon:'ti-file-alert',
-    groups:[
-      { label:'Expiry Tracker', items:[
-        { label:'Employee Docs', file:'pages/empExp.html', icon:'ti-users',     sub:'Visa · EID · Labour', badge:true },
-        { label:'Bike Docs',     file:'pages/bikExp.html', icon:'ti-motorbike', sub:'Mulkiya · Insurance',  badge:true },
-      ]},
-    ],
-  },
-};
-
-let activeSection = null;
-let subOpen = true;
-let sidebarVisible = true;
-let subHideTimer = null;
-
-/* ── Sidebar toggle ── */
-function toggleSidebar() {
-  sidebarVisible = !sidebarVisible;
-  const ib = document.getElementById('icon-bar');
-  const sb = document.getElementById('sub-bar');
-  const appZone = document.getElementById('tb-app-zone');
-  if (sidebarVisible) {
-    ib.style.display = '';
-    sb.style.display = '';
-    appZone.classList.remove('collapsed');
-  } else {
-    ib.style.display = 'none';
-    sb.style.display = 'none';
-    appZone.classList.add('collapsed');
-  }
-}
-
-/* ── Open icon section ── */
-function ibOpen(id, btn) {
-  const sec = SECTIONS[id];
-  if (!sec) return;
-  const sb = document.getElementById('sub-bar');
-  if (subHideTimer) { clearTimeout(subHideTimer); subHideTimer = null; }
-  sb.classList.remove('subitems-hiding');
-
-  if (activeSection === id && subOpen) {
-    subOpen = false; sb.classList.add('collapsed'); return;
+    DATASETS = result;
+    console.log('[DataLayer] permitted datasets:', Object.keys(DATASETS));
+    return DATASETS;
   }
 
-  document.querySelectorAll('.ib-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  /* ─────────────────────────────────────────
+     INDEXEDDB ENGINE
+     Key names: 'ap2_' + datasetKey
+     Entry shape: { ts, data, fingerprint }
+     DB: 'ap2_fleet_cache'  Store: 'datasets'  keyPath: none (out-of-line)
+  ───────────────────────────────────────── */
+  const IDB_NAME  = 'ap2_fleet_cache';
+  const IDB_VER   = 2;
+  const IDB_STORE = 'datasets';
 
-  document.getElementById('sb2-icon').className = 'ti ' + sec.icon;
-  document.getElementById('sb2-title').textContent = sec.label;
+  let _dbPromise = null;
+  function _openDB() {
+    if (_dbPromise) return _dbPromise;
+    _dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open(IDB_NAME, IDB_VER);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (db.objectStoreNames.contains(IDB_STORE)) {
+          db.deleteObjectStore(IDB_STORE);
+        }
+        db.createObjectStore(IDB_STORE);
+      };
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror   = e => reject(e.target.error);
+    });
+    return _dbPromise;
+  }
 
-  const nav = document.getElementById('sb2-nav');
-  nav.innerHTML = sec.groups.map(g => `
-    <div class="sb2-section">${g.label}</div>
-    ${g.items.map(item => `
-      <div class="sb2-item" onclick="loadPage('${item.file}',this,'${item.label}','${item.icon||sec.icon}','${item.sub}','${sec.pillBg.replace(/'/g,'"')}','${sec.pillColor}')">
-        <i class="ti ${item.icon}"></i>${item.label}
-        ${item.badge ? '<span class="sb2-badge">!</span>' : ''}
-      </div>`).join('')}
-  `).join('');
+  async function _idbGet(fullKey) {
+    const db = await _openDB();
+    return new Promise((res, rej) => {
+      const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(fullKey);
+      req.onsuccess = () => res(req.result || null);
+      req.onerror   = () => rej(req.error);
+    });
+  }
 
-  setCtx(sec.pageLabel, sec.pageSub, sec.pillBg, sec.pillColor, sec.pillIcon);
-  subOpen = true;
-  sb.classList.remove('collapsed');
-  activeSection = id;
-  startSubHideTimer();
-}
+  async function _idbSet(fullKey, value) {
+    const db = await _openDB();
+    return new Promise((res, rej) => {
+      const record = { ts: value.ts, data: value.data, fingerprint: value.fingerprint || null };
+      const tx  = db.transaction(IDB_STORE, 'readwrite');
+      const req = tx.objectStore(IDB_STORE).put(record, fullKey);
+      req.onsuccess = () => res(true);
+      req.onerror   = () => { console.error('[DataLayer] IDB put error for', fullKey, req.error); rej(req.error); };
+      tx.onerror    = () => { console.error('[DataLayer] IDB tx error for',  fullKey, tx.error);  rej(tx.error);  };
+    });
+  }
 
-/* ── Load page ── */
-function loadPage(file, el, label, icon, sub, pillBg, pillColor) {
-  if (subHideTimer) { clearTimeout(subHideTimer); subHideTimer = null; }
-  const sb = document.getElementById('sub-bar');
-  sb.classList.remove('subitems-hiding');
+  async function _idbDelete(fullKey) {
+    const db = await _openDB();
+    return new Promise((res, rej) => {
+      const req = db.transaction(IDB_STORE, 'readwrite').objectStore(IDB_STORE).delete(fullKey);
+      req.onsuccess = () => res(true);
+      req.onerror   = () => rej(req.error);
+    });
+  }
 
-  const frame = document.getElementById('main-frame');
-  document.querySelectorAll('.sb2-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (!frame.src.endsWith(file)) frame.src = file;
-  if (label) setCtx(label, sub||'', pillBg||'var(--accent-dim)', pillColor||'var(--accent)', icon||'ti-circle');
-  startSubHideTimer();
-}
+  async function _idbAllKeys() {
+    const db = await _openDB();
+    return new Promise((res, rej) => {
+      const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).getAllKeys();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror   = () => rej(req.error);
+    });
+  }
 
-function startSubHideTimer() {
-  if (subHideTimer) clearTimeout(subHideTimer);
-  subHideTimer = setTimeout(() => {
-    const sb = document.getElementById('sub-bar');
-    sb.classList.add('subitems-hiding');
-    setTimeout(() => {
-      sb.classList.add('collapsed');
-      sb.classList.remove('subitems-hiding');
-      subOpen = false;
-    }, 450);
-  }, 15000);
-}
+  async function _idbGetAll() {
+    const db = await _openDB();
+    return new Promise((res, rej) => {
+      const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).getAll();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror   = () => rej(req.error);
+    });
+  }
 
-/* ── Page context ── */
-function setCtx(label, sub, bg, color, iconCls) {
-  const pill  = document.getElementById('tb-pill');
-  const pillI = document.getElementById('tb-pill-i');
-  const lbl   = document.getElementById('tb-page-label');
-  const s     = document.getElementById('tb-page-sub2');
-  if (pill)  { pill.style.background = bg; pill.style.color = color; }
-  if (pillI) pillI.className = 'ti ' + iconCls;
-  if (lbl)   lbl.textContent = label;
-  if (s)     s.textContent   = sub;
-}
+  /* ─────────────────────────────────────────
+     IN-MEMORY SHADOW  (sync reads for timers / status checks)
+     Mirrors IDB so _cache.get() / .status() / .age() stay synchronous.
+  ───────────────────────────────────────── */
+  const _shadow = new Map();
 
-/* ══ THEME SYSTEM ══ */
-const THEMES = {
-  dark:   { label:'Dark',         icon:'ti-palette' },
-  light:  { label:'Light',        icon:'ti-palette' },
-  purple: { label:'Purple Night', icon:'ti-palette' },
-  ocean:  { label:'Ocean',        icon:'ti-palette' },
-  slate:  { label:'Slate',        icon:'ti-palette' },
-};
-
-function setTheme(mode) {
-  document.documentElement.setAttribute('data-theme', mode);
-  localStorage.setItem('theme', mode);
-
-  // Update label
-  const labelMap = { dark:'Dark', light:'Light', purple:'Purple Night', ocean:'Ocean', slate:'Slate' };
-  const lbl = document.getElementById('theme-dd-label');
-  if (lbl) lbl.textContent = labelMap[mode] || mode;
-
-  // Mark active
-  document.querySelectorAll('.td-item').forEach(el => el.classList.toggle('active', el.dataset.t === mode));
-
-  // Update day/night icon
-  updateDayNightIcon(mode);
-
-  // Broadcast to child iframe (postMessage)
-  try {
-    const frame = document.getElementById('main-frame');
-    if (frame && frame.contentWindow) {
-      frame.contentWindow.postMessage({ type: 'ap-theme', theme: mode }, '*');
+  _openDB().then(async db => {
+    const [keys, records] = await Promise.all([
+      new Promise((res, rej) => {
+        const r = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).getAllKeys();
+        r.onsuccess = () => res(r.result || []);
+        r.onerror   = () => rej(r.error);
+      }),
+      new Promise((res, rej) => {
+        const r = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).getAll();
+        r.onsuccess = () => res(r.result || []);
+        r.onerror   = () => rej(r.error);
+      }),
+    ]);
+    for (let i = 0; i < keys.length; i++) {
+      const k   = keys[i];
+      const rec = records[i];
+      if (typeof k === 'string' && k.startsWith(CACHE_PREFIX) && rec) {
+        _shadow.set(k, { ts: rec.ts, data: rec.data, fingerprint: rec.fingerprint || null });
+      }
     }
-  } catch(_) {}
+    console.log('[DataLayer] IDB shadow loaded —', _shadow.size, 'entries');
+  }).catch(e => console.warn('[DataLayer] IDB shadow load failed:', e.message));
 
-  // Broadcast via BroadcastChannel so ALL child pages pick it up (even non-iframe tabs)
-  try {
-    const bc = new BroadcastChannel('ap-theme');
-    bc.postMessage({ type: 'ap-theme', theme: mode });
-    bc.close();
-  } catch(_) {}
+  /* ─────────────────────────────────────────
+     CACHE PURGE ON LOGIN
+  ───────────────────────────────────────── */
+  function _purgeUnauthorisedCache() {
+    try {
+      let currentFingerprint = null;
+      try {
+        const raw = sessionStorage.getItem('ap_session');
+        if (raw) currentFingerprint = JSON.parse(raw).sessionFingerprint || null;
+      } catch {}
 
-  // Log to event monitor
-  _logEvent('theme', 'Theme changed:', labelMap[mode] || mode);
+      const permittedFullKeys = new Set(
+        Object.keys(DATASETS).map(k => CACHE_PREFIX + k)
+      );
 
-  closeThemeDropdown();
-}
+      const keysToDelete = [];
 
-function updateDayNightIcon(mode) {
-  const icon  = document.getElementById('daynight-icon');
-  if (!icon) return;
-  const map = {
-    light : { cls:'ti ti-sun'          },
-    dark  : { cls:'ti ti-moon'         },
-    purple: { cls:'ti ti-sparkles'     },
-    ocean : { cls:'ti ti-wave-sine'    },
-    slate : { cls:'ti ti-layout-grid'  },
+      for (const [fullKey, entry] of _shadow.entries()) {
+        if (!fullKey.startsWith(CACHE_PREFIX)) continue;
+        if (!permittedFullKeys.has(fullKey)) {
+          keysToDelete.push(fullKey);
+          continue;
+        }
+        if (currentFingerprint && entry.fingerprint && entry.fingerprint !== currentFingerprint) {
+          keysToDelete.push(fullKey);
+        }
+      }
+
+      if (keysToDelete.length) {
+        keysToDelete.forEach(k => {
+          _shadow.delete(k);
+          _idbDelete(k).catch(() => {});
+        });
+        console.log('[DataLayer] purged', keysToDelete.length, 'unauthorised/stale cache entries:', keysToDelete);
+      } else {
+        console.log('[DataLayer] cache purge: nothing to remove — all entries authorised');
+      }
+
+    } catch (e) {
+      console.warn('[DataLayer] _purgeUnauthorisedCache error:', e.message);
+    }
+  }
+
+  /* Build immediately — permissions may already be in session (post-login). */
+  _buildDatasets();
+
+  /* ─────────────────────────────────────────
+     CACHE  — IndexedDB wrappers
+     Entry shape: { ts, data, fingerprint }
+     Keys: 'ap2_' + datasetKey
+  ───────────────────────────────────────── */
+  const _cache = {
+    // Dataset keys from the server already include the 'ap2_' prefix (e.g. 'ap2_bike').
+    // Do NOT prepend CACHE_PREFIX again — just use the key as-is.
+    _key(name) { return name.startsWith(CACHE_PREFIX) ? name : CACHE_PREFIX + name; },
+
+    get(name) {
+      return _shadow.get(this._key(name)) || null;
+    },
+
+    set(name, data) {
+      let fingerprint = null;
+      try {
+        const raw = sessionStorage.getItem('ap_session');
+        if (raw) fingerprint = JSON.parse(raw).sessionFingerprint || null;
+      } catch {}
+
+      const entry   = { ts: Date.now(), data, fingerprint };
+      const fullKey = this._key(name);
+
+      _shadow.set(fullKey, entry);
+
+      _idbSet(fullKey, entry).then(() => {
+        console.log('[DataLayer] IDB write OK:', fullKey, '| rows:', Array.isArray(entry.data) ? entry.data.length : typeof entry.data);
+      }).catch(e => {
+        console.error('[DataLayer] IDB write FAILED for', fullKey, e);
+      });
+      return true;
+    },
+
+    clear(name) {
+      const fullKey = this._key(name);
+      _shadow.delete(fullKey);
+      _idbDelete(fullKey).catch(() => {});
+    },
+
+    clearAll() {
+      const keys = Array.from(_shadow.keys()).filter(k => k.startsWith(CACHE_PREFIX));
+      keys.forEach(k => {
+        _shadow.delete(k);
+        _idbDelete(k).catch(() => {});
+      });
+    },
+
+    /** Returns null (no cache), 'fresh', or 'stale' */
+    status(name) {
+      const entry = this.get(name);
+      if (!entry || entry.data == null) return null;
+      const ds = DATASETS[name];
+      if (!ds) return null;
+      return (Date.now() - entry.ts) < ds.ttlMs ? 'fresh' : 'stale';
+    },
+
+    age(name) {
+      const entry = this.get(name);
+      if (!entry) return Infinity;
+      return Date.now() - entry.ts;
+    },
   };
-  const cfg = map[mode] || map.dark;
-  icon.className = cfg.cls;
-}
 
-/* Quick dark ↔ light toggle via the icon button */
-function quickToggleDarkLight() {
-  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-  setTheme(cur === 'light' ? 'dark' : 'light');
-}
-
-/* Theme dropdown — position:fixed, computed from button bounds */
-function toggleThemeDropdown(e) {
-  e.stopPropagation();
-  const dd  = document.getElementById('theme-dropdown');
-  const btn = document.getElementById('theme-dd-btn');
-  const isOpen = dd.classList.contains('open');
-  if (isOpen) {
-    closeThemeDropdown();
-  } else {
-    // Compute position from button's bounding rect
-    const rect = btn.getBoundingClientRect();
-    const ddW  = 180; // approx dropdown width
-    let left = rect.right - ddW;
-    if (left < 6) left = 6;
-    dd.style.top  = (rect.bottom + 6) + 'px';
-    dd.style.left = left + 'px';
-    dd.style.right = 'auto';
-    dd.classList.add('open');
-    btn.classList.add('open');
-    // Close on next outside click
-    setTimeout(() => document.addEventListener('click', outsideClose, { once: true }), 0);
-  }
-}
-
-function outsideClose(e) {
-  const dd  = document.getElementById('theme-dropdown');
-  const btn = document.getElementById('theme-dd-btn');
-  if (dd && !dd.contains(e.target) && btn && !btn.contains(e.target)) {
-    closeThemeDropdown();
-  }
-}
-
-function closeThemeDropdown() {
-  document.getElementById('theme-dropdown')?.classList.remove('open');
-  document.getElementById('theme-dd-btn')?.classList.remove('open');
-}
-
-/* ── Clock — HH:MM only ── */
-(function tick() {
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  const t = document.getElementById('tb-time');
-  if (t) t.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  setTimeout(tick, 5000); // update every 5s is enough for HH:MM
-})();
-
-/* ══ SESSION GUARD ══
-   auth.js (loaded in <head>) already runs _boot() on DOMContentLoaded
-   and redirects to login.html if the session is invalid or expired.
-   This guard is a secondary safety net in case auth.js failed to load. */
-(function sessionGuard() {
-  try {
-    // If auth.js loaded correctly, it already handled the guard — trust it.
-    if (window.Auth && typeof window.Auth.getCredentials === 'function') {
-      // auth.js is present — it will have already redirected if invalid.
-      // We don't double-redirect here.
-      return;
+  function _evictOldest() {
+    let oldest = null, oldestKey = null;
+    for (const [k, entry] of _shadow.entries()) {
+      if (!k.startsWith(CACHE_PREFIX)) continue;
+      if (!oldest || entry.ts < oldest) { oldest = entry.ts; oldestKey = k; }
     }
-    // auth.js didn't load (CDN failure?) — fall back to old key check
-    const raw = sessionStorage.getItem('ap_session');
-    if (!raw) {
-      console.warn('[index] auth.js not loaded and no session found — redirecting');
-      window.location.replace('https://effimalik.github.io/FleetManagement/login.html');
-      return;
+    if (oldestKey) {
+      _shadow.delete(oldestKey);
+      _idbDelete(oldestKey).catch(() => {});
     }
-    const s = JSON.parse(raw);
-    if (!s || !s.sessionId || !s.token || !s.email) {
-      window.location.replace('https://effimalik.github.io/FleetManagement/login.html');
+  }
+
+  /* ─────────────────────────────────────────
+     IN-FLIGHT DEDUP
+  ───────────────────────────────────────── */
+  const _inflight = {};
+
+  /* ─────────────────────────────────────────
+     CORE FETCH
+     Attaches session credentials to every request.
+     Reads apiKey and paramKey from DATASETS (server-supplied) — no hardcoding.
+  ───────────────────────────────────────── */
+  async function _fetchFromServer(dsKey) {
+    if (_inflight[dsKey]) {
+      console.log(`[DataLayer] ${dsKey}: piggyback on in-flight fetch`);
+      return _inflight[dsKey];
     }
-  } catch (e) {
-    console.error('[sessionGuard] Error — redirecting to be safe:', e);
-    window.location.replace('https://effimalik.github.io/FleetManagement/login.html');
-  }
-})();
 
-/* ── Sign out — delegates to Auth.signOut() which handles server + client ── */
-function signOut() {
-  if (window.Auth && typeof window.Auth.signOut === 'function') {
-    window.Auth.signOut();
-  } else {
-    // Fallback if auth.js failed to load
-    sessionStorage.removeItem('ap_session');
-    window.location.replace('https://effimalik.github.io/FleetManagement/login.html');
-  }
-}
+    const promise = (async () => {
+      _buildDatasets();
 
-/* ── Populate user chip — auth.js does this automatically,
-   but this is called again on DOMContentLoaded for safety ── */
-function populateUserChip() {
-  try {
-    // Prefer auth.js getUser() — it reads from the correct session key
-    if (window.Auth && typeof window.Auth.getUser === 'function') {
-      const u = window.Auth.getUser();
-      if (!u || !u.email) return;
-
-      const avatarEl = document.getElementById('tb-avatar');
-      const nameEl   = document.getElementById('tb-uname');
-      const roleEl   = document.getElementById('tb-urole');
-      const chip     = document.getElementById('tb-user-chip');
-
-      if (avatarEl) avatarEl.textContent = u.initials || '--';
-      if (nameEl)   nameEl.textContent   = u.name     || u.email;
-      if (roleEl)   roleEl.textContent   = u.role     || 'User';
-      if (chip) {
-        chip.title   = `Signed in as ${u.email}\nClick to sign out`;
-        chip.onclick = () => { if (confirm(`Sign out ${u.name || u.email}?`)) window.Auth.signOut(); };
-        chip.style.cursor = 'pointer';
+      const ds = DATASETS[dsKey];
+      if (!ds) {
+        _notifyNotAuthorized(dsKey);
+        throw new Error(`[DataLayer] "${dsKey}" not permitted — access denied`);
       }
-    }
-  } catch (e) { console.error('[populateUserChip]:', e); }
-}
 
-/* ── Init ── */
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('theme') || 'dark';
-  setTheme(saved);
-  ibOpen('ib-emp', document.getElementById('ib-emp'));
-  populateUserChip();
-  updateCacheHealthDot();
-  setInterval(updateCacheHealthDot, 30000);
+      const creds = window.Auth && window.Auth.getCredentials
+        ? window.Auth.getCredentials()
+        : null;
 
-  // Reset sub-bar autohide timer on any activity inside sub-bar
-  const sb = document.getElementById('sub-bar');
-  if (sb) {
-    sb.addEventListener('mousemove', () => { if (subOpen) startSubHideTimer(); });
-    sb.addEventListener('touchstart', () => { if (subOpen) startSubHideTimer(); }, { passive: true });
-  }
-
-  // BroadcastChannel — listen for theme changes from other tabs/windows
-  try {
-    const _bc = new BroadcastChannel('ap-theme');
-    _bc.onmessage = (evt) => {
-      if (evt.data && evt.data.type === 'ap-theme' && evt.data.theme) {
-        // Only apply if different to avoid loop
-        const cur = document.documentElement.getAttribute('data-theme');
-        if (cur !== evt.data.theme) setTheme(evt.data.theme);
+      if (!creds || !creds.sessionId || !creds.token) {
+        throw new Error(`[DataLayer] ${dsKey}: no valid session — aborting fetch`);
       }
-    };
-  } catch(_) {}
 
-  // Periodic miss check (every 60s) — keeps badge updated even when panel is closed
-  setInterval(() => {
-    // Always update the miss/stale badge count; cmScanAll guards autohide internally
-    cmScanAll();
-    updateCacheHealthDot();
-  }, 60000);
-});
+      // paramKey and apiKey come from the server-supplied permissions, not hardcode
+      const paramKey = ds.paramKey || 'type';
+      const url = `${API_BASE}?${paramKey}=${encodeURIComponent(ds.apiKey)}`
+        + `&sessionId=${encodeURIComponent(creds.sessionId)}`
+        + `&token=${encodeURIComponent(creds.token)}`
+        + `&_t=${Date.now()}`;
 
-/* ══ CACHE PANEL ══ */
-let cachePanelOpen = false;
-let cachePanelTimer = null;
-let _cpAutoHideTimer = null;
-let _cpOutsideHandler = null;
+      console.log(`[DataLayer] ${dsKey}: fetching → ${paramKey}=${ds.apiKey}`);
+      const t0 = performance.now();
 
-function _resetCpAutoHide() {
-  if (_cpAutoHideTimer) clearTimeout(_cpAutoHideTimer);
-  _cpAutoHideTimer = setTimeout(closeCachePanel, 3000);
-}
+      const controller = new AbortController();
+      const timeoutId  = setTimeout(() => controller.abort(), 30000);
 
-function toggleCachePanel(e) {
-  e.stopPropagation();
-  cachePanelOpen = !cachePanelOpen;
-  const panel = document.getElementById('cache-panel');
-  const btn   = document.getElementById('cache-status-btn');
-  if (cachePanelOpen) {
-    panel.classList.add('open');
-    btn.classList.add('active');
-    renderCacheTable();
-    cmScanAll();
-    // Tick every second so "remaining" counts down live
-    cachePanelTimer = setInterval(renderCacheTable, 1000);
-    // Autohide on leave, cancel on re-enter
-    panel.removeEventListener('mouseleave', _onCpLeave);
-    panel.removeEventListener('mouseenter', _onCpEnter);
-    panel.addEventListener('mouseleave', _onCpLeave);
-    panel.addEventListener('mouseenter', _onCpEnter);
-    // Start the inactivity countdown immediately
-    _resetCpAutoHide();
-    // Cancel any prior outside-click handler then register a new one
-    if (_cpOutsideHandler) { document.removeEventListener('click', _cpOutsideHandler); }
-    _cpOutsideHandler = (ev) => closePanelOutside(ev);
-    setTimeout(() => document.addEventListener('click', _cpOutsideHandler), 0);
-  } else {
-    closeCachePanel();
+      let res;
+      try {
+        res = await fetch(url, { cache: 'no-store', redirect: 'follow', mode: 'cors', signal: controller.signal });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${dsKey}`);
+
+      const json = await res.json();
+
+      if (json && typeof json === 'object' && !Array.isArray(json) && json.success === false) {
+        const msg = json.error || json.message || 'Unknown server error';
+        console.error(`[DataLayer] ${dsKey}: API rejected — "${msg}" | ${url}`);
+        throw new Error(`[DataLayer] ${dsKey} API error: ${msg}`);
+      }
+
+      const data = _normaliseRows(json);
+
+      if (!Array.isArray(data) || data.length === 0) {
+        console.warn(`[DataLayer] ${dsKey}: empty response — not caching`);
+        throw new Error(`[DataLayer] ${dsKey}: empty or invalid data received`);
+      }
+
+      _cache.set(dsKey, data);
+      const elapsed = Math.round(performance.now() - t0);
+      console.log(`[DataLayer] ${dsKey}: cached ${data.length} rows (${elapsed} ms)`);
+      return data;
+    })();
+
+    _inflight[dsKey] = promise;
+    try {
+      const result = await promise;
+      return result;
+    } finally {
+      delete _inflight[dsKey];
+    }
   }
-}
 
-function _onCpLeave()  { _resetCpAutoHide(); }
-function _onCpEnter()  { if (_cpAutoHideTimer) { clearTimeout(_cpAutoHideTimer); _cpAutoHideTimer = null; } }
+  /* ─────────────────────────────────────────
+     GET — cache-first, fetch-on-miss/stale
+  ───────────────────────────────────────── */
+  async function _get(dsKey, force) {
+    _buildDatasets();
+    const ds = DATASETS[dsKey];
+    if (!ds) {
+      _notifyNotAuthorized(dsKey);
+      throw new Error(`[DataLayer] "${dsKey}" not permitted or unknown`);
+    }
 
-function closePanelOutside(e) {
-  const panel = document.getElementById('cache-panel');
-  const btn   = document.getElementById('cache-status-btn');
-  if (panel && !panel.contains(e.target) && btn && !btn.contains(e.target)) {
-    closeCachePanel();
-  }
-}
-
-function closeCachePanel() {
-  const panel = document.getElementById('cache-panel');
-  document.getElementById('cache-status-btn')?.classList.remove('active');
-  panel?.classList.remove('open');
-  panel?.removeEventListener('mouseleave', _onCpLeave);
-  panel?.removeEventListener('mouseenter', _onCpEnter);
-  cachePanelOpen = false;
-  if (cachePanelTimer) { clearInterval(cachePanelTimer); cachePanelTimer = null; }
-  if (_cpAutoHideTimer) { clearTimeout(_cpAutoHideTimer); _cpAutoHideTimer = null; }
-  if (_cpOutsideHandler) { document.removeEventListener('click', _cpOutsideHandler); _cpOutsideHandler = null; }
-}
-
-const DS_META = {
-  bike:          { label:'Bikes',            icon:'ti-motorbike', color:'var(--teal)',   colorDim:'var(--teal-dim)',   ttlMs: 15*60*1000 },
-  employee:      { label:'Employees',        icon:'ti-users',     color:'var(--accent)', colorDim:'var(--accent-dim)', ttlMs: 10*60*1000 },
-  master:        { label:'Master Sheet',     icon:'ti-table',     color:'var(--purple)', colorDim:'var(--purple-dim)', ttlMs:  5*60*1000 },
-  cioLog:        { label:'Check-In/Out Log', icon:'ti-arrows-horizontal', color:'var(--orange)', colorDim:'var(--orange-dim)', ttlMs: 5*60*1000 },
-  approvedSheet: { label:'Approved Sheet',   icon:'ti-clipboard-check', color:'var(--teal)', colorDim:'var(--teal-dim)', ttlMs: 3*60*1000 },
-  recovery:      { label:'Recovery',         icon:'ti-wallet',    color:'var(--amber)',  colorDim:'var(--amber-dim)',  ttlMs:  6*60*60*1000 },
-};
-
-function fmtTtl(ms) {
-  if (ms <= 0) return '—';
-  const s = Math.floor(ms / 1000);
-  if (s < 60) return s + 's';
-  if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's';
-  return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm';
-}
-
-function fmtTtlLabel(ms) {
-  if (ms < 60000)   return Math.floor(ms/1000) + 's';
-  if (ms < 3600000) return Math.floor(ms/60000) + ' min';
-  return Math.floor(ms/3600000) + ' hr';
-}
-
-function renderCacheTable() {
-  const body = document.getElementById('cache-table-body');
-  const footer = document.getElementById('cp-last-check');
-  if (!body) return;
-
-  // Try to get AdminPro cache status
-  let rows = [];
-  try {
-    if (window.AdminPro && AdminPro.getCacheStatus) {
-      rows = AdminPro.getCacheStatus();
+    if (!force) {
+      const entry = _cache.get(dsKey);
+      if (entry && entry.data != null) {
+        const age = Date.now() - entry.ts;
+        if (age < ds.ttlMs) {
+          console.log(`[DataLayer] ${dsKey}: cache HIT (age ${Math.round(age/1000)}s)`);
+          return entry.data;
+        }
+        console.log(`[DataLayer] ${dsKey}: cache STALE (age ${Math.round(age/1000)}s) — refreshing`);
+      } else {
+        console.log(`[DataLayer] ${dsKey}: cache MISS — fetching`);
+      }
     } else {
-      // Build from DS_META directly reading localStorage
-      rows = Object.entries(DS_META).map(([key, meta]) => {
-        const ageMs = getCacheAge(key);
-        const ttl   = meta.ttlMs;
-        const fresh = ageMs < ttl;
-        let hasData = false;
-        try { const d = getCacheData(key); hasData = Array.isArray(d) ? d.length > 0 : d != null; } catch(_) {}
+      console.log(`[DataLayer] ${dsKey}: force refresh — skipping cache`);
+      _cache.clear(dsKey);
+    }
+
+    return _fetchFromServer(dsKey);
+  }
+
+  /* ─────────────────────────────────────────
+     WARM-IF-EMPTY
+  ───────────────────────────────────────── */
+  async function warmIfEmpty() {
+    _buildDatasets();
+    _purgeUnauthorisedCache();
+
+    const allowedKeys = Object.keys(DATASETS);
+    if (!allowedKeys.length) {
+      console.warn('[DataLayer] warmIfEmpty: no permitted datasets — nothing to fetch');
+      return;
+    }
+
+    const toFetch = allowedKeys.filter(key => {
+      const status = _cache.status(key);
+      return status !== 'fresh';
+    });
+
+    if (!toFetch.length) {
+      console.log('[DataLayer] warmIfEmpty: all datasets are fresh — skipping fetch');
+      _startAllTimers();
+      return;
+    }
+
+    console.log('[DataLayer] warmIfEmpty: fetching', toFetch.length, 'missing/stale datasets:', toFetch);
+
+    await Promise.allSettled(
+      toFetch.map(key => _fetchFromServer(key))
+    );
+
+    _startAllTimers();
+    console.log('[DataLayer] warmIfEmpty: all done');
+  }
+
+  /* ─────────────────────────────────────────
+     BACKGROUND REFRESH TIMERS
+     Each permitted dataset auto-refreshes 30s before its TTL expires.
+     TTL is read from ds.ttlMs which comes from the server — no hardcoding.
+  ───────────────────────────────────────── */
+  const _timers = {};
+
+  function _scheduleRefresh(dsKey) {
+    const ds = DATASETS[dsKey];
+    if (!ds) return;
+
+    if (_timers[dsKey]) { clearTimeout(_timers[dsKey]); delete _timers[dsKey]; }
+
+    const entry = _cache.get(dsKey);
+    if (!entry) return;
+
+    const age       = Date.now() - entry.ts;
+    const remaining = ds.ttlMs - age;
+    const delay     = Math.max(0, remaining - 30000);
+
+    _timers[dsKey] = setTimeout(async () => {
+      if (document.visibilityState === 'hidden') {
+        _scheduleRefresh(dsKey);
+        return;
+      }
+      console.log(`[DataLayer] background refresh: ${dsKey}`);
+      try {
+        await _fetchFromServer(dsKey);
+        _scheduleRefresh(dsKey);
+      } catch (e) {
+        console.warn(`[DataLayer] background refresh failed: ${dsKey}`, e.message);
+        _timers[dsKey] = setTimeout(() => _scheduleRefresh(dsKey), 2 * 60 * 1000);
+      }
+    }, delay);
+
+    console.log(`[DataLayer] ${dsKey}: next refresh in ${Math.round(delay/1000)}s`);
+  }
+
+  function _startAllTimers() {
+    Object.keys(DATASETS).forEach(_scheduleRefresh);
+  }
+
+  /* ─────────────────────────────────────────
+     PUBLIC API  — window.AdminPro
+  ───────────────────────────────────────── */
+  window.AdminPro = {
+
+    VERSION: '2.2',
+
+    /* ── INIT — rebuild permitted DATASETS + purge stale cache + start timers. ── */
+    init() {
+      _buildDatasets();
+      _purgeUnauthorisedCache();
+      _startAllTimers();
+      console.log('[DataLayer] init: ready with', Object.keys(DATASETS).length, 'permitted datasets');
+    },
+
+    /* ── WARMUP ── */
+    warmIfEmpty,
+
+    /* ── STREAM-QUERY ── */
+    async streamQuery(dsKey, predicateFn) {
+      _buildDatasets();
+      const ds = DATASETS[dsKey];
+      if (!ds) { _notifyNotAuthorized(dsKey); throw new Error(`[DataLayer] "${dsKey}" not permitted`); }
+
+      const fullKey = dsKey.startsWith(CACHE_PREFIX) ? dsKey : CACHE_PREFIX + dsKey;
+
+      try {
+        const db = await _openDB();
+        return await new Promise((resolve, reject) => {
+          const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(fullKey);
+          req.onsuccess = () => {
+            const rec = req.result;
+            if (!rec || !Array.isArray(rec.data)) { resolve([]); return; }
+            const results = [];
+            for (let i = 0, len = rec.data.length; i < len; i++) {
+              try { if (predicateFn(rec.data[i])) results.push(rec.data[i]); } catch (_) {}
+            }
+            resolve(results);
+          };
+          req.onerror = () => reject(req.error);
+        });
+      } catch (e) {
+        console.warn('[DataLayer] streamQuery IDB fallback:', e.message);
+        const entry = _cache.get(dsKey);
+        if (!entry || !Array.isArray(entry.data)) return [];
+        return entry.data.filter(row => { try { return predicateFn(row); } catch (_) { return false; } });
+      }
+    },
+
+    /* ── GENERIC GETTER — preferred interface; dsKey = permission key e.g. 'ap2_employee' ── */
+    get(dsKey, force) { return _get(dsKey, force); },
+
+    /* ── NAMED GETTERS (backwards compat) — resolve through permission keys ──────────────
+       These call _get() with the canonical permission key. If the user doesn't have
+       permission for that dataset, the permission gate inside _get() will reject it.
+       Pages that switched to AdminPro.get('ap2_employee') don't need these at all.
+    ── */
+    getEmployees  (force) { return _get('ap2_employee', force); },
+    getBikes      (force) { return _get('ap2_bike',     force); },
+    getMasterSheet(force) { return _get('ap2_master',   force); },
+    getCioLog     (force) { return _get('ap2_cioLog',   force); },
+    getRecovery   (force) { return _get('ap2_recovery', force); },
+
+    /* ── FORCE REFRESH ── */
+    async forceRefresh(dsKey) {
+      if (dsKey) {
+        if (!DATASETS[dsKey]) {
+          console.warn(`[DataLayer] forceRefresh: "${dsKey}" not permitted — skipping`);
+          return;
+        }
+        const data = await _get(dsKey, true);
+        _scheduleRefresh(dsKey);
+        return data;
+      }
+      await Promise.allSettled(Object.keys(DATASETS).map(k => _get(k, true)));
+      _startAllTimers();
+    },
+
+    /* ── WARM CACHE ── */
+    async warmCache() {
+      await this.forceRefresh();
+    },
+
+    /* ── CACHE UTILITIES ── */
+    cache: {
+      get      : (name)        => _cache.get(name),
+      set      : (name, data)  => _cache.set(name, data),
+      clear    : (name)        => _cache.clear(name),
+      clearAll : ()            => _cache.clearAll(),
+      status   : (name)        => _cache.status(name),
+      age      : (name)        => _cache.age(name),
+    },
+
+    /* ── getCacheStatus — returns only permitted datasets for cache panel ── */
+    getCacheStatus() {
+      return Object.entries(DATASETS).map(([key, ds]) => {
+        const entry   = _cache.get(key);
+        const ageMs   = entry ? Date.now() - entry.ts : Infinity;
+        const hasData = entry && entry.data != null
+          ? (Array.isArray(entry.data) ? entry.data.length > 0 : true)
+          : false;
+        const fresh   = hasData && ageMs < ds.ttlMs;
+
         const ageLabel = ageMs === Infinity ? 'Not loaded'
-          : ageMs < 60000 ? Math.floor(ageMs/1000) + 's ago'
-          : ageMs < 3600000 ? Math.floor(ageMs/60000) + 'm ago'
-          : Math.floor(ageMs/3600000) + 'h ago';
+          : ageMs < 60000      ? Math.floor(ageMs / 1000)    + 's ago'
+          : ageMs < 3600000    ? Math.floor(ageMs / 60000)   + 'm ago'
+          :                      Math.floor(ageMs / 3600000) + 'h ago';
+
         let lastSync = null;
         if (ageMs !== Infinity) {
           const d = new Date(Date.now() - ageMs);
-          lastSync = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+          lastSync = d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+            + ', ' + d.toLocaleDateString([], { day:'2-digit', month:'short' });
         }
-        return { key, label: meta.label, ageMs, ageLabel, fresh, hasData, lastSync, ttl };
+
+        const rowCount  = (entry && Array.isArray(entry.data)) ? entry.data.length : null;
+        const remaining = ageMs === Infinity ? 0 : Math.max(0, ds.ttlMs - ageMs);
+        const inFlight  = !!_inflight[key];
+
+        return { key, label: ds.label, ageMs, ageLabel, fresh, hasData, lastSync,
+                 ttl: ds.ttlMs, rowCount, remaining, inFlight };
       });
+    },
+
+    /* ── getActiveDatasets — exposes permitted dataset configs ── */
+    getActiveDatasets() {
+      return { ...DATASETS };
+    },
+
+    /* ── stopAllTimers ── */
+    stopAllTimers() {
+      Object.keys(_timers).forEach(k => { clearTimeout(_timers[k]); delete _timers[k]; });
+    },
+
+    /* ── signOut ── */
+    async signOut() {
+      this.stopAllTimers();
+      DATASETS = {};
+      await _clearAllStorageOnLogout();
+      console.log('[DataLayer] signOut: all storage cleared, DATASETS reset');
+    },
+
+    /* ── clearAllStorage ── */
+    clearAllStorage: _clearAllStorageOnLogout,
+
+    /* ── getDatasetNames — keys of all permitted datasets ── */
+    getDatasetNames() {
+      return Object.keys(DATASETS);
+    },
+
+    /* ── getDatasetMeta — full permitted dataset config ── */
+    getDatasetMeta() {
+      return Object.entries(DATASETS).map(([key, ds]) => ({
+        key,
+        label    : ds.label,
+        apiKey   : ds.apiKey,
+        paramKey : ds.paramKey,
+        ttlMs    : ds.ttlMs,
+      }));
+    },
+
+  };
+
+  /* Backwards-compat alias */
+  window.DataLayer = window.AdminPro;
+
+  /* ─────────────────────────────────────────
+     AUTO-INIT
+  ───────────────────────────────────────── */
+  (function _autoInit() {
+    const isLoginPage = window.location.pathname.endsWith('login.html')
+      || window.location.href.includes('/login.html');
+
+    if (isLoginPage) return;
+
+    function _initAndWarm() {
+      _buildDatasets();
+      _purgeUnauthorisedCache();
+      _startAllTimers();
+      warmIfEmpty().catch(e => console.warn('[DataLayer] autoInit warmIfEmpty error:', e.message));
     }
-  } catch(e) { console.warn('cache status error', e); }
 
-  if (!rows.length) {
-    body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:20px;">No cache data found</td></tr>';
-    return;
-  }
-
-  body.innerHTML = rows.map(row => {
-    const meta = DS_META[row.key] || { icon:'ti-database', color:'var(--accent)', colorDim:'var(--accent-dim)', ttlMs:300000 };
-    const ttlMs = row.ttl || meta.ttlMs;
-    const remaining = row.ageMs === Infinity ? 0 : Math.max(0, ttlMs - row.ageMs);
-    const pct = row.ageMs === Infinity ? 0 : Math.min(100, Math.round((remaining / ttlMs) * 100));
-    const barCls = pct > 50 ? 'fresh' : pct > 20 ? 'mid' : 'low';
-    const remColor = pct > 50 ? 'var(--teal)' : pct > 20 ? 'var(--amber)' : 'var(--red)';
-    const statusCls  = !row.hasData ? 'empty' : row.fresh ? 'fresh' : 'stale';
-    const statusIcon = !row.hasData ? 'ti-minus' : row.fresh ? 'ti-circle-check' : 'ti-alert-triangle';
-    const statusTxt  = !row.hasData ? 'Empty'   : row.fresh ? 'Fresh'          : 'Stale';
-
-    // HH:MM only — strip seconds and AM/PM
-    const syncDisplay = (() => {
-      if (!row.lastSync) return '—';
-      const t = row.lastSync.trim();
-      // extract HH:MM from whatever format comes in
-      const m = t.match(/(\d{1,2}:\d{2})/);
-      return m ? m[1] : t;
-    })();
-
-    return `<tr>
-      <td>
-        <div class="cp-ds-name">
-          <div class="cp-ds-icon" style="background:${meta.colorDim};color:${meta.color};">
-            <i class="ti ${meta.icon}"></i>
-          </div>
-          <span class="cp-ds-name-text" title="${row.label || row.key}">${row.label || row.key}</span>
-        </div>
-      </td>
-      <td class="cp-col-sync">
-        <div class="cp-cell-top" style="color:${row.lastSync ? 'var(--text)' : 'var(--text3)'};font-family:var(--mono);font-weight:600;">${syncDisplay}</div>
-        <div class="cp-cell-bot" style="color:var(--text3);">${fmtTtlLabel(ttlMs)}</div>
-      </td>
-      <td class="cp-col-status-rem">
-        <div class="cp-cell-top">
-          <span class="cp-status-pill ${statusCls}"><i class="ti ${statusIcon}"></i>${statusTxt}</span>
-        </div>
-        <div class="cp-cell-bot" style="color:${remColor};font-family:var(--mono);">
-          ${row.hasData ? fmtTtl(remaining) : '—'}
-          <span class="cp-ttl-bar" style="display:inline-block;vertical-align:middle;width:36px;height:3px;margin-left:4px;background:var(--bg3);border-radius:2px;overflow:hidden;">
-            <span class="cp-ttl-fill ${barCls}" style="display:block;height:100%;width:${pct}%;border-radius:2px;"></span>
-          </span>
-        </div>
-      </td>
-      <td>
-        <div class="cp-row-btns">
-          <button class="cp-row-btn refresh" id="rbtn-${row.key}"
-            onclick="hardRefreshDataset('${row.key}', this)"
-            title="Hard refresh ${row.label || row.key}">
-            <i class="ti ti-refresh"></i>
-          </button>
-          <button class="cp-row-btn delete"
-            onclick="deleteCacheDataset('${row.key}', this)"
-            title="Delete ${row.label || row.key} cache">
-            <i class="ti ti-trash"></i>
-          </button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-
-  if (footer) footer.textContent = 'Updated ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-}
-
-function getCacheAge(key) {
-  try {
-    const raw = localStorage.getItem('ap2_' + key);
-    if (!raw) return Infinity;
-    const { ts } = JSON.parse(raw);
-    return Date.now() - ts;
-  } catch { return Infinity; }
-}
-
-function getCacheData(key) {
-  try {
-    const raw = localStorage.getItem('ap2_' + key);
-    if (!raw) return null;
-    return JSON.parse(raw).data;
-  } catch { return null; }
-}
-
-async function hardRefreshDataset(key, btn) {
-  btn.classList.add('spin');
-  btn.disabled = true;
-  _logEvent('refresh', 'Hard refresh triggered:', key);
-  try {
-    if (window.AdminPro && AdminPro.forceRefresh) {
-      await AdminPro.forceRefresh(key);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _initAndWarm);
     } else {
-      // fallback: just clear the key
-      localStorage.removeItem('ap2_' + key);
+      _initAndWarm();
     }
-    setTimeout(() => { renderCacheTable(); updateCacheHealthDot(); cmScanAll(); }, 300);
-  } catch(e) {
-    console.warn('refresh failed', key, e);
-    _logEvent('miss', 'Refresh error:', key);
-  } finally {
-    btn.classList.remove('spin');
-    btn.disabled = false;
-  }
-}
+  })();
 
-function deleteCacheDataset(key, btn) {
-  _logEvent('delete', 'Cache row deleted:', key);
-  if (window.AdminPro && AdminPro.cache) {
-    AdminPro.cache.clear(key);
-  } else {
-    localStorage.removeItem('ap2_' + key);
-  }
-  renderCacheTable();
-  updateCacheHealthDot();
-  setTimeout(() => cmScanAll(), 250);
-}
+  /* ─────────────────────────────────────────
+     VISIBILITY CHANGE WATCHER
+  ───────────────────────────────────────── */
+  (function _visibilityWatcher() {
+    const isLoginPage = window.location.pathname.endsWith('login.html')
+      || window.location.href.includes('/login.html');
+    if (isLoginPage) return;
 
-async function refreshAllCache() {
-  const btn = document.querySelector('.cp-action-btn');
-  _logEvent('refresh', 'Refresh all cache triggered', '');
-  if (btn) { btn.innerHTML = '<i class="ti ti-refresh" style="animation:spin 1s linear infinite;display:inline-block;"></i> Refreshing…'; btn.disabled = true; }
-  try {
-    if (window.AdminPro && AdminPro.warmCache) {
-      await AdminPro.warmCache();
-    }
-    renderCacheTable();
-    updateCacheHealthDot();
-    cmScanAll();
-  } finally {
-    if (btn) { btn.innerHTML = '<i class="ti ti-refresh"></i> Refresh All'; btn.disabled = false; }
-  }
-}
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
 
-function deleteAllCache() {
-  if (!confirm('Clear the entire fleet_cache? All datasets will need to be re-downloaded.')) return;
-  _logEvent('delete', 'ALL cache cleared', '');
-  if (window.AdminPro && AdminPro.cache) {
-    AdminPro.cache.clearAll();
-  } else {
-    Object.keys(localStorage).filter(k => k.startsWith('ap2_')).forEach(k => localStorage.removeItem(k));
-  }
-  renderCacheTable();
-  updateCacheHealthDot();
-  setTimeout(() => cmScanAll(), 250);
-}
-
-function updateCacheHealthDot() {
-  const dot = document.getElementById('cache-health-dot');
-  if (!dot) return;
-  try {
-    const keys = Object.keys(DS_META);
-    let anyStale = false, anyEmpty = true;
-    for (const k of keys) {
-      const age = getCacheAge(k);
-      const meta = DS_META[k];
-      if (age !== Infinity) anyEmpty = false;
-      if (age !== Infinity && age > meta.ttlMs) anyStale = true;
-    }
-    dot.className = 'cache-dot' + (anyEmpty ? ' error' : anyStale ? ' stale' : '');
-  } catch(e) {}
-}
-
-/* ══ CACHE STALENESS AUTO-REQUEST LISTENER ══
-   Listens for messages from child pages requesting a data refresh,
-   and also proactively re-fetches stale datasets when AdminPro.forceRefresh is available.
-   Cache is stored in localStorage under ap2_* keys — it is SHARED across all
-   users on the same browser/device (same localStorage origin). If a different
-   user logs in on the same device they will see the same cached data until
-   TTL expires or they hard-refresh. To isolate per-user, prefix keys with the
-   user email (handled in dataLayer.js if ap_user_cache_isolation is set). */
-(function cacheWatchdog() {
-  // Listen for child iframe requests: { type:'ap-cache-request', key:'employee' }
-  window.addEventListener('message', async function(evt) {
-    if (!evt.data || evt.data.type !== 'ap-cache-request') return;
-    const key = evt.data.key;
-    if (!key || !DS_META[key]) return;
-    const age = getCacheAge(key);
-    const meta = DS_META[key];
-    const isStale = age === Infinity || age > meta.ttlMs;
-    if (isStale && window.AdminPro && AdminPro.forceRefresh) {
       try {
-        await AdminPro.forceRefresh(key);
-        updateCacheHealthDot();
-        // Notify child that data is ready
-        const frame = document.getElementById('main-frame');
-        if (frame && frame.contentWindow) {
-          frame.contentWindow.postMessage({ type:'ap-cache-ready', key }, '*');
-        }
-      } catch(e) { console.warn('[cacheWatchdog] refresh failed for', key, e); }
-    } else if (!isStale) {
-      // Data is fresh — immediately tell child
-      const frame = document.getElementById('main-frame');
-      if (frame && frame.contentWindow) {
-        frame.contentWindow.postMessage({ type:'ap-cache-ready', key }, '*');
+        _buildDatasets();
+      } catch (e) {
+        console.warn('[DataLayer] visibilityWatcher: _buildDatasets unavailable —', e.message);
+        return;
       }
-    }
-  });
 
-  // Proactive watchdog: every 60 s check if any key is stale and auto-warm
-  setInterval(async function() {
-    if (!window.AdminPro || !AdminPro.forceRefresh) return;
-    for (const [key, meta] of Object.entries(DS_META)) {
-      const age = getCacheAge(key);
-      if (age !== Infinity && age > meta.ttlMs) {
-        try { await AdminPro.forceRefresh(key); } catch(_) {}
+      try {
+        const staleKeys = Object.keys(DATASETS).filter(key => {
+          const status = _cache.status(key);
+          return status !== 'fresh';
+        });
+        if (staleKeys.length) {
+          console.log('[DataLayer] Tab visible — refreshing stale datasets:', staleKeys);
+          Promise.allSettled(staleKeys.map(key => _fetchFromServer(key))).then(() => {
+            _startAllTimers();
+          });
+        }
+      } catch (e) {
+        console.warn('[DataLayer] visibilityWatcher error:', e.message);
       }
-    }
-    updateCacheHealthDot();
-  }, 60000);
+    });
+  })();
+
+  console.log('[DataLayer] v2.2 loaded — IndexedDB cache — window.AdminPro ready');
+
 })();
-</script>
-</body>
-</html>

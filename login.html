@@ -3,17 +3,21 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AdminPro UAE — Sign In</title>
+<title>FleetFlow Pro — Sign In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  
 <!--
   LOAD ORDER MATTERS:
   auth.js is loaded FIRST — but on login.html it skips all session guards.
   The login flow here is self-contained: it does NOT call Auth.isAuthenticated()
   before the user clicks — only after a successful server response.
 -->
-<script src="https://effimalik.github.io/FleetManagement/shared/auth.js?v=5"></script>
+<script src="https://effimalik.github.io/Testing/shared/auth.js?v=5"></script>
+<script src="https://effimalik.github.io/Testing/shared/dataLayer.js?v=5"></script>
+<script src="https://effimalik.github.io/Testing/shared/devPre.js"></script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
@@ -269,7 +273,7 @@ body::after{
 <header class="topbar">
   <div class="tb-logo"><i class="ti ti-truck"></i></div>
   <div>
-    <div class="tb-name">AdminPro UAE</div>
+    <div class="tb-name">FleetFlow Pro</div>
     <div class="tb-sub">HR &amp; Fleet Management</div>
   </div>
   <div class="tb-spacer"></div>
@@ -286,10 +290,11 @@ body::after{
   <div class="card">
     <div class="card-icon"><i class="ti ti-shield-lock"></i></div>
     <div class="card-title">Secure Sign In</div>
-    <div class="card-subtitle">Access AdminPro UAE with your authorised Google account.</div>
+    <div class="card-subtitle">Access FleetFlow Pro with your authorised Google account.</div>
 
     <div class="divider"></div>
 
+    
     <div class="info-box">
       <i class="ti ti-info-circle"></i>
       <p>Only <strong>pre-approved Google accounts</strong> can access this system. Your email is verified against the access database automatically after sign-in.</p>
@@ -324,7 +329,7 @@ body::after{
           <div class="step" id="step-2"><div class="step-dot"></div><span>Retrieving your account</span></div>
           <div class="step" id="step-3"><div class="step-dot"></div><span>Checking access database</span></div>
           <div class="step" id="step-4"><div class="step-dot"></div><span>Validating account status</span></div>
-          <div class="step" id="step-5"><div class="step-dot"></div><span>Opening AdminPro UAE</span></div>
+          <div class="step" id="step-5"><div class="step-dot"></div><span>Opening FleetFlow Pro</span></div>
         </div>
         <div class="status-msg" id="status-msg" style="display:none;margin-top:10px;"></div>
       </div>
@@ -360,11 +365,12 @@ body::after{
    Keep in sync with auth.js and Code.gs CFG block
 ═══════════════════════════════════════════════════ */
 const CONFIG = {
-  // ← Your deployed Apps Script web app URL
-  API_BASE         : 'https://script.google.com/macros/s/AKfycbzDk9vOmUL39H4LF-CbHpqJfkHOXEEtNlQIANaQIIHKYAH50mAg92N7Qlsv6cKCFdFBzA/exec',
+  API_BASE         : 'https://script.google.com/macros/s/AKfycbz2JR-pzV1olU_P3Hv4fW7Np16AH4rAsbTxuEtU9l2CdT1dkdCqyBMQrd_2lDt-6XNd/exec',
   GOOGLE_CLIENT_ID : '743775120253-lr54jgst59jqr5s61vc3i4o3rnfn596a.apps.googleusercontent.com',
 };
-const ALLOWED_ORIGIN = 'https://effimalik.github.io/FleetManagement/';
+
+  
+const ALLOWED_ORIGIN = 'https://effimalik.github.io/Testing/';
 const DEFAULT_PAGE   = ALLOWED_ORIGIN + 'index.html';
 
 /* ═══════════════════════════════════════════════════
@@ -719,7 +725,7 @@ async function startGoogleLogin() {
     await sleep(350);
     showDenied(
       result && result.email   ? result.email   : null,
-      result && result.reason  ? result.reason  : 'Your account is not authorised to access AdminPro UAE. Contact your administrator.',
+      result && result.reason  ? result.reason  : 'Your account is not authorised to access FleetFlow Pro. Contact your administrator.',
       result && result.title   ? result.title   : 'Access Denied',
       result && result.status === 'inactive' ? 'ti-user-off' : 'ti-shield-x',
       result && result.status === 'inactive'  // isWarning = true for inactive accounts
@@ -753,11 +759,12 @@ async function startGoogleLogin() {
   let sessionCreated = false;
   try {
     sessionCreated = window.Auth && window.Auth.createSession({
-      sessionId : result.sessionId,
-      token     : result.token,
-      email     : result.email,
-      name      : result.name || result.email,
-      role      : result.role || 'User',
+      sessionId   : result.sessionId,
+      token       : result.token,
+      email       : result.email,
+      name        : result.name || result.email,
+      role        : result.role || 'User',
+      permissions : result.permissions || null,
     });
   } catch (e) {
     console.error('[Login] Auth.createSession threw:', e.message);
@@ -773,14 +780,34 @@ async function startGoogleLogin() {
   }
 
      setStep(5, 'done');
-     showStatus('loading', 'Pre-loading data…', 'ti-loader-2');
-     await sleep(400);
- 
-     // Warm all datasets in background — non-blocking, best-effort
-     if (window.AdminPro && typeof window.AdminPro.warmIfEmpty === 'function') {
-       try { await AdminPro.warmIfEmpty(); } catch (_) {}
+     showStatus('loading', 'Preparing portal…', 'ti-loader-2');
+     await sleep(300);
+
+     // ── Fetch portal permissions for this user ──────────────────
+     // This calls ?type=getPermissions on your Apps Script and stores
+     // the result in sessionStorage so index.html can apply it instantly.
+     try {
+       if (window.Auth && typeof window.Auth.fetchPermissions === 'function') {
+         await window.Auth.fetchPermissions();
+       }
+     } catch (_) {
+       // Non-blocking — index.html will retry automatically on load
+       console.warn('[Login] fetchPermissions failed — will retry on index.html');
      }
+
+     showStatus('loading', 'Pre-loading data…', 'ti-loader-2');
  
+     // Warm all permitted datasets BEFORE redirect — dataLayer.js is now loaded
+     // on this page so cache is pre-filled. index.html will load instantly.
+     if (window.AdminPro && typeof window.AdminPro.warmIfEmpty === 'function') {
+       try {
+         await AdminPro.warmIfEmpty();
+         console.log('[Login] Data pre-loaded into cache — index.html will be instant');
+       } catch (e) {
+         console.warn('[Login] warmIfEmpty failed (non-fatal):', e.message);
+       }
+     }
+
      doRedirect();
 }
 </script>
